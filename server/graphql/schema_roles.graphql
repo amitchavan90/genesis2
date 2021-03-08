@@ -1,0 +1,32 @@
+type Role {
+	id: String
+	name: String
+	tier: Int!
+	archived: Boolean!
+	createdAt: Time!
+	permissions: [Perm!]!
+	trackActions: [TrackAction!]!
+}
+
+type RolesResult {
+	roles: [Role!]!
+	total: Int!
+}
+
+input UpdateRole {
+	name: NullString
+	permissions: [String!]
+	trackActionIDs: [String!]
+}
+
+extend type Query {
+	roles(search: SearchFilter!, limit: Int!, offset: Int!, excludeSuper: Boolean!): RolesResult! @hasPerm(p: RoleList)
+	role(name: String!): Role! @hasPerm(p: RoleRead)
+}
+
+extend type Mutation {
+	roleCreate(input: UpdateRole!): Role! @hasPerm(p: RoleCreate)
+	roleUpdate(id: ID!, input: UpdateRole!): Role! @hasPerm(p: RoleUpdate)
+	roleArchive(id: ID!): Role! @hasPerm(p: RoleArchive)
+	roleUnarchive(id: ID!): Role! @hasPerm(p: RoleUnarchive)
+}

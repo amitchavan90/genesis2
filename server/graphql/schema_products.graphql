@@ -1,0 +1,72 @@
+type Product {
+	id: ID!
+	code: String!
+	registerID: String! @hasPerm(p: ProductRead)
+	loyaltyPoints: Int!
+	loyaltyPointsExpire: Time!
+
+	archived: Boolean!
+	createdAt: Time!
+
+	sku: SKU
+	description: String!
+	carton: Carton
+	order: Order
+	contract: Contract
+	distributor: Distributor
+	# price: Int!
+	# currency: String!
+	# weight: Int!
+	
+	isBeef: Boolean!
+	isPointProduct: Boolean!
+	isAppProduct: Boolean!
+
+	registered: Boolean!
+	registeredBy: User
+
+	transactions: [Transaction!]!
+	latestTrackAction: LatestTransactionInfo
+}
+
+type ProductResult {
+	products: [Product!]!
+	total: Int!
+}
+
+input UpdateProduct {
+	code: NullString
+	cartonID: NullString
+	orderID: NullString
+	skuID: NullString
+	contractID: NullString
+	distributorID: NullString
+	loyaltyPoints: NullInt
+	loyaltyPointsExpire: NullTime
+	inheritCartonHistory: NullBool
+	description: NullString
+}
+
+extend type Query {
+	products(
+		search: SearchFilter!
+		limit: Int!
+		offset: Int!
+		cartonID: String
+		orderID: String
+		skuID: String
+		distributorID: String
+		contractID: String
+		trackActionID: String
+	): ProductResult! @hasPerm(p: ProductList)
+	product(code: String!): Product! @hasPerm(p: ProductRead)
+	productByID(id: String!): Product!
+}
+
+extend type Mutation {
+	productCreate(input: UpdateProduct!): Product! @hasPerm(p: ProductCreate)
+	productUpdate(id: ID!, input: UpdateProduct!): Product! @hasPerm(p: ProductUpdate)
+	productArchive(id: ID!): Product! @hasPerm(p: ProductArchive)
+	productUnarchive(id: ID!): Product! @hasPerm(p: ProductUnarchive)
+	productBatchAction(ids: [ID!]!, action: Action!, value: BatchActionInput): Boolean! @hasPerm(p: ProductUpdate)
+}

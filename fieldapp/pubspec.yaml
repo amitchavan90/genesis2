@@ -1,0 +1,71 @@
+name: fieldapp
+description: The Genesis Field App
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^0.1.3
+  uuid: 2.2.0
+  image_picker: ^0.6.7+11
+  graphql_flutter: ^3.1.0
+  shared_preferences: ^0.5.12
+  auto_size_text: ^2.1.0
+  page_transition: ^1.1.6
+  fluttertoast: ^7.1.1
+  fab_circular_menu: ^0.1.5
+  connectivity: ^0.4.9+3
+  awesome_dialog: ^0.1.3
+  geolocator: ^6.1.0
+  geohash: ^0.2.1
+  geocoder: ^0.2.1
+  qrscan:
+    git:
+      url: git://github.com/Torrunt/qrcode_scanner.git
+  flutter_sentry: ^0.4.2
+  smart_select:
+    git:
+      url: git://github.com/Torrunt/flutter_smart_select.git
+  font_awesome_flutter:
+    git: git@github.com:ninja-software/font_awesome_flutter.git
+  package_info: ^0.4.3
+  ota_update: ^2.4.1
+  url_launcher: ^5.7.2
+  pinput: ^0.2.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_launcher_icons: ^0.7.4
+
+flutter_icons:
+  image_path: "assets/logo.png"
+  adaptive_icon_background: "#1a1a1a"
+  adaptive_icon_foreground: "assets/logo.png"
+  android: true
+
+# The following section is specific to Flutter.
+flutter:
+  assets:
+    - assets/
+  uses-material-design: true
+  fonts:
+    - family: Konnect
+      fonts:
+        - asset: assets/fonts/Konnect-Regular.otf
+        - asset: assets/fonts/Konnect-Bold.otf
+          weight: 700
+        - asset: assets/fonts/Konnect-SemiBold.otf
+          weight: 600
+        - asset: assets/fonts/Konnect-Medium.otf
+          weight: 500
+        - asset: assets/fonts/Konnect-Thin.otf
+          weight: 200
+        - asset: assets/fonts/Konnect-Hairline.otf
+          weight: 100

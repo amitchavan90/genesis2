@@ -1,0 +1,265 @@
+scalar Time
+scalar NullString
+scalar NullInt
+scalar NullTime
+scalar NullBool
+scalar Upload
+
+enum Perm {
+	UserList
+	UserCreate
+	UserRead
+	UserUpdate
+	UserArchive
+	UserUnarchive
+
+	ReferralList
+	ReferralRead
+	
+	TaskList
+	TaskCreate
+	TaskRead
+	TaskUpdate
+	TaskArchive
+	TaskUnarchive
+	
+	UserTaskList
+	UserTaskCreate
+	UserTaskRead
+	UserTaskUpdate
+	UserTaskArchive
+	UserTaskUnarchive
+
+	OrganisationList
+	OrganisationCreate
+	OrganisationRead
+	OrganisationUpdate
+	OrganisationArchive
+	OrganisationUnarchive
+
+	RoleList
+	RoleCreate
+	RoleRead
+	RoleUpdate
+	RoleArchive
+	RoleUnarchive
+
+	SKUList
+	SKUCreate
+	SKURead
+	SKUUpdate
+	SKUArchive
+	SKUUnarchive
+	
+	CategoryList
+	CategoryCreate
+	CategoryRead
+	CategoryUpdate
+	CategoryArchive
+	CategoryUnarchive
+	
+	ProductCategoryList
+	ProductCategoryCreate
+	ProductCategoryRead
+	ProductCategoryUpdate
+	ProductCategoryArchive
+	ProductCategoryUnarchive
+
+	ContainerList
+	ContainerRead
+	ContainerCreate
+	ContainerUpdate
+	ContainerArchive
+	ContainerUnarchive
+
+	PalletList
+	PalletRead
+	PalletCreate
+	PalletUpdate
+	PalletArchive
+	PalletUnarchive
+
+	CartonList
+	CartonRead
+	CartonCreate
+	CartonUpdate
+	CartonArchive
+	CartonUnarchive
+
+	ProductList
+	ProductRead
+	ProductCreate
+	ProductUpdate
+	ProductArchive
+	ProductUnarchive
+
+	OrderList
+	OrderRead
+	OrderCreate
+	OrderUpdate
+	OrderArchive
+	OrderUnarchive
+
+	TrackActionList
+	TrackActionRead
+	TrackActionCreate
+	TrackActionUpdate
+	TrackActionArchive
+	TrackActionUnarchive
+
+	ContractList
+	ContractRead
+	ContractCreate
+	ContractUpdate
+	ContractArchive
+	ContractUnarchive
+
+	DistributorList
+	DistributorRead
+	DistributorCreate
+	DistributorUpdate
+	DistributorArchive
+	DistributorUnarchive
+
+	ActivityListBlockchainActivity
+	ActivityListUserActivity
+
+	UseAdvancedMode
+	UseAdminPortal
+}
+
+directive @hasPerm(p: Perm!) on FIELD_DEFINITION
+directive @hasAnyPerm(p: [Perm!]) on FIELD_DEFINITION
+directive @hasAllPerms(p: [Perm!]) on FIELD_DEFINITION
+
+enum FilterOption {
+	All
+	Active
+	Archived
+
+	ProductWithoutOrder
+	ProductWithoutCarton
+	ProductWithoutSKU
+	CartonWithoutPallet
+	PalletWithoutContainer
+
+	System
+	Blockchain
+
+	Pending
+}
+enum SortByOption {
+	DateCreated
+	DateUpdated
+	Alphabetical
+}
+enum SortDir {
+	Ascending
+	Descending
+}
+
+enum Action {
+	Archive
+	Unarchive
+
+	SetSKU
+	SetOrder
+	SetDistributor
+	SetContract
+	SetCarton
+	SetPallet
+	SetContainer
+
+	DetachFromSKU
+	DetachFromOrder
+	DetachFromDistributor
+	DetachFromContract
+	DetachFromCarton
+	DetachFromPallet
+	DetachFromContainer
+
+	SetBonusLoyaltyPoints
+	InheritCartonHistory
+}
+
+type PageInfo {
+	startCursor: ID!
+	endCursor: ID!
+}
+
+type Blob {
+	id: String!
+	file_url: String
+	file_name: String!
+	mime_type: String!
+	file_size_bytes: Int!
+	views: Int!
+}
+
+input RequestToken {
+	email: String!
+	password: String!
+}
+
+input SearchFilter {
+	search: NullString
+	filter: FilterOption
+	sortBy: SortByOption
+	sortDir: SortDir
+}
+
+input BatchActionInput {
+	str: NullString
+	no: NullInt
+	dateTime: NullTime
+	bool: NullBool
+}
+
+type GetObjectResponse {
+	product: Product
+	carton: Carton
+	pallet: Pallet
+	container: Container
+}
+input GetObjectsRequest {
+	productIDs: [String!]!
+	cartonIDs: [String!]!
+	palletIDs: [String!]!
+	containerIDs: [String!]!
+}
+type GetObjectsResponse {
+	products: [Product!]!
+	cartons: [Carton!]!
+	pallets: [Pallet!]!
+	containers: [Container!]!
+}
+
+type Settings {
+	consumerHost: String!
+	adminHost: String!
+	etherscanHost: String!
+	fieldappVersion: String!
+	smartContractAddress: String!
+}
+
+type TickerInfo {
+	lastTick: Time!
+	tickInterval: Int!
+}
+
+type Query {
+	settings: Settings!
+	getTickerInfo: TickerInfo!
+
+	getObject(id: String!): GetObjectResponse!
+	getObjects(input: GetObjectsRequest!): GetObjectsResponse!
+}
+
+type Mutation {
+	RequestToken(input: RequestToken): String!
+
+	fileUpload(file: Upload!): Blob!
+	fileUploadMultiple(files: [Upload!]!): [Blob!]!
+
+	deploySmartContract: Settings! @hasPerm(p: ActivityListBlockchainActivity)
+}

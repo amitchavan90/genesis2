@@ -1,0 +1,36 @@
+type Order {
+	id: ID!
+	code: String!
+	archived: Boolean!
+	createdAt: Time!
+
+	sku: SKU
+	productCount: Int!
+}
+
+type OrderResult {
+	orders: [Order!]!
+	total: Int!
+}
+
+input UpdateOrder {
+	code: NullString
+}
+input CreateOrder {
+	contractID: NullString
+	skuID: NullString
+	quantity: Int!
+}
+
+extend type Query {
+	orders(search: SearchFilter!, limit: Int!, offset: Int!): OrderResult! @hasPerm(p: OrderList)
+	order(code: String!): Order! @hasPerm(p: OrderRead)
+}
+
+extend type Mutation {
+	orderCreate(input: CreateOrder!): Order! @hasPerm(p: OrderCreate)
+	orderUpdate(id: ID!, input: UpdateOrder!): Order! @hasPerm(p: OrderUpdate)
+	orderArchive(id: ID!): Order! @hasPerm(p: OrderArchive)
+	orderUnarchive(id: ID!): Order! @hasPerm(p: OrderUnarchive)
+	orderBatchAction(ids: [ID!]!, action: Action!, value: BatchActionInput): Boolean! @hasPerm(p: OrderUpdate)
+}

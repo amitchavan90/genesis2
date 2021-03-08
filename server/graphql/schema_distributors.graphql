@@ -1,0 +1,31 @@
+type Distributor {
+	id: ID!
+	code: String!
+	name: String!
+
+	archived: Boolean!
+	createdAt: Time!
+}
+
+type DistributorResult {
+	distributors: [Distributor!]!
+	total: Int!
+	createdAt: Time!
+}
+
+input UpdateDistributor {
+	name: NullString
+	code: NullString
+}
+
+extend type Query {
+	distributors(search: SearchFilter!, limit: Int!, offset: Int!): DistributorResult! @hasPerm(p: DistributorList)
+	distributor(code: String!): Distributor! @hasPerm(p: DistributorRead)
+}
+
+extend type Mutation {
+	distributorCreate(input: UpdateDistributor!): Distributor! @hasPerm(p: DistributorCreate)
+	distributorUpdate(id: ID!, input: UpdateDistributor!): Distributor! @hasPerm(p: DistributorUpdate)
+	distributorArchive(id: ID!): Distributor! @hasPerm(p: DistributorArchive)
+	distributorUnarchive(id: ID!): Distributor! @hasPerm(p: DistributorUnarchive)
+}

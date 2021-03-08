@@ -1,0 +1,28 @@
+package main
+
+import (
+	"crypto/ecdsa"
+	"genesis"
+)
+
+var cfgBlockchain = &genesis.Blockchain{
+	PrivateKeyBytes:             "aaaaaa",
+	PrivateKeyPassword:          "aaaaaa",
+	EthereumHost:                "https://rinkeby.infura.io/v3/aaaaaa",
+	EtherscanHost:               "https://rinkeby.etherscan.io",
+	TestPrivateKey:              "",
+	CreateContractOnFirstRun:    false,
+	FlushPendingActionsInterval: 24,
+}
+
+// addresses
+var (
+	strAddressFrom = "aaaaaa"
+
+	// contract addr
+	strAddressTo = "aaaaaa"
+	// wallet test addr
+	// strAddressTo = "aaaaaa"
+
+	privateKey *ecdsa.PrivateKey
+)

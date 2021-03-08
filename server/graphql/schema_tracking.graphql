@@ -1,0 +1,117 @@
+type TrackAction {
+	id: ID!
+	code: String!
+	requirePhotos: [Boolean!]
+
+	name: String!
+	nameChinese: String!
+	private: Boolean!
+	system: Boolean!
+	blockchain: Boolean!
+	archived: Boolean!
+	createdAt: Time!
+}
+
+type TransactionPhotos {
+	cartonPhoto: Blob
+	productPhoto: Blob
+}
+
+type Manifest {
+	id: ID!
+	transactionHash: NullString
+	merkleRootSha256: NullString
+}
+
+type Transaction {
+	id: ID!
+	transactionHash: NullString
+	transactionPending: Boolean!
+	manifestLineJson: NullString
+	manifestLineSha256: NullString
+	manifestID: NullString
+	manifest: Manifest
+
+	locationGeohash: NullString
+	locationName: NullString
+	action: TrackAction!
+	memo: NullString
+	createdAt: Time!
+	createdBy: User
+	createdByName: String!
+
+	carton: Carton
+	product: Product
+
+	photos: TransactionPhotos
+
+	scannedAt: NullTime
+}
+
+type TrackActionResult {
+	trackActions: [TrackAction!]!
+	total: Int!
+}
+
+input UpdateTrackAction {
+	name: NullString
+	requirePhotos: [Boolean!]
+	nameChinese: NullString
+	private: NullBool
+	blockchain: NullBool
+}
+
+input RecordTransactionInput {
+	trackActionCode: String!
+
+	productIDs: [String!]
+	cartonIDs: [String!]
+	palletIDs: [String!]
+	containerIDs: [String!]
+
+	productScanTimes: [Time!]
+	cartonScanTimes: [Time!]
+	palletScanTimes: [Time!]
+	containerScanTimes: [Time!]
+
+	cartonPhotoBlobIDs: [String!]
+	productPhotoBlobIDs: [String!]
+
+	memo: NullString
+	locationGeohash: NullString
+	locationName: NullString
+}
+
+type TransactionsResult {
+	transactions: [Transaction!]!
+	total: Int!
+}
+
+type LatestTransactionInfo {
+	name: String!
+	createdAt: Time!
+}
+
+extend type Query {
+	trackActions(search: SearchFilter!, limit: Int!, offset: Int!): TrackActionResult! @hasPerm(p: TrackActionList)
+	trackAction(code: String!): TrackAction! @hasPerm(p: TrackActionRead)
+
+	transactions(search: SearchFilter!, limit: Int!, offset: Int!, productID: String, cartonID: String, trackActionID: String): TransactionsResult!
+		@hasPerm(p: ActivityListBlockchainActivity)
+
+	pendingTransactionsCount: Int!
+	ethereumAccountAddress: String!
+	ethereumAccountBalance: String!
+}
+
+extend type Mutation {
+	trackActionCreate(input: UpdateTrackAction!): TrackAction! @hasPerm(p: TrackActionCreate)
+	trackActionUpdate(id: ID!, input: UpdateTrackAction!): TrackAction! @hasPerm(p: TrackActionUpdate)
+	trackActionArchive(id: ID!): TrackAction! @hasPerm(p: TrackActionArchive)
+	trackActionUnarchive(id: ID!): TrackAction! @hasPerm(p: TrackActionUnarchive)
+
+	recordTransaction(input: RecordTransactionInput!): Boolean!
+
+	# force commit pending transactions to blockchain
+	flushPendingTransactions: Boolean!
+}

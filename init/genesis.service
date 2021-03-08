@@ -1,0 +1,14 @@
+[Unit]
+Description=Genesis
+After=network.target
+
+[Service]
+Type=simple
+User=genesis
+WorkingDirectory=/usr/share/latitude28/genesis
+ExecStart=/usr/share/latitude28/genesis/bin/genesis-server serve
+Restart=always
+EnvironmentFile=-/usr/share/latitude28/genesis/init/genesis-prod.env
+
+[Install]
+WantedBy=multi-user.target

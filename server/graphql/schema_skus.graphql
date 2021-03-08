@@ -1,0 +1,86 @@
+type SKUContent {
+	title: String!
+	content: String!
+}
+input SKUContentInput {
+	title: String!
+	content: String!
+}
+
+type SKU {
+	id: ID!
+	name: String!
+	code: String!
+	description: String!
+	weight: Int!
+	price: Int!
+	currency: String!
+	isBeef: Boolean!
+	isPointSku: Boolean!
+	isAppSku: Boolean!
+	loyaltyPoints: Int!
+	archived: Boolean!
+	createdAt: Time!
+
+	hasClones: Boolean!
+	cloneParentID: NullString
+
+	masterPlan: Blob
+	video: Blob
+	urls: [SKUContent!]!
+	productInfo: [SKUContent!]!
+	photos: [Blob!]!
+
+	productCount: Int!
+}
+
+type SKUResult {
+	skus: [SKU!]!
+	total: Int!
+}
+
+input UpdateSKU {
+	name: NullString
+	code: NullString
+	description: NullString
+
+	weight: NullInt
+	price: NullInt
+	currency: NullString
+
+	isBeef: NullBool
+	isRetailSku: NullBool
+	isPointSku: NullBool
+	isAppSku: NullBool
+	isMiniappSku: NullBool
+	loyaltyPoints: NullInt
+
+	masterPlanBlobID: NullString
+	videoBlobID: NullString
+	urls: [SKUContentInput!]
+	productInfo: [SKUContentInput!]
+	photoBlobIDs: [String!]
+
+	cloneParentID: NullString
+}
+
+type SKUClone {
+	sku: SKU!
+	depth: Int!
+}
+
+extend type Query {
+	skus(search: SearchFilter!, limit: Int!, offset: Int!): SKUResult! @hasPerm(p: SKUList)
+	sku(code: String!): SKU! @hasPerm(p: SKURead)
+	skuByID(id: ID!): SKU!
+
+	skuCloneTree(id: ID!): [SKUClone!] @hasPerm(p: SKURead)
+}
+
+extend type Mutation {
+	skuCreate(input: UpdateSKU!): SKU! @hasPerm(p: SKUCreate)
+	skuUpdate(id: ID!, input: UpdateSKU!): SKU! @hasPerm(p: SKUUpdate)
+	skuArchive(id: ID!): SKU! @hasPerm(p: SKUArchive)
+	skuUnarchive(id: ID!): SKU! @hasPerm(p: SKUUnarchive)
+	skuBatchAction(ids: [ID!]!, action: Action!, value: BatchActionInput): Boolean! @hasPerm(p: SKUUpdate)
+}

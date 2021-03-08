@@ -1,0 +1,44 @@
+type Task {
+	id: ID!
+	title: String!
+	description: String!
+	loyaltyPoints: Int!
+	isTimeBound: Boolean!
+	isPeopleBound: Boolean!
+	isProductRelevant: Boolean!
+	finishDate: Time
+	maximumPeople: Int!
+    skuID: NullString
+	createdAt: Time!
+}
+
+type TasksResult {
+	tasks: [Task!]!
+	total: Int!
+}
+
+input UpdateTask {
+	title: String!
+	description: String!
+	loyaltyPoints: Int!
+	
+	isTimeBound: Boolean!
+	isPeopleBound: Boolean!
+	isProductRelevant: Boolean!
+	
+	finishDate: Time
+	maximumPeople: Int!
+    skuID: NullString
+}
+
+extend type Query {
+	tasks(search: SearchFilter!, limit: Int!, offset: Int!): TasksResult! @hasPerm(p: TaskList)
+	task(id: String): Task! @hasPerm(p: TaskRead)
+}
+
+extend type Mutation {
+	taskCreate(input: UpdateTask!): Task! @hasPerm(p: TaskCreate)
+	taskUpdate(id: ID!, input: UpdateTask!): Task! @hasPerm(p: TaskUpdate)
+	taskArchive(id: ID!): Task! @hasPerm(p: TaskArchive)
+	taskUnarchive(id: ID!): Task! @hasPerm(p: TaskUnarchive)
+}

@@ -1,0 +1,36 @@
+# for tracking user activity
+enum ObjectType {
+	Self
+	User
+	Role
+	Sku
+	Contract
+	Order
+	Container
+	Pallet
+	Carton
+	Distributor
+	Product
+	TrackAction
+	Blob
+	Blockchain
+}
+
+type UserActivity {
+	id: ID!
+	user: User!
+	action: String!
+	objectID: NullString
+	objectCode: NullString
+	objectType: ObjectType!
+	createdAt: Time!
+}
+
+type UserActivityResult {
+	userActivities: [UserActivity!]!
+	total: Int!
+}
+
+extend type Query {
+	userActivities(search: SearchFilter!, limit: Int!, offset: Int!, userID: String): UserActivityResult! @hasPerm(p: ActivityListUserActivity)
+}

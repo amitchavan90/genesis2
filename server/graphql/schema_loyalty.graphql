@@ -1,0 +1,23 @@
+type UserLoyaltyActivity {
+	id: ID!
+	user: User!
+	product: Product
+	amount: Int!
+	bonus: Int!
+	message: String!
+	transactionHash: NullString
+	createdAt: Time!
+}
+
+input UpdateLoyaltyPoints {
+	productIDs: [String!]
+	cartonID: NullString
+	palletID: NullString
+	containerID: NullString
+	loyaltyPoints: Int!
+	loyaltyPointsExpire: Time!
+}
+
+extend type Query {
+	getLoyaltyActivity(userID: ID!): [UserLoyaltyActivity!]! @hasPerm(p: UserRead)
+}

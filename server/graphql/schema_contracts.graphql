@@ -1,0 +1,36 @@
+type Contract {
+	id: ID!
+	code: String!
+	name: String!
+	description: String!
+	supplierName: String!
+	dateSigned: NullTime
+
+	archived: Boolean!
+	createdAt: Time!
+}
+
+type ContractResult {
+	contracts: [Contract!]!
+	total: Int!
+	createdAt: Time!
+}
+
+input UpdateContract {
+	name: NullString
+	description: NullString
+	supplierName: NullString
+	dateSigned: NullTime
+}
+
+extend type Query {
+	contracts(search: SearchFilter!, limit: Int!, offset: Int!): ContractResult! @hasPerm(p: ContractList)
+	contract(code: String!): Contract! @hasPerm(p: ContractRead)
+}
+
+extend type Mutation {
+	contractCreate(input: UpdateContract!): Contract! @hasPerm(p: ContractCreate)
+	contractUpdate(id: ID!, input: UpdateContract!): Contract! @hasPerm(p: ContractUpdate)
+	contractArchive(id: ID!): Contract! @hasPerm(p: ContractArchive)
+	contractUnarchive(id: ID!): Contract! @hasPerm(p: ContractUnarchive)
+}

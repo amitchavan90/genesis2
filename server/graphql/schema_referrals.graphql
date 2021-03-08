@@ -1,0 +1,17 @@
+type Referral {
+	id: ID!
+	userID: String!
+	referredByID: String!
+	isRedemmed: Boolean!
+	createdAt: Time!
+}
+
+type ReferralsResult {
+	referrals: [Referral!]!
+	total: Int!
+}
+
+extend type Query {
+	referrals(search: SearchFilter!, limit: Int!, offset: Int!): ReferralsResult! @hasPerm(p: ReferralList)
+	referral(userID: String): Referral! @hasPerm(p: ReferralRead)
+}

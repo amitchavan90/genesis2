@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+		<title></title>
+		<style>
+			html,
+			body {
+				height: 100%;
+				margin: 0;
+			}
+			/* Fix flickering animation rendering on ios device */
+			@supports (-webkit-touch-callout: none) {
+				* {
+					-webkit-perspective: 1000;
+					-webkit-backface-visibility: hidden;
+				}
+			}
+			.un-perspectiver {
+				-webkit-perspective: unset !important;
+				-webkit-backface-visibility: unset !important;
+			}
+
+			.vertical-timeline::before {
+				background: #59b7e8 !important;
+			}
+		</style>
+	</head>
+	<body>
+		<noscript>
+			Javascript is required to use this App.
+		</noscript>
+		<div id="app"></div>
+	</body>
+</html>

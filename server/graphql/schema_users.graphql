@@ -1,0 +1,82 @@
+type Organisation {
+	id: ID!
+	name: String!
+	users: [User!]!
+}
+# type Referral {
+# 	id: ID!
+# 	userID: String!
+# 	referredByID: String!
+# 	isRedemmed: Boolean!
+# 	createdAt: Time!
+# }
+type User {
+	id: ID!
+	firstName: NullString
+	lastName: NullString
+	email: NullString
+	organisation: Organisation
+	referralCode: NullString
+	verified: Boolean!
+	role: Role!
+	archived: Boolean!
+
+	mobilePhone: NullString
+	mobileVerified: Boolean!
+
+	wechatID: NullString
+	loyaltyPoints: Int!
+	referrals: [Referral!]! @hasPerm(p: ReferralList)
+
+	affiliateOrg: NullString
+	createdAt: Time!
+}
+
+type UsersResult {
+	users: [User!]!
+	total: Int!
+}
+type ConsumersResult {
+	consumers: [User!]!
+	total: Int!
+}
+
+input UpdateUser {
+	email: NullString
+	firstName: NullString
+	lastName: NullString
+	roleID: NullString
+	password: NullString
+	affiliateOrg: NullString
+	mobilePhone: NullString
+	referredByCode: NullString
+}
+
+extend type Query {
+	me: User!
+
+	organisations: [Organisation!]! @hasPerm(p: OrganisationList)
+	users(search: SearchFilter!, limit: Int!, offset: Int!): UsersResult! @hasPerm(p: UserList)
+	user(email: String, wechatID: String): User! @hasPerm(p: UserRead)
+
+	consumers(search: SearchFilter!, limit: Int!, offset: Int!): ConsumersResult! @hasPerm(p: UserList)
+
+	# grabs user by token - if it's a short alphaNumeric token (SMS reset): an email must be provided as well
+	verifyResetToken(token: String!, email: NullString): Boolean!
+}
+
+extend type Mutation {
+	changePassword(oldPassword: String!, password: String!): Boolean!
+	changeDetails(input: UpdateUser!): User!
+
+	userCreate(input: UpdateUser!): User! @hasPerm(p: UserCreate)
+	userUpdate(id: ID!, input: UpdateUser!): User! @hasPerm(p: UserUpdate)
+
+	forgotPassword(email: String!, viaSMS: Boolean): Boolean!
+	# change password with token and new password (requires email if short alphaNumeric token)
+	resetPassword(token: String!, password: String!, email: NullString): Boolean!
+	resendEmailVerification(email: String!): Boolean!
+
+	userArchive(id: ID!): User! @hasPerm(p: UserArchive)
+	userUnarchive(id: ID!): User! @hasPerm(p: UserUnarchive)
+}

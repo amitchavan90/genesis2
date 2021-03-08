@@ -1,0 +1,44 @@
+type Pallet {
+	id: ID!
+	code: String!
+	archived: Boolean!
+	createdAt: Time!
+	description: String!
+
+	container: Container
+
+	latestTrackAction: LatestTransactionInfo
+}
+
+extend type Container {
+	palletCount: Int!
+}
+
+type PalletResult {
+	pallets: [Pallet!]!
+	total: Int!
+}
+
+input UpdatePallet {
+	code: NullString
+	description: NullString
+	containerID: NullString
+}
+input CreatePallet {
+	containerID: NullString
+	quantity: Int!
+	description: String!
+}
+
+extend type Query {
+	pallets(search: SearchFilter!, limit: Int!, offset: Int!, containerID: String, trackActionID: String): PalletResult! @hasPerm(p: PalletList)
+	pallet(code: String!): Pallet! @hasPerm(p: PalletRead)
+}
+
+extend type Mutation {
+	palletCreate(input: CreatePallet!): String! @hasPerm(p: PalletCreate)
+	palletUpdate(id: ID!, input: UpdatePallet!): Pallet! @hasPerm(p: PalletUpdate)
+	palletArchive(id: ID!): Pallet! @hasPerm(p: PalletArchive)
+	palletUnarchive(id: ID!): Pallet! @hasPerm(p: PalletUnarchive)
+	palletBatchAction(ids: [ID!]!, action: Action!, value: BatchActionInput): Boolean! @hasPerm(p: PalletUpdate)
+}

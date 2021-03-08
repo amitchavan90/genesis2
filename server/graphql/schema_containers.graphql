@@ -1,0 +1,34 @@
+type Container {
+	id: ID!
+	code: String!
+	archived: Boolean!
+	createdAt: Time!
+	description: String!
+}
+
+type ContainerResult {
+	containers: [Container!]!
+	total: Int!
+}
+
+input UpdateContainer {
+	code: NullString
+	description: NullString
+}
+input CreateContainer {
+	quantity: Int!
+	description: String!
+}
+
+extend type Query {
+	containers(search: SearchFilter!, limit: Int!, offset: Int!): ContainerResult! @hasPerm(p: ContainerList)
+	container(code: String!): Container! @hasPerm(p: ContainerRead)
+}
+
+extend type Mutation {
+	containerCreate(input: CreateContainer!): String! @hasPerm(p: ContainerCreate)
+	containerUpdate(id: ID!, input: UpdateContainer!): Container! @hasPerm(p: ContainerUpdate)
+	containerArchive(id: ID!): Container! @hasPerm(p: ContainerArchive)
+	containerUnarchive(id: ID!): Container! @hasPerm(p: ContainerUnarchive)
+	containerBatchAction(ids: [ID!]!, action: Action!, value: BatchActionInput): Boolean! @hasPerm(p: ContainerUpdate)
+}

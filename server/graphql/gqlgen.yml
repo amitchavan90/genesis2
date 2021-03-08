@@ -1,0 +1,78 @@
+schema:
+  - schema.graphql
+  - schema_roles.graphql
+  - schema_users.graphql
+  - schema_referrals.graphql
+  - schema_tasks.graphql
+  - schema_skus.graphql
+  - schema_orders.graphql
+  - schema_containers.graphql
+  - schema_pallets.graphql
+  - schema_cartons.graphql
+  - schema_products.graphql
+  - schema_loyalty.graphql
+  - schema_tracking.graphql
+  - schema_contracts.graphql
+  - schema_distributors.graphql
+  - schema_user_activity.graphql
+exec:
+  filename: ./graphql_schema_gen.go
+model:
+  filename: ./graphql_models_gen.go
+resolver:
+  filename: ./graphql_resolver.go
+  type: Resolver
+autobind: []
+models:
+  NullString:
+    model: genesis/graphql.NullString
+  NullInt:
+    model: genesis/graphql.NullInt
+  NullTime:
+    model: genesis/graphql.NullTime
+  NullBool:
+    model: genesis/graphql.NullBool
+  Settings:
+    model: genesis/db.Setting
+  Blob:
+    model: genesis/db.Blob
+  Role:
+    model: genesis/db.Role
+  User:
+    model: genesis/db.User
+  Referral:
+    model: genesis/db.Referral
+  Task:
+    model: genesis/db.Task
+  Organisation:
+    model: genesis/db.Organisation
+  SKU:
+    model: genesis/db.StockKeepingUnit
+  SKUContent:
+    model: genesis/db.StockKeepingUnitContent
+  Container:
+    model: genesis/db.Container
+  Pallet:
+    model: genesis/db.Pallet
+  Carton:
+    model: genesis/db.Carton
+  Product:
+    model: genesis/db.Product
+  BlankProduct:
+    model: genesis/db.BlankProduct
+  Order:
+    model: genesis/db.Order
+  Distributor:
+    model: genesis/db.Distributor
+  UserLoyaltyActivity:
+    model: genesis/db.UserLoyaltyActivity
+  TrackAction:
+    model: genesis/db.TrackAction
+  Transaction:
+    model: genesis/db.Transaction
+  Manifest:
+    model: genesis/db.Manifest
+  Contract:
+    model: genesis/db.Contract
+  UserActivity:
+    model: genesis/db.UserActivity

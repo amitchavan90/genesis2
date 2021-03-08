@@ -1,0 +1,58 @@
+type Carton {
+	id: ID!
+	code: String!
+	weight: String!
+	processedAt: NullTime
+	description: String!
+	meatType: String!
+
+	archived: Boolean!
+	createdAt: Time!
+
+	pallet: Pallet
+	sku: SKU
+	order: Order
+	distributor: Distributor
+
+	transactions: [Transaction!]!
+	latestTrackAction: LatestTransactionInfo
+
+	productCount: Int!
+	spreadsheetLink: String!
+}
+
+extend type Pallet {
+	cartonCount: Int!
+}
+
+type CartonResult {
+	cartons: [Carton!]!
+	total: Int!
+}
+
+input UpdateCarton {
+	code: NullString
+	weight: NullString
+	palletID: NullString
+	processedAt: NullTime
+	description: NullString
+	meatType: NullString
+}
+input CreateCarton {
+	palletID: NullString
+	quantity: Int!
+	description: String!
+}
+
+extend type Query {
+	cartons(search: SearchFilter!, limit: Int!, offset: Int!, palletID: String, trackActionID: String): CartonResult! @hasPerm(p: CartonList)
+	carton(code: String!): Carton! @hasPerm(p: CartonRead)
+}
+
+extend type Mutation {
+	cartonCreate(input: CreateCarton!): String! @hasPerm(p: CartonCreate)
+	cartonUpdate(id: ID!, input: UpdateCarton!): Carton! @hasPerm(p: CartonUpdate)
+	cartonArchive(id: ID!): Carton! @hasPerm(p: CartonArchive)
+	cartonUnarchive(id: ID!): Carton! @hasPerm(p: CartonUnarchive)
+	cartonBatchAction(ids: [ID!]!, action: Action!, value: BatchActionInput): Boolean! @hasPerm(p: CartonUpdate)
+}

@@ -1,0 +1,90 @@
+@font-face {
+	font-family: "Konnect";
+	src: url("./assets/fonts/Konnect-Regular.otf");
+}
+@font-face {
+	font-family: "Konnect";
+	src: url("./assets/fonts/Konnect-Bold.otf");
+	font-weight: bold;
+}
+@font-face {
+	font-family: "Konnect";
+	src: url("./assets/fonts/Konnect-Medium.otf");
+	font-weight: 500;
+}
+@font-face {
+	font-family: "Konnect";
+	src: url("./assets/fonts/Konnect-SemiBold.otf");
+	font-weight: 600;
+}
+@font-face {
+	font-family: "Konnect";
+	src: url("./assets/fonts/Konnect-Light.otf");
+	font-weight: 300;
+}
+@font-face {
+	font-family: "Konnect";
+	src: url("./assets/fonts/Konnect-Italic.otf");
+	font-style: italic;
+}
+
+@font-face {
+	font-family: "Elephant Black";
+	src: url("./assets/fonts/Elephant Black.ttf");
+}
+@font-face {
+	font-family: "Spartan Book Classified";
+	src: url("./assets/fonts/Spartan-BookClassified.otf");
+}
+
+.slick-arrow {
+	z-index: 2;
+	display: flex !important;
+	align-items: center;
+	height: 100% !important;
+	width: 10% !important;
+}
+.slick-prev {
+	left: 8px !important;
+}
+.slick-prev:before {
+	margin-right: auto;
+}
+.slick-next {
+	right: 8px !important;
+}
+.slick-next:before {
+	margin-left: auto;
+}
+.slick-track {
+	display: flex !important;
+	align-items: center;
+}
+
+// Shimmer
+.shimmer {
+	z-index: 5;
+	background: linear-gradient(135deg, transparent 20%, transparent 35%, rgba(255, 255, 255, 0.2) 50%, transparent 65%, transparent 80%);
+	border: unset;
+	animation: shimmer 3s ease-in-out infinite;
+	background-size: 200%;
+	background-position: 50%;
+
+	&:after {
+		display: block;
+		width: 50%;
+		height: 50%;
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+}
+
+@keyframes shimmer {
+	0% {
+		background-position: 150%;
+	}
+	100% {
+		background-position: -50%;
+	}
+}
