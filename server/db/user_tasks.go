@@ -23,92 +23,72 @@ import (
 
 // UserTask is an object representing the database table.
 type UserTask struct {
-	ID            string      `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
-	TaskID        null.String `db:"task_id" boil:"task_id" json:"task_id,omitempty" toml:"task_id" yaml:"task_id,omitempty"`
-	UserID        string      `db:"user_id" boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	Status        string      `db:"status" boil:"status" json:"status" toml:"status" yaml:"status"`
-	IsComplete    bool        `db:"is_complete" boil:"is_complete" json:"is_complete" toml:"is_complete" yaml:"is_complete"`
-	IsActive      bool        `db:"is_active" boil:"is_active" json:"is_active" toml:"is_active" yaml:"is_active"`
-	LoyaltyPoints int         `db:"loyalty_points" boil:"loyalty_points" json:"loyalty_points" toml:"loyalty_points" yaml:"loyalty_points"`
-	Archived      bool        `db:"archived" boil:"archived" json:"archived" toml:"archived" yaml:"archived"`
-	ArchivedAt    null.Time   `db:"archived_at" boil:"archived_at" json:"archived_at,omitempty" toml:"archived_at" yaml:"archived_at,omitempty"`
-	UpdatedAt     time.Time   `db:"updated_at" boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	CreatedAt     time.Time   `db:"created_at" boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	ID         string      `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
+	TaskID     null.String `db:"task_id" boil:"task_id" json:"task_id,omitempty" toml:"task_id" yaml:"task_id,omitempty"`
+	UserID     string      `db:"user_id" boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	Status     string      `db:"status" boil:"status" json:"status" toml:"status" yaml:"status"`
+	IsComplete bool        `db:"is_complete" boil:"is_complete" json:"is_complete" toml:"is_complete" yaml:"is_complete"`
+	UpdatedAt  time.Time   `db:"updated_at" boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	CreatedAt  time.Time   `db:"created_at" boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 
 	R *userTaskR `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userTaskL  `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var UserTaskColumns = struct {
-	ID            string
-	TaskID        string
-	UserID        string
-	Status        string
-	IsComplete    string
-	IsActive      string
-	LoyaltyPoints string
-	Archived      string
-	ArchivedAt    string
-	UpdatedAt     string
-	CreatedAt     string
+	ID         string
+	TaskID     string
+	UserID     string
+	Status     string
+	IsComplete string
+	UpdatedAt  string
+	CreatedAt  string
 }{
-	ID:            "id",
-	TaskID:        "task_id",
-	UserID:        "user_id",
-	Status:        "status",
-	IsComplete:    "is_complete",
-	IsActive:      "is_active",
-	LoyaltyPoints: "loyalty_points",
-	Archived:      "archived",
-	ArchivedAt:    "archived_at",
-	UpdatedAt:     "updated_at",
-	CreatedAt:     "created_at",
+	ID:         "id",
+	TaskID:     "task_id",
+	UserID:     "user_id",
+	Status:     "status",
+	IsComplete: "is_complete",
+	UpdatedAt:  "updated_at",
+	CreatedAt:  "created_at",
 }
 
 // Generated where
 
 var UserTaskWhere = struct {
-	ID            whereHelperstring
-	TaskID        whereHelpernull_String
-	UserID        whereHelperstring
-	Status        whereHelperstring
-	IsComplete    whereHelperbool
-	IsActive      whereHelperbool
-	LoyaltyPoints whereHelperint
-	Archived      whereHelperbool
-	ArchivedAt    whereHelpernull_Time
-	UpdatedAt     whereHelpertime_Time
-	CreatedAt     whereHelpertime_Time
+	ID         whereHelperstring
+	TaskID     whereHelpernull_String
+	UserID     whereHelperstring
+	Status     whereHelperstring
+	IsComplete whereHelperbool
+	UpdatedAt  whereHelpertime_Time
+	CreatedAt  whereHelpertime_Time
 }{
-	ID:            whereHelperstring{field: "\"user_tasks\".\"id\""},
-	TaskID:        whereHelpernull_String{field: "\"user_tasks\".\"task_id\""},
-	UserID:        whereHelperstring{field: "\"user_tasks\".\"user_id\""},
-	Status:        whereHelperstring{field: "\"user_tasks\".\"status\""},
-	IsComplete:    whereHelperbool{field: "\"user_tasks\".\"is_complete\""},
-	IsActive:      whereHelperbool{field: "\"user_tasks\".\"is_active\""},
-	LoyaltyPoints: whereHelperint{field: "\"user_tasks\".\"loyalty_points\""},
-	Archived:      whereHelperbool{field: "\"user_tasks\".\"archived\""},
-	ArchivedAt:    whereHelpernull_Time{field: "\"user_tasks\".\"archived_at\""},
-	UpdatedAt:     whereHelpertime_Time{field: "\"user_tasks\".\"updated_at\""},
-	CreatedAt:     whereHelpertime_Time{field: "\"user_tasks\".\"created_at\""},
+	ID:         whereHelperstring{field: "\"user_tasks\".\"id\""},
+	TaskID:     whereHelpernull_String{field: "\"user_tasks\".\"task_id\""},
+	UserID:     whereHelperstring{field: "\"user_tasks\".\"user_id\""},
+	Status:     whereHelperstring{field: "\"user_tasks\".\"status\""},
+	IsComplete: whereHelperbool{field: "\"user_tasks\".\"is_complete\""},
+	UpdatedAt:  whereHelpertime_Time{field: "\"user_tasks\".\"updated_at\""},
+	CreatedAt:  whereHelpertime_Time{field: "\"user_tasks\".\"created_at\""},
 }
 
 // UserTaskRels is where relationship names are stored.
 var UserTaskRels = struct {
-	Task          string
-	User          string
-	UserTaskSteps string
+	Task         string
+	User         string
+	UserSubtasks string
 }{
-	Task:          "Task",
-	User:          "User",
-	UserTaskSteps: "UserTaskSteps",
+	Task:         "Task",
+	User:         "User",
+	UserSubtasks: "UserSubtasks",
 }
 
 // userTaskR is where relationships are stored.
 type userTaskR struct {
-	Task          *Task
-	User          *User
-	UserTaskSteps UserTaskStepSlice
+	Task         *Task
+	User         *User
+	UserSubtasks UserSubtaskSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -120,9 +100,9 @@ func (*userTaskR) NewStruct() *userTaskR {
 type userTaskL struct{}
 
 var (
-	userTaskAllColumns            = []string{"id", "task_id", "user_id", "status", "is_complete", "is_active", "loyalty_points", "archived", "archived_at", "updated_at", "created_at"}
-	userTaskColumnsWithoutDefault = []string{"task_id", "user_id", "status", "archived_at"}
-	userTaskColumnsWithDefault    = []string{"id", "is_complete", "is_active", "loyalty_points", "archived", "updated_at", "created_at"}
+	userTaskAllColumns            = []string{"id", "task_id", "user_id", "status", "is_complete", "updated_at", "created_at"}
+	userTaskColumnsWithoutDefault = []string{"task_id", "user_id", "status"}
+	userTaskColumnsWithDefault    = []string{"id", "is_complete", "updated_at", "created_at"}
 	userTaskPrimaryKeyColumns     = []string{"id"}
 )
 
@@ -393,22 +373,22 @@ func (o *UserTask) User(mods ...qm.QueryMod) userQuery {
 	return query
 }
 
-// UserTaskSteps retrieves all the user_task_step's UserTaskSteps with an executor.
-func (o *UserTask) UserTaskSteps(mods ...qm.QueryMod) userTaskStepQuery {
+// UserSubtasks retrieves all the user_subtask's UserSubtasks with an executor.
+func (o *UserTask) UserSubtasks(mods ...qm.QueryMod) userSubtaskQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"user_task_steps\".\"user_task_id\"=?", o.ID),
+		qm.Where("\"user_subtasks\".\"user_task_id\"=?", o.ID),
 	)
 
-	query := UserTaskSteps(queryMods...)
-	queries.SetFrom(query.Query, "\"user_task_steps\"")
+	query := UserSubtasks(queryMods...)
+	queries.SetFrom(query.Query, "\"user_subtasks\"")
 
 	if len(queries.GetSelect(query.Query)) == 0 {
-		queries.SetSelect(query.Query, []string{"\"user_task_steps\".*"})
+		queries.SetSelect(query.Query, []string{"\"user_subtasks\".*"})
 	}
 
 	return query
@@ -620,9 +600,9 @@ func (userTaskL) LoadUser(e boil.Executor, singular bool, maybeUserTask interfac
 	return nil
 }
 
-// LoadUserTaskSteps allows an eager lookup of values, cached into the
+// LoadUserSubtasks allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (userTaskL) LoadUserTaskSteps(e boil.Executor, singular bool, maybeUserTask interface{}, mods queries.Applicator) error {
+func (userTaskL) LoadUserSubtasks(e boil.Executor, singular bool, maybeUserTask interface{}, mods queries.Applicator) error {
 	var slice []*UserTask
 	var object *UserTask
 
@@ -659,29 +639,29 @@ func (userTaskL) LoadUserTaskSteps(e boil.Executor, singular bool, maybeUserTask
 		return nil
 	}
 
-	query := NewQuery(qm.From(`user_task_steps`), qm.WhereIn(`user_task_steps.user_task_id in ?`, args...))
+	query := NewQuery(qm.From(`user_subtasks`), qm.WhereIn(`user_subtasks.user_task_id in ?`, args...))
 	if mods != nil {
 		mods.Apply(query)
 	}
 
 	results, err := query.Query(e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load user_task_steps")
+		return errors.Wrap(err, "failed to eager load user_subtasks")
 	}
 
-	var resultSlice []*UserTaskStep
+	var resultSlice []*UserSubtask
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice user_task_steps")
+		return errors.Wrap(err, "failed to bind eager loaded slice user_subtasks")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on user_task_steps")
+		return errors.Wrap(err, "failed to close results in eager load on user_subtasks")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for user_task_steps")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for user_subtasks")
 	}
 
-	if len(userTaskStepAfterSelectHooks) != 0 {
+	if len(userSubtaskAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(e); err != nil {
 				return err
@@ -689,10 +669,10 @@ func (userTaskL) LoadUserTaskSteps(e boil.Executor, singular bool, maybeUserTask
 		}
 	}
 	if singular {
-		object.R.UserTaskSteps = resultSlice
+		object.R.UserSubtasks = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
-				foreign.R = &userTaskStepR{}
+				foreign.R = &userSubtaskR{}
 			}
 			foreign.R.UserTask = object
 		}
@@ -702,9 +682,9 @@ func (userTaskL) LoadUserTaskSteps(e boil.Executor, singular bool, maybeUserTask
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
 			if queries.Equal(local.ID, foreign.UserTaskID) {
-				local.R.UserTaskSteps = append(local.R.UserTaskSteps, foreign)
+				local.R.UserSubtasks = append(local.R.UserSubtasks, foreign)
 				if foreign.R == nil {
-					foreign.R = &userTaskStepR{}
+					foreign.R = &userSubtaskR{}
 				}
 				foreign.R.UserTask = local
 				break
@@ -840,11 +820,11 @@ func (o *UserTask) SetUser(exec boil.Executor, insert bool, related *User) error
 	return nil
 }
 
-// AddUserTaskSteps adds the given related objects to the existing relationships
+// AddUserSubtasks adds the given related objects to the existing relationships
 // of the user_task, optionally inserting them as new records.
-// Appends related to o.R.UserTaskSteps.
+// Appends related to o.R.UserSubtasks.
 // Sets related.R.UserTask appropriately.
-func (o *UserTask) AddUserTaskSteps(exec boil.Executor, insert bool, related ...*UserTaskStep) error {
+func (o *UserTask) AddUserSubtasks(exec boil.Executor, insert bool, related ...*UserSubtask) error {
 	var err error
 	for _, rel := range related {
 		if insert {
@@ -854,9 +834,9 @@ func (o *UserTask) AddUserTaskSteps(exec boil.Executor, insert bool, related ...
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
-				"UPDATE \"user_task_steps\" SET %s WHERE %s",
+				"UPDATE \"user_subtasks\" SET %s WHERE %s",
 				strmangle.SetParamNames("\"", "\"", 1, []string{"user_task_id"}),
-				strmangle.WhereClause("\"", "\"", 2, userTaskStepPrimaryKeyColumns),
+				strmangle.WhereClause("\"", "\"", 2, userSubtaskPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
 
@@ -874,15 +854,15 @@ func (o *UserTask) AddUserTaskSteps(exec boil.Executor, insert bool, related ...
 
 	if o.R == nil {
 		o.R = &userTaskR{
-			UserTaskSteps: related,
+			UserSubtasks: related,
 		}
 	} else {
-		o.R.UserTaskSteps = append(o.R.UserTaskSteps, related...)
+		o.R.UserSubtasks = append(o.R.UserSubtasks, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
-			rel.R = &userTaskStepR{
+			rel.R = &userSubtaskR{
 				UserTask: o,
 			}
 		} else {
@@ -892,14 +872,14 @@ func (o *UserTask) AddUserTaskSteps(exec boil.Executor, insert bool, related ...
 	return nil
 }
 
-// SetUserTaskSteps removes all previously related items of the
+// SetUserSubtasks removes all previously related items of the
 // user_task replacing them completely with the passed
 // in related items, optionally inserting them as new records.
-// Sets o.R.UserTask's UserTaskSteps accordingly.
-// Replaces o.R.UserTaskSteps with related.
-// Sets related.R.UserTask's UserTaskSteps accordingly.
-func (o *UserTask) SetUserTaskSteps(exec boil.Executor, insert bool, related ...*UserTaskStep) error {
-	query := "update \"user_task_steps\" set \"user_task_id\" = null where \"user_task_id\" = $1"
+// Sets o.R.UserTask's UserSubtasks accordingly.
+// Replaces o.R.UserSubtasks with related.
+// Sets related.R.UserTask's UserSubtasks accordingly.
+func (o *UserTask) SetUserSubtasks(exec boil.Executor, insert bool, related ...*UserSubtask) error {
+	query := "update \"user_subtasks\" set \"user_task_id\" = null where \"user_task_id\" = $1"
 	values := []interface{}{o.ID}
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, query)
@@ -911,7 +891,7 @@ func (o *UserTask) SetUserTaskSteps(exec boil.Executor, insert bool, related ...
 	}
 
 	if o.R != nil {
-		for _, rel := range o.R.UserTaskSteps {
+		for _, rel := range o.R.UserSubtasks {
 			queries.SetScanner(&rel.UserTaskID, nil)
 			if rel.R == nil {
 				continue
@@ -920,15 +900,15 @@ func (o *UserTask) SetUserTaskSteps(exec boil.Executor, insert bool, related ...
 			rel.R.UserTask = nil
 		}
 
-		o.R.UserTaskSteps = nil
+		o.R.UserSubtasks = nil
 	}
-	return o.AddUserTaskSteps(exec, insert, related...)
+	return o.AddUserSubtasks(exec, insert, related...)
 }
 
-// RemoveUserTaskSteps relationships from objects passed in.
-// Removes related items from R.UserTaskSteps (uses pointer comparison, removal does not keep order)
+// RemoveUserSubtasks relationships from objects passed in.
+// Removes related items from R.UserSubtasks (uses pointer comparison, removal does not keep order)
 // Sets related.R.UserTask.
-func (o *UserTask) RemoveUserTaskSteps(exec boil.Executor, related ...*UserTaskStep) error {
+func (o *UserTask) RemoveUserSubtasks(exec boil.Executor, related ...*UserSubtask) error {
 	var err error
 	for _, rel := range related {
 		queries.SetScanner(&rel.UserTaskID, nil)
@@ -944,16 +924,16 @@ func (o *UserTask) RemoveUserTaskSteps(exec boil.Executor, related ...*UserTaskS
 	}
 
 	for _, rel := range related {
-		for i, ri := range o.R.UserTaskSteps {
+		for i, ri := range o.R.UserSubtasks {
 			if rel != ri {
 				continue
 			}
 
-			ln := len(o.R.UserTaskSteps)
+			ln := len(o.R.UserSubtasks)
 			if ln > 1 && i < ln-1 {
-				o.R.UserTaskSteps[i] = o.R.UserTaskSteps[ln-1]
+				o.R.UserSubtasks[i] = o.R.UserSubtasks[ln-1]
 			}
-			o.R.UserTaskSteps = o.R.UserTaskSteps[:ln-1]
+			o.R.UserSubtasks = o.R.UserSubtasks[:ln-1]
 			break
 		}
 	}

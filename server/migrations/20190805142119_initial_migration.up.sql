@@ -96,6 +96,7 @@ CREATE TABLE stock_keeping_units (
     code text UNIQUE NOT NULL,
     description text NOT NULL,
     weight int NOT NULL DEFAULT 0,
+    weight_unit text NOT NULL,
     price int NOT NULL DEFAULT 0,
     currency text NOT NULL,
     is_beef boolean NOT NULL DEFAULT FALSE,
@@ -130,15 +131,13 @@ CREATE TABLE stock_keeping_unit_photos (
 CREATE TABLE categories (
     id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid (),
     sku_id uuid NOT NULL REFERENCES stock_keeping_units (id),
-    name text NOT NULL UNIQUE,
-    updated_at timestamptz NOT NULL DEFAULT NOW(),
+    name text NOT NULL,
     created_at timestamptz NOT NULL DEFAULT NOW()
 );
 CREATE TABLE product_categories (
     id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid (),
     sku_id uuid NOT NULL REFERENCES stock_keeping_units (id),
-    name text NOT NULL UNIQUE,
-    updated_at timestamptz NOT NULL DEFAULT NOW(),
+    name text NOT NULL,
     created_at timestamptz NOT NULL DEFAULT NOW()
 );
 -- Tasks Specifications
@@ -153,15 +152,16 @@ CREATE TABLE tasks (
     finish_date timestamptz,
     maximum_people int NOT NULL DEFAULT 0,
     sku_id uuid REFERENCES stock_keeping_units (id),
+    is_final boolean NOT NULL DEFAULT FALSE,
     archived boolean NOT NULL DEFAULT FALSE,
     archived_at timestamptz,
     updated_at timestamptz NOT NULL DEFAULT NOW(),
     created_at timestamptz NOT NULL DEFAULT NOW()
 );
-CREATE TABLE task_steps (
+CREATE TABLE subtasks (
     id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid (),
     task_id uuid REFERENCES tasks (id),
-    name text NOT NULL,
+    title text NOT NULL,
     description text NOT NULL,
     updated_at timestamptz NOT NULL DEFAULT NOW(),
     created_at timestamptz NOT NULL DEFAULT NOW()
@@ -172,21 +172,15 @@ CREATE TABLE user_tasks (
     user_id uuid NOT NULL REFERENCES users (id),
     status text NOT NULL,
     is_complete boolean NOT NULL DEFAULT FALSE,
-    is_active boolean NOT NULL DEFAULT FALSE,
-    loyalty_points int NOT NULL DEFAULT 0,
-    archived boolean NOT NULL DEFAULT FALSE,
-    archived_at timestamptz,
     updated_at timestamptz NOT NULL DEFAULT NOW(),
     created_at timestamptz NOT NULL DEFAULT NOW()
 );
-CREATE TABLE user_task_steps (
+CREATE TABLE user_subtasks (
     id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid (),
+    subtask_id uuid REFERENCES subtasks (id),
     user_task_id uuid REFERENCES user_tasks (id),
-    name text NOT NULL,
-    description text NOT NULL,
     status text NOT NULL,
     is_complete boolean NOT NULL DEFAULT FALSE,
-    is_active boolean NOT NULL DEFAULT FALSE,
     updated_at timestamptz NOT NULL DEFAULT NOW(),
     created_at timestamptz NOT NULL DEFAULT NOW()
 );
@@ -424,4 +418,3 @@ CREATE TABLE user_loyalty_activities (
     created_at timestamptz NOT NULL DEFAULT NOW()
 );
 COMMIT;
-

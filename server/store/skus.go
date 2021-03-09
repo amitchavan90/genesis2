@@ -158,6 +158,28 @@ func (s *SKU) Insert(record *db.StockKeepingUnit, txes ...*sql.Tx) (*db.StockKee
 	return record, nil
 }
 
+// InsertCategory skus
+func (s *SKU) InsertCategory(cat *db.Category, txes ...*sql.Tx) (*db.Category, error) {
+	err := handleTransactions(s.Conn, func(tx *sql.Tx) error {
+		return cat.Insert(tx, boil.Infer())
+	}, txes...)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return cat, nil
+}
+
+// InsertProductCategory skus
+func (s *SKU) InsertProductCategory(pcat *db.ProductCategory, txes ...*sql.Tx) (*db.ProductCategory, error) {
+	err := handleTransactions(s.Conn, func(tx *sql.Tx) error {
+		return pcat.Insert(tx, boil.Infer())
+	}, txes...)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return pcat, nil
+}
+
 // Update skus
 func (s *SKU) Update(record *db.StockKeepingUnit, txes ...*sql.Tx) (*db.StockKeepingUnit, error) {
 	record.UpdatedAt = time.Now()
@@ -231,6 +253,24 @@ func (s *SKU) GetClones(id string) (db.StockKeepingUnitSlice, error) {
 // GetContent returns SKU content (string pairs)
 func (s *SKU) GetContent(sku *db.StockKeepingUnit, contentType string) (db.StockKeepingUnitContentSlice, error) {
 	return sku.SkuStockKeepingUnitContents(db.StockKeepingUnitContentWhere.ContentType.EQ(contentType)).All(s.Conn)
+}
+
+// GetCategories skus by skuID
+func (s *SKU) GetCategories(skuID string, txes ...*sql.Tx) (db.CategorySlice, error) {
+	dat, err := db.Categories(db.CategoryWhere.SkuID.EQ(skuID)).All(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
+// GetProductCategories skus by skuID
+func (s *SKU) GetProductCategories(skuID string, txes ...*sql.Tx) (db.ProductCategorySlice, error) {
+	dat, err := db.ProductCategories(db.ProductCategoryWhere.SkuID.EQ(skuID)).All(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
 }
 
 // UpdateContent clears and adds new SKU content (string pairs)

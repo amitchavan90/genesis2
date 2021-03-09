@@ -1,3 +1,8 @@
+type Subtask {
+	id: ID!
+	title: String!
+	description: String!
+}
 type Task {
 	id: ID!
 	title: String!
@@ -6,15 +11,23 @@ type Task {
 	isTimeBound: Boolean!
 	isPeopleBound: Boolean!
 	isProductRelevant: Boolean!
+	isFinal: Boolean!
 	finishDate: Time
 	maximumPeople: Int!
     skuID: NullString
+	archived: Boolean!
 	createdAt: Time!
+	subtasks: [Subtask!]!
 }
 
 type TasksResult {
 	tasks: [Task!]!
 	total: Int!
+}
+
+input UpdateSubtask {
+	title: String!
+	description: String!
 }
 
 input UpdateTask {
@@ -25,10 +38,12 @@ input UpdateTask {
 	isTimeBound: Boolean!
 	isPeopleBound: Boolean!
 	isProductRelevant: Boolean!
+	isFinal: Boolean
 	
 	finishDate: Time
 	maximumPeople: Int!
     skuID: NullString
+	subtasks: [UpdateSubtask]
 }
 
 extend type Query {

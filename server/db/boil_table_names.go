@@ -26,13 +26,13 @@ var TableNames = struct {
 	StockKeepingUnitContent string
 	StockKeepingUnitPhotos  string
 	StockKeepingUnits       string
-	TaskSteps               string
+	Subtasks                string
 	Tasks                   string
 	TrackActions            string
 	Transactions            string
 	UserActivities          string
 	UserLoyaltyActivities   string
-	UserTaskSteps           string
+	UserSubtasks            string
 	UserTasks               string
 	Users                   string
 }{
@@ -58,13 +58,13 @@ var TableNames = struct {
 	StockKeepingUnitContent: "stock_keeping_unit_content",
 	StockKeepingUnitPhotos:  "stock_keeping_unit_photos",
 	StockKeepingUnits:       "stock_keeping_units",
-	TaskSteps:               "task_steps",
+	Subtasks:                "subtasks",
 	Tasks:                   "tasks",
 	TrackActions:            "track_actions",
 	Transactions:            "transactions",
 	UserActivities:          "user_activities",
 	UserLoyaltyActivities:   "user_loyalty_activities",
-	UserTaskSteps:           "user_task_steps",
+	UserSubtasks:            "user_subtasks",
 	UserTasks:               "user_tasks",
 	Users:                   "users",
 }

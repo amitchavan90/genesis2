@@ -31,6 +31,14 @@ func (r *taskResolver) FinishDate(ctx context.Context, obj *db.Task) (*time.Time
 	return &t.FinishDate.Time, nil
 }
 
+func (r *taskResolver) Subtasks(ctx context.Context, obj *db.Task) ([]*db.Subtask, error) {
+	result, err := r.TaskStore.GetSubtasks(obj.ID)
+	if err != nil {
+		return nil, terror.New(err, "get subtasks")
+	}
+	return result, nil
+}
+
 ///////////////
 //   Query   //
 ///////////////
@@ -66,6 +74,7 @@ func (r *queryResolver) Tasks(ctx context.Context, search graphql.SearchFilter, 
 func (r *mutationResolver) TaskCreate(ctx context.Context, input graphql.UpdateTask) (*db.Task, error) {
 	// Create Task
 	t := &db.Task{}
+	subtasks := []db.Subtask{}
 
 	taskID, _ := uuid.NewV4()
 	t.ID = taskID.String()
@@ -82,6 +91,9 @@ func (r *mutationResolver) TaskCreate(ctx context.Context, input graphql.UpdateT
 	t.IsTimeBound = input.IsTimeBound
 	t.IsPeopleBound = input.IsPeopleBound
 	t.IsProductRelevant = input.IsProductRelevant
+	if *input.IsFinal {
+		t.IsFinal = true
+	}
 
 	if input.IsTimeBound {
 		if input.FinishDate == nil {
@@ -105,7 +117,16 @@ func (r *mutationResolver) TaskCreate(ctx context.Context, input graphql.UpdateT
 		t.SkuID = null.StringFrom(input.SkuID.String)
 	}
 
-	created, err := r.TaskStore.Insert(t)
+	if len(input.Subtasks) >= 0 {
+		st := db.Subtask{}
+		for i := range input.Subtasks {
+			st.Title = input.Subtasks[i].Title
+			st.Description = input.Subtasks[i].Description
+			subtasks = append(subtasks, st)
+		}
+	}
+
+	created, err := r.TaskStore.Insert(t, subtasks)
 	if err != nil {
 		return nil, terror.New(err, "create task")
 	}

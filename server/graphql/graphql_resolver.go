@@ -529,6 +529,12 @@ func (r *skuResolver) ProductInfo(ctx context.Context, obj *db.StockKeepingUnit)
 func (r *skuResolver) Photos(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.Blob, error) {
 	panic("not implemented")
 }
+func (r *skuResolver) Categories(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.Category, error) {
+	panic("not implemented")
+}
+func (r *skuResolver) ProductCategories(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.ProductCategory, error) {
+	panic("not implemented")
+}
 func (r *skuResolver) ProductCount(ctx context.Context, obj *db.StockKeepingUnit) (int, error) {
 	panic("not implemented")
 }
@@ -551,6 +557,9 @@ func (r *settingsResolver) FieldappVersion(ctx context.Context, obj *db.Setting)
 type taskResolver struct{ *Resolver }
 
 func (r *taskResolver) FinishDate(ctx context.Context, obj *db.Task) (*time.Time, error) {
+	panic("not implemented")
+}
+func (r *taskResolver) Subtasks(ctx context.Context, obj *db.Task) ([]*db.Subtask, error) {
 	panic("not implemented")
 }
 

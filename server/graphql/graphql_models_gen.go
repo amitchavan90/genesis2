@@ -203,6 +203,10 @@ type UpdateCarton struct {
 	MeatType    *null.String `json:"meatType"`
 }
 
+type UpdateCategory struct {
+	Name string `json:"name"`
+}
+
 type UpdateContainer struct {
 	Code        *null.String `json:"code"`
 	Description *null.String `json:"description"`
@@ -252,6 +256,10 @@ type UpdateProduct struct {
 	Description          *null.String `json:"description"`
 }
 
+type UpdateProductCategory struct {
+	Name string `json:"name"`
+}
+
 type UpdateRole struct {
 	Name           *null.String `json:"name"`
 	Permissions    []string     `json:"permissions"`
@@ -259,36 +267,46 @@ type UpdateRole struct {
 }
 
 type UpdateSku struct {
-	Name             *null.String       `json:"name"`
-	Code             *null.String       `json:"code"`
-	Description      *null.String       `json:"description"`
-	Weight           *null.Int          `json:"weight"`
-	Price            *null.Int          `json:"price"`
-	Currency         *null.String       `json:"currency"`
-	IsBeef           *null.Bool         `json:"isBeef"`
-	IsRetailSku      *null.Bool         `json:"isRetailSku"`
-	IsPointSku       *null.Bool         `json:"isPointSku"`
-	IsAppSku         *null.Bool         `json:"isAppSku"`
-	IsMiniappSku     *null.Bool         `json:"isMiniappSku"`
-	LoyaltyPoints    *null.Int          `json:"loyaltyPoints"`
-	MasterPlanBlobID *null.String       `json:"masterPlanBlobID"`
-	VideoBlobID      *null.String       `json:"videoBlobID"`
-	Urls             []*SKUContentInput `json:"urls"`
-	ProductInfo      []*SKUContentInput `json:"productInfo"`
-	PhotoBlobIDs     []string           `json:"photoBlobIDs"`
-	CloneParentID    *null.String       `json:"cloneParentID"`
+	Name              *null.String             `json:"name"`
+	Code              *null.String             `json:"code"`
+	Description       *null.String             `json:"description"`
+	Weight            *null.Int                `json:"weight"`
+	WeightUnit        *null.String             `json:"weightUnit"`
+	Price             *null.Int                `json:"price"`
+	Currency          *null.String             `json:"currency"`
+	IsBeef            *null.Bool               `json:"isBeef"`
+	IsRetailSku       *null.Bool               `json:"isRetailSku"`
+	IsPointSku        *null.Bool               `json:"isPointSku"`
+	IsAppSku          *null.Bool               `json:"isAppSku"`
+	IsMiniappSku      *null.Bool               `json:"isMiniappSku"`
+	LoyaltyPoints     *null.Int                `json:"loyaltyPoints"`
+	MasterPlanBlobID  *null.String             `json:"masterPlanBlobID"`
+	VideoBlobID       *null.String             `json:"videoBlobID"`
+	Urls              []*SKUContentInput       `json:"urls"`
+	ProductInfo       []*SKUContentInput       `json:"productInfo"`
+	PhotoBlobIDs      []string                 `json:"photoBlobIDs"`
+	Categories        []*UpdateCategory        `json:"categories"`
+	ProductCategories []*UpdateProductCategory `json:"productCategories"`
+	CloneParentID     *null.String             `json:"cloneParentID"`
+}
+
+type UpdateSubtask struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }
 
 type UpdateTask struct {
-	Title             string       `json:"title"`
-	Description       string       `json:"description"`
-	LoyaltyPoints     int          `json:"loyaltyPoints"`
-	IsTimeBound       bool         `json:"isTimeBound"`
-	IsPeopleBound     bool         `json:"isPeopleBound"`
-	IsProductRelevant bool         `json:"isProductRelevant"`
-	FinishDate        *time.Time   `json:"finishDate"`
-	MaximumPeople     int          `json:"maximumPeople"`
-	SkuID             *null.String `json:"skuID"`
+	Title             string           `json:"title"`
+	Description       string           `json:"description"`
+	LoyaltyPoints     int              `json:"loyaltyPoints"`
+	IsTimeBound       bool             `json:"isTimeBound"`
+	IsPeopleBound     bool             `json:"isPeopleBound"`
+	IsProductRelevant bool             `json:"isProductRelevant"`
+	IsFinal           *bool            `json:"isFinal"`
+	FinishDate        *time.Time       `json:"finishDate"`
+	MaximumPeople     int              `json:"maximumPeople"`
+	SkuID             *null.String     `json:"skuID"`
+	Subtasks          []*UpdateSubtask `json:"subtasks"`
 }
 
 type UpdateTrackAction struct {

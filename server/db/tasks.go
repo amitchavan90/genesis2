@@ -33,6 +33,7 @@ type Task struct {
 	FinishDate        null.Time   `db:"finish_date" boil:"finish_date" json:"finish_date,omitempty" toml:"finish_date" yaml:"finish_date,omitempty"`
 	MaximumPeople     int         `db:"maximum_people" boil:"maximum_people" json:"maximum_people" toml:"maximum_people" yaml:"maximum_people"`
 	SkuID             null.String `db:"sku_id" boil:"sku_id" json:"sku_id,omitempty" toml:"sku_id" yaml:"sku_id,omitempty"`
+	IsFinal           bool        `db:"is_final" boil:"is_final" json:"is_final" toml:"is_final" yaml:"is_final"`
 	Archived          bool        `db:"archived" boil:"archived" json:"archived" toml:"archived" yaml:"archived"`
 	ArchivedAt        null.Time   `db:"archived_at" boil:"archived_at" json:"archived_at,omitempty" toml:"archived_at" yaml:"archived_at,omitempty"`
 	UpdatedAt         time.Time   `db:"updated_at" boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
@@ -53,6 +54,7 @@ var TaskColumns = struct {
 	FinishDate        string
 	MaximumPeople     string
 	SkuID             string
+	IsFinal           string
 	Archived          string
 	ArchivedAt        string
 	UpdatedAt         string
@@ -68,6 +70,7 @@ var TaskColumns = struct {
 	FinishDate:        "finish_date",
 	MaximumPeople:     "maximum_people",
 	SkuID:             "sku_id",
+	IsFinal:           "is_final",
 	Archived:          "archived",
 	ArchivedAt:        "archived_at",
 	UpdatedAt:         "updated_at",
@@ -87,6 +90,7 @@ var TaskWhere = struct {
 	FinishDate        whereHelpernull_Time
 	MaximumPeople     whereHelperint
 	SkuID             whereHelpernull_String
+	IsFinal           whereHelperbool
 	Archived          whereHelperbool
 	ArchivedAt        whereHelpernull_Time
 	UpdatedAt         whereHelpertime_Time
@@ -102,6 +106,7 @@ var TaskWhere = struct {
 	FinishDate:        whereHelpernull_Time{field: "\"tasks\".\"finish_date\""},
 	MaximumPeople:     whereHelperint{field: "\"tasks\".\"maximum_people\""},
 	SkuID:             whereHelpernull_String{field: "\"tasks\".\"sku_id\""},
+	IsFinal:           whereHelperbool{field: "\"tasks\".\"is_final\""},
 	Archived:          whereHelperbool{field: "\"tasks\".\"archived\""},
 	ArchivedAt:        whereHelpernull_Time{field: "\"tasks\".\"archived_at\""},
 	UpdatedAt:         whereHelpertime_Time{field: "\"tasks\".\"updated_at\""},
@@ -111,18 +116,18 @@ var TaskWhere = struct {
 // TaskRels is where relationship names are stored.
 var TaskRels = struct {
 	Sku       string
-	TaskSteps string
+	Subtasks  string
 	UserTasks string
 }{
 	Sku:       "Sku",
-	TaskSteps: "TaskSteps",
+	Subtasks:  "Subtasks",
 	UserTasks: "UserTasks",
 }
 
 // taskR is where relationships are stored.
 type taskR struct {
 	Sku       *StockKeepingUnit
-	TaskSteps TaskStepSlice
+	Subtasks  SubtaskSlice
 	UserTasks UserTaskSlice
 }
 
@@ -135,9 +140,9 @@ func (*taskR) NewStruct() *taskR {
 type taskL struct{}
 
 var (
-	taskAllColumns            = []string{"id", "title", "description", "loyalty_points", "is_time_bound", "is_people_bound", "is_product_relevant", "finish_date", "maximum_people", "sku_id", "archived", "archived_at", "updated_at", "created_at"}
+	taskAllColumns            = []string{"id", "title", "description", "loyalty_points", "is_time_bound", "is_people_bound", "is_product_relevant", "finish_date", "maximum_people", "sku_id", "is_final", "archived", "archived_at", "updated_at", "created_at"}
 	taskColumnsWithoutDefault = []string{"title", "description", "finish_date", "sku_id", "archived_at"}
-	taskColumnsWithDefault    = []string{"id", "loyalty_points", "is_time_bound", "is_people_bound", "is_product_relevant", "maximum_people", "archived", "updated_at", "created_at"}
+	taskColumnsWithDefault    = []string{"id", "loyalty_points", "is_time_bound", "is_people_bound", "is_product_relevant", "maximum_people", "is_final", "archived", "updated_at", "created_at"}
 	taskPrimaryKeyColumns     = []string{"id"}
 )
 
@@ -394,22 +399,22 @@ func (o *Task) Sku(mods ...qm.QueryMod) stockKeepingUnitQuery {
 	return query
 }
 
-// TaskSteps retrieves all the task_step's TaskSteps with an executor.
-func (o *Task) TaskSteps(mods ...qm.QueryMod) taskStepQuery {
+// Subtasks retrieves all the subtask's Subtasks with an executor.
+func (o *Task) Subtasks(mods ...qm.QueryMod) subtaskQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"task_steps\".\"task_id\"=?", o.ID),
+		qm.Where("\"subtasks\".\"task_id\"=?", o.ID),
 	)
 
-	query := TaskSteps(queryMods...)
-	queries.SetFrom(query.Query, "\"task_steps\"")
+	query := Subtasks(queryMods...)
+	queries.SetFrom(query.Query, "\"subtasks\"")
 
 	if len(queries.GetSelect(query.Query)) == 0 {
-		queries.SetSelect(query.Query, []string{"\"task_steps\".*"})
+		queries.SetSelect(query.Query, []string{"\"subtasks\".*"})
 	}
 
 	return query
@@ -541,9 +546,9 @@ func (taskL) LoadSku(e boil.Executor, singular bool, maybeTask interface{}, mods
 	return nil
 }
 
-// LoadTaskSteps allows an eager lookup of values, cached into the
+// LoadSubtasks allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (taskL) LoadTaskSteps(e boil.Executor, singular bool, maybeTask interface{}, mods queries.Applicator) error {
+func (taskL) LoadSubtasks(e boil.Executor, singular bool, maybeTask interface{}, mods queries.Applicator) error {
 	var slice []*Task
 	var object *Task
 
@@ -580,29 +585,29 @@ func (taskL) LoadTaskSteps(e boil.Executor, singular bool, maybeTask interface{}
 		return nil
 	}
 
-	query := NewQuery(qm.From(`task_steps`), qm.WhereIn(`task_steps.task_id in ?`, args...))
+	query := NewQuery(qm.From(`subtasks`), qm.WhereIn(`subtasks.task_id in ?`, args...))
 	if mods != nil {
 		mods.Apply(query)
 	}
 
 	results, err := query.Query(e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load task_steps")
+		return errors.Wrap(err, "failed to eager load subtasks")
 	}
 
-	var resultSlice []*TaskStep
+	var resultSlice []*Subtask
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice task_steps")
+		return errors.Wrap(err, "failed to bind eager loaded slice subtasks")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on task_steps")
+		return errors.Wrap(err, "failed to close results in eager load on subtasks")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for task_steps")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for subtasks")
 	}
 
-	if len(taskStepAfterSelectHooks) != 0 {
+	if len(subtaskAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(e); err != nil {
 				return err
@@ -610,10 +615,10 @@ func (taskL) LoadTaskSteps(e boil.Executor, singular bool, maybeTask interface{}
 		}
 	}
 	if singular {
-		object.R.TaskSteps = resultSlice
+		object.R.Subtasks = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
-				foreign.R = &taskStepR{}
+				foreign.R = &subtaskR{}
 			}
 			foreign.R.Task = object
 		}
@@ -623,9 +628,9 @@ func (taskL) LoadTaskSteps(e boil.Executor, singular bool, maybeTask interface{}
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
 			if queries.Equal(local.ID, foreign.TaskID) {
-				local.R.TaskSteps = append(local.R.TaskSteps, foreign)
+				local.R.Subtasks = append(local.R.Subtasks, foreign)
 				if foreign.R == nil {
-					foreign.R = &taskStepR{}
+					foreign.R = &subtaskR{}
 				}
 				foreign.R.Task = local
 				break
@@ -810,11 +815,11 @@ func (o *Task) RemoveSku(exec boil.Executor, related *StockKeepingUnit) error {
 	return nil
 }
 
-// AddTaskSteps adds the given related objects to the existing relationships
+// AddSubtasks adds the given related objects to the existing relationships
 // of the task, optionally inserting them as new records.
-// Appends related to o.R.TaskSteps.
+// Appends related to o.R.Subtasks.
 // Sets related.R.Task appropriately.
-func (o *Task) AddTaskSteps(exec boil.Executor, insert bool, related ...*TaskStep) error {
+func (o *Task) AddSubtasks(exec boil.Executor, insert bool, related ...*Subtask) error {
 	var err error
 	for _, rel := range related {
 		if insert {
@@ -824,9 +829,9 @@ func (o *Task) AddTaskSteps(exec boil.Executor, insert bool, related ...*TaskSte
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
-				"UPDATE \"task_steps\" SET %s WHERE %s",
+				"UPDATE \"subtasks\" SET %s WHERE %s",
 				strmangle.SetParamNames("\"", "\"", 1, []string{"task_id"}),
-				strmangle.WhereClause("\"", "\"", 2, taskStepPrimaryKeyColumns),
+				strmangle.WhereClause("\"", "\"", 2, subtaskPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
 
@@ -844,15 +849,15 @@ func (o *Task) AddTaskSteps(exec boil.Executor, insert bool, related ...*TaskSte
 
 	if o.R == nil {
 		o.R = &taskR{
-			TaskSteps: related,
+			Subtasks: related,
 		}
 	} else {
-		o.R.TaskSteps = append(o.R.TaskSteps, related...)
+		o.R.Subtasks = append(o.R.Subtasks, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
-			rel.R = &taskStepR{
+			rel.R = &subtaskR{
 				Task: o,
 			}
 		} else {
@@ -862,14 +867,14 @@ func (o *Task) AddTaskSteps(exec boil.Executor, insert bool, related ...*TaskSte
 	return nil
 }
 
-// SetTaskSteps removes all previously related items of the
+// SetSubtasks removes all previously related items of the
 // task replacing them completely with the passed
 // in related items, optionally inserting them as new records.
-// Sets o.R.Task's TaskSteps accordingly.
-// Replaces o.R.TaskSteps with related.
-// Sets related.R.Task's TaskSteps accordingly.
-func (o *Task) SetTaskSteps(exec boil.Executor, insert bool, related ...*TaskStep) error {
-	query := "update \"task_steps\" set \"task_id\" = null where \"task_id\" = $1"
+// Sets o.R.Task's Subtasks accordingly.
+// Replaces o.R.Subtasks with related.
+// Sets related.R.Task's Subtasks accordingly.
+func (o *Task) SetSubtasks(exec boil.Executor, insert bool, related ...*Subtask) error {
+	query := "update \"subtasks\" set \"task_id\" = null where \"task_id\" = $1"
 	values := []interface{}{o.ID}
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, query)
@@ -881,7 +886,7 @@ func (o *Task) SetTaskSteps(exec boil.Executor, insert bool, related ...*TaskSte
 	}
 
 	if o.R != nil {
-		for _, rel := range o.R.TaskSteps {
+		for _, rel := range o.R.Subtasks {
 			queries.SetScanner(&rel.TaskID, nil)
 			if rel.R == nil {
 				continue
@@ -890,15 +895,15 @@ func (o *Task) SetTaskSteps(exec boil.Executor, insert bool, related ...*TaskSte
 			rel.R.Task = nil
 		}
 
-		o.R.TaskSteps = nil
+		o.R.Subtasks = nil
 	}
-	return o.AddTaskSteps(exec, insert, related...)
+	return o.AddSubtasks(exec, insert, related...)
 }
 
-// RemoveTaskSteps relationships from objects passed in.
-// Removes related items from R.TaskSteps (uses pointer comparison, removal does not keep order)
+// RemoveSubtasks relationships from objects passed in.
+// Removes related items from R.Subtasks (uses pointer comparison, removal does not keep order)
 // Sets related.R.Task.
-func (o *Task) RemoveTaskSteps(exec boil.Executor, related ...*TaskStep) error {
+func (o *Task) RemoveSubtasks(exec boil.Executor, related ...*Subtask) error {
 	var err error
 	for _, rel := range related {
 		queries.SetScanner(&rel.TaskID, nil)
@@ -914,16 +919,16 @@ func (o *Task) RemoveTaskSteps(exec boil.Executor, related ...*TaskStep) error {
 	}
 
 	for _, rel := range related {
-		for i, ri := range o.R.TaskSteps {
+		for i, ri := range o.R.Subtasks {
 			if rel != ri {
 				continue
 			}
 
-			ln := len(o.R.TaskSteps)
+			ln := len(o.R.Subtasks)
 			if ln > 1 && i < ln-1 {
-				o.R.TaskSteps[i] = o.R.TaskSteps[ln-1]
+				o.R.Subtasks[i] = o.R.Subtasks[ln-1]
 			}
-			o.R.TaskSteps = o.R.TaskSteps[:ln-1]
+			o.R.Subtasks = o.R.Subtasks[:ln-1]
 			break
 		}
 	}
