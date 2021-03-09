@@ -13,6 +13,7 @@ import { Perm } from "../../types/enums"
 import { ListPage } from "./listPages"
 import { UserEdit, ConsumerEdit } from "./system/userEdit"
 const SKUEdit = React.lazy(() => import("./skuEdit"))
+const TaskEdit = React.lazy(() => import("./inventory/taskEdit"))
 const RoleEdit = React.lazy(() => import("./system/roleEdit"))
 const ContainerEdit = React.lazy(() => import("./inventory/containerEdit"))
 const PalletEdit = React.lazy(() => import("./inventory/palletEdit"))
@@ -114,6 +115,8 @@ const PortalInner = () => {
 
 							{hasPermission(Perm.TrackActionUpdate) && <Route path={"/portal/trackAction/:code"} component={TrackActionEdit} />}
 							{hasPermission(Perm.TrackActionList) && <Route path={"/portal/trackActions"} component={ListPage.TrackActions} />}
+
+							{hasPermission(Perm.TaskCreate) && <Route path={"/portal/taskEdit"} component={TaskEdit} />}
 							<Route path={"/portal/"} component={Dashboard} />
 						</Switch>
 					</div>

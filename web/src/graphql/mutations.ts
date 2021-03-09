@@ -460,6 +460,15 @@ const FLUSH_PENDING_TRANSACTIONS = gql`
 	}
 `
 
+const CREATE_TASK = gql`
+	mutation taskCreate($input: UpdateTask!) {
+		taskCreate(input: $input) {
+			...TASKFragment
+		}
+	}
+	${fragment.TASK}
+`
+
 export const mutation = {
 	FILE_UPLOAD,
 	FILE_UPLOAD_MULTIPLE,
@@ -534,4 +543,6 @@ export const mutation = {
 
 	DEPLOY_SMART_CONTRACT,
 	FLUSH_PENDING_TRANSACTIONS,
+
+	CREATE_TASK,
 }

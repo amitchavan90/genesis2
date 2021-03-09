@@ -66,9 +66,16 @@ export interface SKUContent {
 export interface SKU {
 	id: string
 	name: string
+	//brand :string
+	price: number
+	//point: number
+	weight: number
+	//ingredients: string
 	code: string
 	description: string
 	isBeef: boolean
+	isAppSku: boolean
+	isPointSku: boolean
 	loyaltyPoints: number
 	archived: boolean
 
@@ -84,6 +91,18 @@ export interface SKU {
 export interface SKUClone {
 	sku: SKU
 	depth: number
+}
+
+export interface Task{
+    title:string
+    description:String
+    loyaltyPoints:number
+    isTimeBound:boolean
+    isPeopleBound:boolean
+    isProductRelevant: boolean
+    finishDate:Date
+    maximumPeople:number
+    skuID:string
 }
 
 export interface Container {

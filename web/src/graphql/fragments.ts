@@ -60,6 +60,10 @@ const SKU = gql`
 		code
 		description
 		isBeef
+		isPointSku
+		isAppSku
+		weight
+		price
 		archived
 		productCount
 		loyaltyPoints
@@ -466,6 +470,21 @@ const PRODUCT_VIEW = gql`
 	${SKU}
 	${TRANSACTION_VIEW}
 `
+const TASK = gql`
+	fragment TaskFragment on Task {
+		id,
+		title,
+		description,
+		loyaltyPoints,
+		isTimeBound,
+		isPeopleBound,
+		isProductRelevant,
+		finishDate,
+		maximumPeople,
+		skuID,
+		createdAt
+	}
+`
 
 export const fragment = {
 	USER,
@@ -497,4 +516,6 @@ export const fragment = {
 	TRACK_ACTION,
 	TRANSACTION,
 	TRANSACTION_VIEW,
+
+	TASK,
 }

@@ -34,6 +34,11 @@ import { promiseTimeout, TIMED_OUT } from "../../helpers/timeout"
 
 type FormData = {
 	name: string
+	brand :string
+	price: number
+	point: number
+	weight: number
+	ingredients: string
 	code: string
 	urls: SKUContent[]
 	productInfo: SKUContent[]
@@ -86,6 +91,8 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	const [showSuccessModal, setShowSuccessModal] = React.useState(false)
 	const [description, setDescription] = React.useState("")
 	const [isBeef, setIsBeef] = React.useState<boolean>()
+	const [isAppSku, setIsAppSku] = React.useState<boolean>()
+	const [isPointSku, setIsPointSku] = React.useState<boolean>()
 
 	const [masterPlanFile, setMasterPlanFile] = React.useState<File>()
 	const [masterPlanURL, setMasterPlanURL] = React.useState<string>()
@@ -103,7 +110,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 	const { register, setValue, handleSubmit, errors, getValues } = useForm<FormData>()
 
-	const onSubmit = handleSubmit(async ({ name, code, urls, productInfo, loyaltyPoints }) => {
+	const onSubmit = handleSubmit(async ({ name,brand, price, point, weight, ingredients, code, urls, productInfo, loyaltyPoints }) => {
 		setTimedOut(false)
 
 		// Upload Master Plan
@@ -172,9 +179,16 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 		const input = {
 			name,
+			//brand,
+			price,
+			//point,
+			weight,
+			//ingredients,
 			code,
 			description,
 			isBeef,
+			isAppSku,
+			isPointSku,
 			masterPlanBlobID,
 			videoBlobID,
 			photoBlobIDs,
@@ -185,6 +199,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 		}
 
 		if (isNewSKU) {
+			console.log("input---------------->",input);
 			updateSKU({
 				variables: { input },
 				update: (cache: any) => invalidateListQueries(cache, "skus"),
@@ -207,6 +222,11 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 		if (!sku) return
 
 		setValue("name", sku.name)
+		//setValue("brand", sku.brand)
+		setValue("price", sku.price)
+		//setValue("point", sku.point)
+		setValue("weight", sku.weight)
+		//setValue("ingredients", sku.ingredients)
 		setValue("code", sku.code)
 		setValue("loyaltyPoints", sku.loyaltyPoints)
 		setDescription(sku.description)
@@ -338,6 +358,34 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 				</Checkbox>
 			</FormControl>
 
+			<FormControl caption="">
+				<Checkbox checked={isAppSku} onChange={e => setIsAppSku(e.currentTarget.checked)}>
+					Is App
+				</Checkbox>
+			</FormControl>
+
+			<FormControl caption="">
+				<Checkbox checked={isPointSku} onChange={e => setIsPointSku(e.currentTarget.checked)}>
+					Is Point SKU
+				</Checkbox>
+			</FormControl>
+			{breakLine}
+			<FormControl label="Price" error={errors.price ? errors.price.message : ""} positive="">
+				<Input name="price" type="number" inputRef={register({ required: "Required" })} />
+			</FormControl>
+			{/* <FormControl label="Point" error={errors.point ? errors.point.message : ""} positive="">
+				<Input name="point" type="number" inputRef={register({ required: "Required" })} />
+			</FormControl> */}
+			{breakLine}
+			{/* <FormControl label="Brand" error={errors.brand ? errors.brand.message : ""} positive="">
+				<Input name="brand" inputRef={register({ required: "Required" })} />
+			</FormControl> */}
+			<FormControl label="Weight" error={errors.weight ? errors.weight.message : ""} positive="">
+				<Input name="weight" type="number" inputRef={register({ required: "Required" })} />
+			</FormControl>
+			{/* <FormControl label="Ingredients" error={errors.ingredients ? errors.ingredients.message : ""} positive="">
+				<Input name="ingredients" inputRef={register({ required: "Required" })} />
+			</FormControl> */}
 			{breakLine}
 
 			<ImageUpload.Single

@@ -76,7 +76,7 @@ func main() {
 		smsToken                           = serveFlagSet.String("sms_token", "", "Twilio Auth Token. Required if SMS Enabled")
 		skipUserverification               = serveFlagSet.Bool("skip_userverification", false, "Should Skip Verification sending be enabled. If true, verification is not required for users.")
 		blockchainPrivatekeybytes          = serveFlagSet.String("blockchain_privatekeybytes", "", "The private key JSON in base 64 encoding")
-		blockchainPrivatekeypassword       = serveFlagSet.String("blockchain_privatekeypassword", "tiger", "Password to unlock the private key")
+		blockchainPrivatekeypassword       = serveFlagSet.String("blockchain_privatekeypassword", "Spark", "Password to unlock the private key")
 		blockchainEthereumhost             = serveFlagSet.String("blockchain_ethereumhost", "http://127.0.0.1:8545", "Host of the geth node")
 		blockchainEtherscanhost            = serveFlagSet.String("blockchain_etherscanhost", "https://rinkeby.etherscan.io", "Etherscan host for the transaction links")
 		blockchainTestprivatekey           = serveFlagSet.String("blockchain_testprivatekey", "", "Use a single private key (for testing) instead of the private key file + pass")
