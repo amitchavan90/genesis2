@@ -96,17 +96,6 @@ export const SideBar = () => {
 			<div>
 				<SideMenuButton index={index++} icon="chart-pie" label="Dashboard" url="/portal" strictSelection />
 
-				{hasPermission(Perm.ContractList) && (
-					<SideMenuButton
-						index={index++}
-						icon="file-contract"
-						label="Livestock Specifications"
-						url="/portal/contracts"
-						altURL="/portal/contract"
-						fontSize="16px"
-					/>
-				)}
-
 				{hasPermission(Perm.OrderList) && <SideMenuButton index={index++} icon="shopping-cart" label="Orders" url="/portal/orders" altURL="/portal/order" />}
 
 				{showInventoryPanel && (
@@ -151,6 +140,17 @@ export const SideBar = () => {
 
 				{hasPermission(Perm.DistributorList) && (
 					<SideMenuButton index={index++} icon="shopping-basket" label="Distributors" url="/portal/distributors" altURL="/portal/distributor" />
+				)}
+
+				{hasPermission(Perm.ContractList) && (
+					<SideMenuButton
+						index={index++}
+						icon="file-contract"
+						label="ORIGIN"
+						url="/portal/contracts"
+						altURL="/portal/contract"
+						fontSize="16px"
+					/>
 				)}
 
 				{showActivityPanel && (

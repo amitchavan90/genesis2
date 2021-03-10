@@ -171,6 +171,14 @@ const ContractEdit = (props: RouteComponentProps<{ code: string }>) => {
 				<Input name="supplierName" inputRef={register({ required: "Required" })} />
 			</FormControl>
 
+			<FormControl label="Latitude" error={errors.name ? errors.name.message : ""} positive="">
+				<Input name="name" inputRef={register({ required: "Required" })} />
+			</FormControl>
+
+			<FormControl label="Longitude" error={errors.name ? errors.name.message : ""} positive="">
+				<Input name="name" inputRef={register({ required: "Required" })} />
+			</FormControl>
+
 			<FormControl label="Date Signed" caption="YYYY/MM/DD" error="" positive="">
 				<div
 					style={{

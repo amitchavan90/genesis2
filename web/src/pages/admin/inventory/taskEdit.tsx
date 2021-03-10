@@ -16,6 +16,7 @@ import { Spread } from "../../../components/spread"
 import { CenteredPage } from "../../../components/common"
 import { invalidateListQueries } from "../../../apollo"
 import { Checkbox } from "baseui/checkbox"
+import { Datepicker } from "baseui/datepicker"
 import { Task} from "../../../types/types"
 
 type FormData = {
@@ -48,8 +49,9 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 	const [description, setDescription] = React.useState("")
 	const [isTimeBound, setIsTimeBound] = React.useState<boolean>()
 	const [isPeopleBound, setIsPeopleBound] = React.useState<boolean>()
-	const [isProductRelevant, setIsProductRelevant] = React.useState<boolean>(false)
-
+	const [isProductRelevant, setIsProductRelevant] = React.useState<boolean>()
+	const [finishDate, setfinishDate] = React.useState(new Date())
+    console.log("finishDate---------------->",finishDate)
 	const breakLine = <div className={breakLineStyle} />
 
 	const { register, setValue, handleSubmit, errors, getValues } = useForm<FormData>()
@@ -65,7 +67,7 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 			loyaltyPoints,
 			finishDate,
 			maximumPeople,
-			skuID
+			//skuID
 		}
 
 		if (isNewTask) {
@@ -86,9 +88,9 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 		if (!task) return
 		setValue("title",task.title)
 		setValue("loyaltyPoints", task.loyaltyPoints)
-		setValue("finishDate", task.finishDate)
 		setValue("maximumPeople", task.maximumPeople)
-		setValue("L280001", task.skuID)
+		setfinishDate(new Date(task.finishDate))
+		//setValue("L280001", task.skuID)
 	}, [task])
 	
 	const editForm = (
@@ -147,9 +149,19 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 			<FormControl label="Maximum People" error={errors.maximumPeople ? errors.maximumPeople.message : ""} positive="">
 				<Input name="maximumPeople" type="number" inputRef={register}/>
 			</FormControl>
-			<FormControl label="Finish Date" error={errors.finishDate ? errors.finishDate.message : ""} positive="">
+			{/* <FormControl label="Finish Date" error={errors.finishDate ? errors.finishDate.message : ""} positive="">
 				<Input name="finishDate" type="Date" inputRef={register} />
-			</FormControl>
+			</FormControl> */}
+			<FormControl label="Finish Date" caption="YYYY/MM/DD" error="" positive="">
+				<div
+					style={{
+						width: "160px",
+						marginRight: "10px",
+					}}
+				>
+					<Datepicker value={finishDate} onChange={({ date }) => setfinishDate(date as Date)} />
+				</div>
+			</FormControl>	
 			{breakLine}
 			<Spread>
 				<Button type="button" kind="secondary" onClick={() => history.push("/portal/skus")}>

@@ -539,6 +539,15 @@ const TICKER_INFO = gql`
 		}
 	}
 `
+//task 
+const TASK = gql`
+	query task($code: String!) {
+		task(code: $code) {
+			...TASKFragment
+		}
+	}
+	${fragment.TASK}
+`
 
 export const query = {
 	ME,
@@ -603,4 +612,6 @@ export const query = {
 	PENDING_TRANSACTIONS_COUNT,
 	FIELDAPP_VERSION,
 	TICKER_INFO,
+
+	TASK,
 }
