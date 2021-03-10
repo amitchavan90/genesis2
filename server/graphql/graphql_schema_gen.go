@@ -101,6 +101,11 @@ type ComplexityRoot struct {
 		Total   func(childComplexity int) int
 	}
 
+	Category struct {
+		ID   func(childComplexity int) int
+		Name func(childComplexity int) int
+	}
+
 	ConsumersResult struct {
 		Consumers func(childComplexity int) int
 		Total     func(childComplexity int) int
@@ -308,6 +313,11 @@ type ComplexityRoot struct {
 		Transactions        func(childComplexity int) int
 	}
 
+	ProductCategory struct {
+		ID   func(childComplexity int) int
+		Name func(childComplexity int) int
+	}
+
 	ProductResult struct {
 		Products func(childComplexity int) int
 		Total    func(childComplexity int) int
@@ -388,27 +398,30 @@ type ComplexityRoot struct {
 	}
 
 	Sku struct {
-		Archived      func(childComplexity int) int
-		CloneParentID func(childComplexity int) int
-		Code          func(childComplexity int) int
-		CreatedAt     func(childComplexity int) int
-		Currency      func(childComplexity int) int
-		Description   func(childComplexity int) int
-		HasClones     func(childComplexity int) int
-		ID            func(childComplexity int) int
-		IsAppSku      func(childComplexity int) int
-		IsBeef        func(childComplexity int) int
-		IsPointSku    func(childComplexity int) int
-		LoyaltyPoints func(childComplexity int) int
-		MasterPlan    func(childComplexity int) int
-		Name          func(childComplexity int) int
-		Photos        func(childComplexity int) int
-		Price         func(childComplexity int) int
-		ProductCount  func(childComplexity int) int
-		ProductInfo   func(childComplexity int) int
-		Urls          func(childComplexity int) int
-		Video         func(childComplexity int) int
-		Weight        func(childComplexity int) int
+		Archived          func(childComplexity int) int
+		Categories        func(childComplexity int) int
+		CloneParentID     func(childComplexity int) int
+		Code              func(childComplexity int) int
+		CreatedAt         func(childComplexity int) int
+		Currency          func(childComplexity int) int
+		Description       func(childComplexity int) int
+		HasClones         func(childComplexity int) int
+		ID                func(childComplexity int) int
+		IsAppSku          func(childComplexity int) int
+		IsBeef            func(childComplexity int) int
+		IsPointSku        func(childComplexity int) int
+		LoyaltyPoints     func(childComplexity int) int
+		MasterPlan        func(childComplexity int) int
+		Name              func(childComplexity int) int
+		Photos            func(childComplexity int) int
+		Price             func(childComplexity int) int
+		ProductCategories func(childComplexity int) int
+		ProductCount      func(childComplexity int) int
+		ProductInfo       func(childComplexity int) int
+		Urls              func(childComplexity int) int
+		Video             func(childComplexity int) int
+		Weight            func(childComplexity int) int
+		WeightUnit        func(childComplexity int) int
 	}
 
 	SKUClone struct {
@@ -434,17 +447,26 @@ type ComplexityRoot struct {
 		SmartContractAddress func(childComplexity int) int
 	}
 
+	Subtask struct {
+		Description func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Title       func(childComplexity int) int
+	}
+
 	Task struct {
+		Archived          func(childComplexity int) int
 		CreatedAt         func(childComplexity int) int
 		Description       func(childComplexity int) int
 		FinishDate        func(childComplexity int) int
 		ID                func(childComplexity int) int
+		IsFinal           func(childComplexity int) int
 		IsPeopleBound     func(childComplexity int) int
 		IsProductRelevant func(childComplexity int) int
 		IsTimeBound       func(childComplexity int) int
 		LoyaltyPoints     func(childComplexity int) int
 		MaximumPeople     func(childComplexity int) int
 		SkuID             func(childComplexity int) int
+		Subtasks          func(childComplexity int) int
 		Title             func(childComplexity int) int
 	}
 
@@ -725,6 +747,8 @@ type SKUResolver interface {
 	Urls(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.StockKeepingUnitContent, error)
 	ProductInfo(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.StockKeepingUnitContent, error)
 	Photos(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.Blob, error)
+	Categories(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.Category, error)
+	ProductCategories(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.ProductCategory, error)
 	ProductCount(ctx context.Context, obj *db.StockKeepingUnit) (int, error)
 }
 type SettingsResolver interface {
@@ -735,6 +759,8 @@ type SettingsResolver interface {
 }
 type TaskResolver interface {
 	FinishDate(ctx context.Context, obj *db.Task) (*time.Time, error)
+
+	Subtasks(ctx context.Context, obj *db.Task) ([]*db.Subtask, error)
 }
 type TrackActionResolver interface {
 	RequirePhotos(ctx context.Context, obj *db.TrackAction) ([]bool, error)
@@ -952,6 +978,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CartonResult.Total(childComplexity), true
+
+	case "Category.id":
+		if e.complexity.Category.ID == nil {
+			break
+		}
+
+		return e.complexity.Category.ID(childComplexity), true
+
+	case "Category.name":
+		if e.complexity.Category.Name == nil {
+			break
+		}
+
+		return e.complexity.Category.Name(childComplexity), true
 
 	case "ConsumersResult.consumers":
 		if e.complexity.ConsumersResult.Consumers == nil {
@@ -2318,6 +2358,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Product.Transactions(childComplexity), true
 
+	case "ProductCategory.id":
+		if e.complexity.ProductCategory.ID == nil {
+			break
+		}
+
+		return e.complexity.ProductCategory.ID(childComplexity), true
+
+	case "ProductCategory.name":
+		if e.complexity.ProductCategory.Name == nil {
+			break
+		}
+
+		return e.complexity.ProductCategory.Name(childComplexity), true
+
 	case "ProductResult.products":
 		if e.complexity.ProductResult.Products == nil {
 			break
@@ -2932,6 +2986,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Sku.Archived(childComplexity), true
 
+	case "SKU.categories":
+		if e.complexity.Sku.Categories == nil {
+			break
+		}
+
+		return e.complexity.Sku.Categories(childComplexity), true
+
 	case "SKU.cloneParentID":
 		if e.complexity.Sku.CloneParentID == nil {
 			break
@@ -3037,6 +3098,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Sku.Price(childComplexity), true
 
+	case "SKU.productCategories":
+		if e.complexity.Sku.ProductCategories == nil {
+			break
+		}
+
+		return e.complexity.Sku.ProductCategories(childComplexity), true
+
 	case "SKU.productCount":
 		if e.complexity.Sku.ProductCount == nil {
 			break
@@ -3071,6 +3139,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Sku.Weight(childComplexity), true
+
+	case "SKU.weightUnit":
+		if e.complexity.Sku.WeightUnit == nil {
+			break
+		}
+
+		return e.complexity.Sku.WeightUnit(childComplexity), true
 
 	case "SKUClone.depth":
 		if e.complexity.SKUClone.Depth == nil {
@@ -3149,6 +3224,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Settings.SmartContractAddress(childComplexity), true
 
+	case "Subtask.description":
+		if e.complexity.Subtask.Description == nil {
+			break
+		}
+
+		return e.complexity.Subtask.Description(childComplexity), true
+
+	case "Subtask.id":
+		if e.complexity.Subtask.ID == nil {
+			break
+		}
+
+		return e.complexity.Subtask.ID(childComplexity), true
+
+	case "Subtask.title":
+		if e.complexity.Subtask.Title == nil {
+			break
+		}
+
+		return e.complexity.Subtask.Title(childComplexity), true
+
+	case "Task.archived":
+		if e.complexity.Task.Archived == nil {
+			break
+		}
+
+		return e.complexity.Task.Archived(childComplexity), true
+
 	case "Task.createdAt":
 		if e.complexity.Task.CreatedAt == nil {
 			break
@@ -3176,6 +3279,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Task.ID(childComplexity), true
+
+	case "Task.isFinal":
+		if e.complexity.Task.IsFinal == nil {
+			break
+		}
+
+		return e.complexity.Task.IsFinal(childComplexity), true
 
 	case "Task.isPeopleBound":
 		if e.complexity.Task.IsPeopleBound == nil {
@@ -3218,6 +3328,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Task.SkuID(childComplexity), true
+
+	case "Task.subtasks":
+		if e.complexity.Task.Subtasks == nil {
+			break
+		}
+
+		return e.complexity.Task.Subtasks(childComplexity), true
 
 	case "Task.title":
 		if e.complexity.Task.Title == nil {
@@ -4458,7 +4575,15 @@ extend type Mutation {
 	roleUnarchive(id: ID!): Role! @hasPerm(p: RoleUnarchive)
 }
 `},
-	&ast.Source{Name: "schema_skus.graphql", Input: `type SKUContent {
+	&ast.Source{Name: "schema_skus.graphql", Input: `type Category {
+	id: String!
+	name: String!
+}
+type ProductCategory {
+	id: String!
+	name: String!
+}
+type SKUContent {
 	title: String!
 	content: String!
 }
@@ -4473,6 +4598,7 @@ type SKU {
 	code: String!
 	description: String!
 	weight: Int!
+	weightUnit: String!
 	price: Int!
 	currency: String!
 	isBeef: Boolean!
@@ -4490,6 +4616,8 @@ type SKU {
 	urls: [SKUContent!]!
 	productInfo: [SKUContent!]!
 	photos: [Blob!]!
+	categories: [Category!]!
+	productCategories: [ProductCategory!]!
 
 	productCount: Int!
 }
@@ -4499,12 +4627,20 @@ type SKUResult {
 	total: Int!
 }
 
+input UpdateCategory {
+	name: String!
+}
+input UpdateProductCategory {
+	name: String!
+}
+
 input UpdateSKU {
 	name: NullString
 	code: NullString
 	description: NullString
 
 	weight: NullInt
+	weightUnit: NullString
 	price: NullInt
 	currency: NullString
 
@@ -4520,6 +4656,8 @@ input UpdateSKU {
 	urls: [SKUContentInput!]
 	productInfo: [SKUContentInput!]
 	photoBlobIDs: [String!]
+	categories: [UpdateCategory]
+	productCategories: [UpdateProductCategory]
 
 	cloneParentID: NullString
 }
@@ -4545,7 +4683,12 @@ extend type Mutation {
 	skuBatchAction(ids: [ID!]!, action: Action!, value: BatchActionInput): Boolean! @hasPerm(p: SKUUpdate)
 }
 `},
-	&ast.Source{Name: "schema_tasks.graphql", Input: `type Task {
+	&ast.Source{Name: "schema_tasks.graphql", Input: `type Subtask {
+	id: ID!
+	title: String!
+	description: String!
+}
+type Task {
 	id: ID!
 	title: String!
 	description: String!
@@ -4553,15 +4696,23 @@ extend type Mutation {
 	isTimeBound: Boolean!
 	isPeopleBound: Boolean!
 	isProductRelevant: Boolean!
+	isFinal: Boolean!
 	finishDate: Time
 	maximumPeople: Int!
     skuID: NullString
+	archived: Boolean!
 	createdAt: Time!
+	subtasks: [Subtask!]!
 }
 
 type TasksResult {
 	tasks: [Task!]!
 	total: Int!
+}
+
+input UpdateSubtask {
+	title: String!
+	description: String!
 }
 
 input UpdateTask {
@@ -4572,10 +4723,12 @@ input UpdateTask {
 	isTimeBound: Boolean!
 	isPeopleBound: Boolean!
 	isProductRelevant: Boolean!
+	isFinal: Boolean
 	
 	finishDate: Time
 	maximumPeople: Int!
     skuID: NullString
+	subtasks: [UpdateSubtask]
 }
 
 extend type Query {
@@ -4750,13 +4903,6 @@ extend type Query {
 	name: String!
 	users: [User!]!
 }
-# type Referral {
-# 	id: ID!
-# 	userID: String!
-# 	referredByID: String!
-# 	isRedemmed: Boolean!
-# 	createdAt: Time!
-# }
 type User {
 	id: ID!
 	firstName: NullString
@@ -7793,6 +7939,80 @@ func (ec *executionContext) _CartonResult_total(ctx context.Context, field graph
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Category_id(ctx context.Context, field graphql.CollectedField, obj *db.Category) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Category",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Category_name(ctx context.Context, field graphql.CollectedField, obj *db.Category) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Category",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConsumersResult_consumers(ctx context.Context, field graphql.CollectedField, obj *ConsumersResult) (ret graphql.Marshaler) {
@@ -15079,6 +15299,80 @@ func (ec *executionContext) _Product_latestTrackAction(ctx context.Context, fiel
 	return ec.marshalOLatestTransactionInfo2ᚖgenesisᚋgraphqlᚐLatestTransactionInfo(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _ProductCategory_id(ctx context.Context, field graphql.CollectedField, obj *db.ProductCategory) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "ProductCategory",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProductCategory_name(ctx context.Context, field graphql.CollectedField, obj *db.ProductCategory) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "ProductCategory",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _ProductResult_products(ctx context.Context, field graphql.CollectedField, obj *ProductResult) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -18607,6 +18901,43 @@ func (ec *executionContext) _SKU_weight(ctx context.Context, field graphql.Colle
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _SKU_weightUnit(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SKU",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WeightUnit, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _SKU_price(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -19153,6 +19484,80 @@ func (ec *executionContext) _SKU_photos(ctx context.Context, field graphql.Colle
 	return ec.marshalNBlob2ᚕᚖgenesisᚋdbᚐBlobᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _SKU_categories(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SKU",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.SKU().Categories(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*db.Category)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNCategory2ᚕᚖgenesisᚋdbᚐCategoryᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SKU_productCategories(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SKU",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.SKU().ProductCategories(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*db.ProductCategory)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNProductCategory2ᚕᚖgenesisᚋdbᚐProductCategoryᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _SKU_productCount(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -19597,6 +20002,117 @@ func (ec *executionContext) _Settings_smartContractAddress(ctx context.Context, 
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Subtask_id(ctx context.Context, field graphql.CollectedField, obj *db.Subtask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Subtask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Subtask_title(ctx context.Context, field graphql.CollectedField, obj *db.Subtask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Subtask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Subtask_description(ctx context.Context, field graphql.CollectedField, obj *db.Subtask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Subtask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Task_id(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -19856,6 +20372,43 @@ func (ec *executionContext) _Task_isProductRelevant(ctx context.Context, field g
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Task_isFinal(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Task",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsFinal, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Task_finishDate(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -19961,6 +20514,43 @@ func (ec *executionContext) _Task_skuID(ctx context.Context, field graphql.Colle
 	return ec.marshalONullString2githubᚗcomᚋvolatiletechᚋnullᚐString(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Task_archived(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Task",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Archived, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Task_createdAt(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -19996,6 +20586,43 @@ func (ec *executionContext) _Task_createdAt(ctx context.Context, field graphql.C
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Task_subtasks(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Task",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().Subtasks(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*db.Subtask)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNSubtask2ᚕᚖgenesisᚋdbᚐSubtaskᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TasksResult_tasks(ctx context.Context, field graphql.CollectedField, obj *TasksResult) (ret graphql.Marshaler) {
@@ -24204,6 +24831,24 @@ func (ec *executionContext) unmarshalInputUpdateCarton(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateCategory(ctx context.Context, obj interface{}) (UpdateCategory, error) {
+	var it UpdateCategory
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateContainer(ctx context.Context, obj interface{}) (UpdateContainer, error) {
 	var it UpdateContainer
 	var asMap = obj.(map[string]interface{})
@@ -24456,6 +25101,24 @@ func (ec *executionContext) unmarshalInputUpdateProduct(ctx context.Context, obj
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateProductCategory(ctx context.Context, obj interface{}) (UpdateProductCategory, error) {
+	var it UpdateProductCategory
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateRole(ctx context.Context, obj interface{}) (UpdateRole, error) {
 	var it UpdateRole
 	var asMap = obj.(map[string]interface{})
@@ -24513,6 +25176,12 @@ func (ec *executionContext) unmarshalInputUpdateSKU(ctx context.Context, obj int
 		case "weight":
 			var err error
 			it.Weight, err = ec.unmarshalONullInt2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐInt(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "weightUnit":
+			var err error
+			it.WeightUnit, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24594,9 +25263,45 @@ func (ec *executionContext) unmarshalInputUpdateSKU(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "categories":
+			var err error
+			it.Categories, err = ec.unmarshalOUpdateCategory2ᚕᚖgenesisᚋgraphqlᚐUpdateCategory(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "productCategories":
+			var err error
+			it.ProductCategories, err = ec.unmarshalOUpdateProductCategory2ᚕᚖgenesisᚋgraphqlᚐUpdateProductCategory(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "cloneParentID":
 			var err error
 			it.CloneParentID, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateSubtask(ctx context.Context, obj interface{}) (UpdateSubtask, error) {
+	var it UpdateSubtask
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "title":
+			var err error
+			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+			it.Description, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24648,6 +25353,12 @@ func (ec *executionContext) unmarshalInputUpdateTask(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "isFinal":
+			var err error
+			it.IsFinal, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "finishDate":
 			var err error
 			it.FinishDate, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
@@ -24663,6 +25374,12 @@ func (ec *executionContext) unmarshalInputUpdateTask(ctx context.Context, obj in
 		case "skuID":
 			var err error
 			it.SkuID, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "subtasks":
+			var err error
+			it.Subtasks, err = ec.unmarshalOUpdateSubtask2ᚕᚖgenesisᚋgraphqlᚐUpdateSubtask(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25005,6 +25722,38 @@ func (ec *executionContext) _CartonResult(ctx context.Context, sel ast.Selection
 			}
 		case "total":
 			out.Values[i] = ec._CartonResult_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var categoryImplementors = []string{"Category"}
+
+func (ec *executionContext) _Category(ctx context.Context, sel ast.SelectionSet, obj *db.Category) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, categoryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Category")
+		case "id":
+			out.Values[i] = ec._Category_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Category_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -26284,6 +27033,38 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var productCategoryImplementors = []string{"ProductCategory"}
+
+func (ec *executionContext) _ProductCategory(ctx context.Context, sel ast.SelectionSet, obj *db.ProductCategory) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, productCategoryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProductCategory")
+		case "id":
+			out.Values[i] = ec._ProductCategory_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._ProductCategory_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var productResultImplementors = []string{"ProductResult"}
 
 func (ec *executionContext) _ProductResult(ctx context.Context, sel ast.SelectionSet, obj *ProductResult) graphql.Marshaler {
@@ -27170,6 +27951,11 @@ func (ec *executionContext) _SKU(ctx context.Context, sel ast.SelectionSet, obj 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "weightUnit":
+			out.Values[i] = ec._SKU_weightUnit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "price":
 			out.Values[i] = ec._SKU_price(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -27285,6 +28071,34 @@ func (ec *executionContext) _SKU(ctx context.Context, sel ast.SelectionSet, obj 
 					}
 				}()
 				res = ec._SKU_photos(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "categories":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SKU_categories(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "productCategories":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SKU_productCategories(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -27494,6 +28308,43 @@ func (ec *executionContext) _Settings(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
+var subtaskImplementors = []string{"Subtask"}
+
+func (ec *executionContext) _Subtask(ctx context.Context, sel ast.SelectionSet, obj *db.Subtask) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, subtaskImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Subtask")
+		case "id":
+			out.Values[i] = ec._Subtask_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "title":
+			out.Values[i] = ec._Subtask_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "description":
+			out.Values[i] = ec._Subtask_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var taskImplementors = []string{"Task"}
 
 func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj *db.Task) graphql.Marshaler {
@@ -27540,6 +28391,11 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "isFinal":
+			out.Values[i] = ec._Task_isFinal(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "finishDate":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -27558,11 +28414,30 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "skuID":
 			out.Values[i] = ec._Task_skuID(ctx, field, obj)
+		case "archived":
+			out.Values[i] = ec._Task_archived(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "createdAt":
 			out.Values[i] = ec._Task_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "subtasks":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Task_subtasks(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -28647,6 +29522,57 @@ func (ec *executionContext) marshalNCartonResult2ᚖgenesisᚋgraphqlᚐCartonRe
 	return ec._CartonResult(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNCategory2genesisᚋdbᚐCategory(ctx context.Context, sel ast.SelectionSet, v db.Category) graphql.Marshaler {
+	return ec._Category(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCategory2ᚕᚖgenesisᚋdbᚐCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.Category) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCategory2ᚖgenesisᚋdbᚐCategory(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNCategory2ᚖgenesisᚋdbᚐCategory(ctx context.Context, sel ast.SelectionSet, v *db.Category) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Category(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNConsumersResult2genesisᚋgraphqlᚐConsumersResult(ctx context.Context, sel ast.SelectionSet, v ConsumersResult) graphql.Marshaler {
 	return ec._ConsumersResult(ctx, sel, &v)
 }
@@ -29282,6 +30208,57 @@ func (ec *executionContext) marshalNProduct2ᚖgenesisᚋdbᚐProduct(ctx contex
 	return ec._Product(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNProductCategory2genesisᚋdbᚐProductCategory(ctx context.Context, sel ast.SelectionSet, v db.ProductCategory) graphql.Marshaler {
+	return ec._ProductCategory(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProductCategory2ᚕᚖgenesisᚋdbᚐProductCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.ProductCategory) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProductCategory2ᚖgenesisᚋdbᚐProductCategory(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNProductCategory2ᚖgenesisᚋdbᚐProductCategory(ctx context.Context, sel ast.SelectionSet, v *db.ProductCategory) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ProductCategory(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNProductResult2genesisᚋgraphqlᚐProductResult(ctx context.Context, sel ast.SelectionSet, v ProductResult) graphql.Marshaler {
 	return ec._ProductResult(ctx, sel, &v)
 }
@@ -29631,6 +30608,57 @@ func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalNSubtask2genesisᚋdbᚐSubtask(ctx context.Context, sel ast.SelectionSet, v db.Subtask) graphql.Marshaler {
+	return ec._Subtask(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSubtask2ᚕᚖgenesisᚋdbᚐSubtaskᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.Subtask) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNSubtask2ᚖgenesisᚋdbᚐSubtask(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNSubtask2ᚖgenesisᚋdbᚐSubtask(ctx context.Context, sel ast.SelectionSet, v *db.Subtask) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Subtask(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNTask2genesisᚋdbᚐTask(ctx context.Context, sel ast.SelectionSet, v db.Task) graphql.Marshaler {
@@ -31004,6 +32032,102 @@ func (ec *executionContext) marshalOTransactionPhotos2ᚖgenesisᚋgraphqlᚐTra
 		return graphql.Null
 	}
 	return ec._TransactionPhotos(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOUpdateCategory2genesisᚋgraphqlᚐUpdateCategory(ctx context.Context, v interface{}) (UpdateCategory, error) {
+	return ec.unmarshalInputUpdateCategory(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOUpdateCategory2ᚕᚖgenesisᚋgraphqlᚐUpdateCategory(ctx context.Context, v interface{}) ([]*UpdateCategory, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*UpdateCategory, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalOUpdateCategory2ᚖgenesisᚋgraphqlᚐUpdateCategory(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOUpdateCategory2ᚖgenesisᚋgraphqlᚐUpdateCategory(ctx context.Context, v interface{}) (*UpdateCategory, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOUpdateCategory2genesisᚋgraphqlᚐUpdateCategory(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) unmarshalOUpdateProductCategory2genesisᚋgraphqlᚐUpdateProductCategory(ctx context.Context, v interface{}) (UpdateProductCategory, error) {
+	return ec.unmarshalInputUpdateProductCategory(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOUpdateProductCategory2ᚕᚖgenesisᚋgraphqlᚐUpdateProductCategory(ctx context.Context, v interface{}) ([]*UpdateProductCategory, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*UpdateProductCategory, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalOUpdateProductCategory2ᚖgenesisᚋgraphqlᚐUpdateProductCategory(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOUpdateProductCategory2ᚖgenesisᚋgraphqlᚐUpdateProductCategory(ctx context.Context, v interface{}) (*UpdateProductCategory, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOUpdateProductCategory2genesisᚋgraphqlᚐUpdateProductCategory(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) unmarshalOUpdateSubtask2genesisᚋgraphqlᚐUpdateSubtask(ctx context.Context, v interface{}) (UpdateSubtask, error) {
+	return ec.unmarshalInputUpdateSubtask(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOUpdateSubtask2ᚕᚖgenesisᚋgraphqlᚐUpdateSubtask(ctx context.Context, v interface{}) ([]*UpdateSubtask, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*UpdateSubtask, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalOUpdateSubtask2ᚖgenesisᚋgraphqlᚐUpdateSubtask(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOUpdateSubtask2ᚖgenesisᚋgraphqlᚐUpdateSubtask(ctx context.Context, v interface{}) (*UpdateSubtask, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOUpdateSubtask2genesisᚋgraphqlᚐUpdateSubtask(ctx, v)
+	return &res, err
 }
 
 func (ec *executionContext) marshalOUser2genesisᚋdbᚐUser(ctx context.Context, sel ast.SelectionSet, v db.User) graphql.Marshaler {

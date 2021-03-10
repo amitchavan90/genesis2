@@ -88,6 +88,22 @@ func (r *skuResolver) HasClones(ctx context.Context, obj *db.StockKeepingUnit) (
 	return hasClones, nil
 }
 
+func (r *skuResolver) Categories(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.Category, error) {
+	dat, err := r.SKUStore.GetCategories(obj.ID)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
+func (r *skuResolver) ProductCategories(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.ProductCategory, error) {
+	dat, err := r.SKUStore.GetProductCategories(obj.ID)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
 ///////////////
 //   Query   //
 ///////////////
@@ -270,6 +286,10 @@ func (r *mutationResolver) SkuCreate(ctx context.Context, input graphql.UpdateSk
 	u.IsBeef = input.IsBeef.Bool
 	u.IsPointSku = input.IsPointSku.Bool
 	u.IsAppSku = input.IsAppSku.Bool
+	u.Weight = input.Weight.Int
+	u.WeightUnit = input.WeightUnit.String
+	u.Price = input.Price.Int
+	u.Currency = input.Currency.String
 
 	created, err := r.SKUStore.Insert(u)
 	if err != nil {
@@ -293,6 +313,35 @@ func (r *mutationResolver) SkuCreate(ctx context.Context, input graphql.UpdateSk
 		err := r.SKUStore.UpdatePhotos(created, input.PhotoBlobIDs)
 		if err != nil {
 			return nil, terror.New(err, "create sku")
+		}
+	}
+
+	// Add categories
+	if len(input.Categories) >= 0 {
+		for i := range input.Categories {
+			cat := &db.Category{}
+			id, _ := uuid.NewV4()
+			cat.ID = id.String()
+			cat.SkuID = created.ID
+			cat.Name = input.Categories[i].Name
+			_, err = r.SKUStore.InsertCategory(cat)
+			if err != nil {
+				return nil, terror.New(err, "create sku")
+			}
+		}
+	}
+
+	if len(input.ProductCategories) >= 0 {
+		for i := range input.ProductCategories {
+			pcat := &db.ProductCategory{}
+			id, _ := uuid.NewV4()
+			pcat.ID = id.String()
+			pcat.SkuID = created.ID
+			pcat.Name = input.ProductCategories[i].Name
+			_, err = r.SKUStore.InsertProductCategory(pcat)
+			if err != nil {
+				return nil, terror.New(err, "create sku")
+			}
 		}
 	}
 

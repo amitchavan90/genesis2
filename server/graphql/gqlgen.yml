@@ -44,12 +44,18 @@ models:
     model: genesis/db.Referral
   Task:
     model: genesis/db.Task
+  Subtask:
+    model: genesis/db.Subtask
   Organisation:
     model: genesis/db.Organisation
   SKU:
     model: genesis/db.StockKeepingUnit
   SKUContent:
     model: genesis/db.StockKeepingUnitContent
+  Category:
+    model: genesis/db.Category
+  ProductCategory:
+    model: genesis/db.ProductCategory
   Container:
     model: genesis/db.Container
   Pallet:

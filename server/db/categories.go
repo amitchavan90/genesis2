@@ -25,7 +25,6 @@ type Category struct {
 	ID        string    `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
 	SkuID     string    `db:"sku_id" boil:"sku_id" json:"sku_id" toml:"sku_id" yaml:"sku_id"`
 	Name      string    `db:"name" boil:"name" json:"name" toml:"name" yaml:"name"`
-	UpdatedAt time.Time `db:"updated_at" boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	CreatedAt time.Time `db:"created_at" boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 
 	R *categoryR `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -36,13 +35,11 @@ var CategoryColumns = struct {
 	ID        string
 	SkuID     string
 	Name      string
-	UpdatedAt string
 	CreatedAt string
 }{
 	ID:        "id",
 	SkuID:     "sku_id",
 	Name:      "name",
-	UpdatedAt: "updated_at",
 	CreatedAt: "created_at",
 }
 
@@ -52,13 +49,11 @@ var CategoryWhere = struct {
 	ID        whereHelperstring
 	SkuID     whereHelperstring
 	Name      whereHelperstring
-	UpdatedAt whereHelpertime_Time
 	CreatedAt whereHelpertime_Time
 }{
 	ID:        whereHelperstring{field: "\"categories\".\"id\""},
 	SkuID:     whereHelperstring{field: "\"categories\".\"sku_id\""},
 	Name:      whereHelperstring{field: "\"categories\".\"name\""},
-	UpdatedAt: whereHelpertime_Time{field: "\"categories\".\"updated_at\""},
 	CreatedAt: whereHelpertime_Time{field: "\"categories\".\"created_at\""},
 }
 
@@ -83,9 +78,9 @@ func (*categoryR) NewStruct() *categoryR {
 type categoryL struct{}
 
 var (
-	categoryAllColumns            = []string{"id", "sku_id", "name", "updated_at", "created_at"}
+	categoryAllColumns            = []string{"id", "sku_id", "name", "created_at"}
 	categoryColumnsWithoutDefault = []string{"sku_id", "name"}
-	categoryColumnsWithDefault    = []string{"id", "updated_at", "created_at"}
+	categoryColumnsWithDefault    = []string{"id", "created_at"}
 	categoryPrimaryKeyColumns     = []string{"id"}
 )
 
@@ -531,9 +526,6 @@ func (o *Category) Insert(exec boil.Executor, columns boil.Columns) error {
 	var err error
 	currTime := time.Now().In(boil.GetLocation())
 
-	if o.UpdatedAt.IsZero() {
-		o.UpdatedAt = currTime
-	}
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}
@@ -611,10 +603,6 @@ func (o *Category) Insert(exec boil.Executor, columns boil.Columns) error {
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *Category) Update(exec boil.Executor, columns boil.Columns) (int64, error) {
-	currTime := time.Now().In(boil.GetLocation())
-
-	o.UpdatedAt = currTime
-
 	var err error
 	if err = o.doBeforeUpdateHooks(exec); err != nil {
 		return 0, err
@@ -745,7 +733,6 @@ func (o *Category) Upsert(exec boil.Executor, updateOnConflict bool, conflictCol
 	}
 	currTime := time.Now().In(boil.GetLocation())
 
-	o.UpdatedAt = currTime
 	if o.CreatedAt.IsZero() {
 		o.CreatedAt = currTime
 	}

@@ -1,3 +1,11 @@
+type Category {
+	id: String!
+	name: String!
+}
+type ProductCategory {
+	id: String!
+	name: String!
+}
 type SKUContent {
 	title: String!
 	content: String!
@@ -13,6 +21,7 @@ type SKU {
 	code: String!
 	description: String!
 	weight: Int!
+	weightUnit: String!
 	price: Int!
 	currency: String!
 	isBeef: Boolean!
@@ -30,6 +39,8 @@ type SKU {
 	urls: [SKUContent!]!
 	productInfo: [SKUContent!]!
 	photos: [Blob!]!
+	categories: [Category!]!
+	productCategories: [ProductCategory!]!
 
 	productCount: Int!
 }
@@ -39,12 +50,20 @@ type SKUResult {
 	total: Int!
 }
 
+input UpdateCategory {
+	name: String!
+}
+input UpdateProductCategory {
+	name: String!
+}
+
 input UpdateSKU {
 	name: NullString
 	code: NullString
 	description: NullString
 
 	weight: NullInt
+	weightUnit: NullString
 	price: NullInt
 	currency: NullString
 
@@ -60,6 +79,8 @@ input UpdateSKU {
 	urls: [SKUContentInput!]
 	productInfo: [SKUContentInput!]
 	photoBlobIDs: [String!]
+	categories: [UpdateCategory]
+	productCategories: [UpdateProductCategory]
 
 	cloneParentID: NullString
 }

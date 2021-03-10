@@ -119,6 +119,15 @@ func (s *Tasks) SearchSelect(search graphql.SearchFilter, limit int, offset int)
 	return count, records, nil
 }
 
+// GetSubtasks by taskID
+func (s *Tasks) GetSubtasks(taskID string, txes ...*sql.Tx) (db.SubtaskSlice, error) {
+	dat, err := db.Subtasks(db.SubtaskWhere.TaskID.EQ(null.StringFrom(taskID))).All(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
 // GetMany tasks given a list of IDs
 func (s *Tasks) GetMany(keys []string, txes ...*sql.Tx) (db.TaskSlice, []error) {
 	if len(keys) == 0 {
@@ -149,7 +158,7 @@ func (s *Tasks) GetMany(keys []string, txes ...*sql.Tx) (db.TaskSlice, []error) 
 // Get a task given their ID
 func (s *Tasks) Get(id uuid.UUID, txes ...*sql.Tx) (*db.Task, error) {
 	dat, err := db.Tasks(db.TaskWhere.ID.EQ(id.String()),
-		qm.Load(db.TaskRels.TaskSteps, qm.Select(db.TaskStepColumns.ID, db.TaskStepColumns.Name, db.TaskStepColumns.Description)),
+		qm.Load(db.TaskRels.Subtasks, qm.Select(db.SubtaskColumns.ID, db.SubtaskColumns.Title, db.SubtaskColumns.Description)),
 	).One(s.Conn)
 	if err != nil {
 		return nil, terror.New(err, "")
@@ -158,19 +167,36 @@ func (s *Tasks) Get(id uuid.UUID, txes ...*sql.Tx) (*db.Task, error) {
 }
 
 // Insert a task
-func (s *Tasks) Insert(u *db.Task, txes ...*sql.Tx) (*db.Task, error) {
+func (s *Tasks) Insert(t *db.Task, subtasks []db.Subtask, txes ...*sql.Tx) (*db.Task, error) {
 	var err error
 
 	handleTransactions(s.Conn, func(tx *sql.Tx) error {
-		return u.Insert(tx, boil.Infer())
+		return t.Insert(tx, boil.Infer())
 	}, txes...)
 
-	err = u.Reload(s.Conn)
+	err = t.Reload(s.Conn)
 	if err != nil {
 		return nil, terror.New(err, "")
 	}
 
-	return u, nil
+	if len(subtasks) >= 0 {
+		for i := range subtasks {
+			stID, _ := uuid.NewV4()
+			subtasks[i].ID = stID.String()
+			subtasks[i].TaskID = null.StringFrom(t.ID)
+
+			handleTransactions(s.Conn, func(tx *sql.Tx) error {
+				return subtasks[i].Insert(tx, boil.Infer())
+			}, txes...)
+
+			err = subtasks[i].Reload(s.Conn)
+			if err != nil {
+				return nil, terror.New(err, "")
+			}
+		}
+	}
+
+	return t, nil
 }
 
 // Update a task

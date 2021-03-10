@@ -3,13 +3,6 @@ type Organisation {
 	name: String!
 	users: [User!]!
 }
-# type Referral {
-# 	id: ID!
-# 	userID: String!
-# 	referredByID: String!
-# 	isRedemmed: Boolean!
-# 	createdAt: Time!
-# }
 type User {
 	id: ID!
 	firstName: NullString

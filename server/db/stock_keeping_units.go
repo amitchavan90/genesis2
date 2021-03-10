@@ -28,6 +28,7 @@ type StockKeepingUnit struct {
 	Code             string      `db:"code" boil:"code" json:"code" toml:"code" yaml:"code"`
 	Description      string      `db:"description" boil:"description" json:"description" toml:"description" yaml:"description"`
 	Weight           int         `db:"weight" boil:"weight" json:"weight" toml:"weight" yaml:"weight"`
+	WeightUnit       string      `db:"weight_unit" boil:"weight_unit" json:"weight_unit" toml:"weight_unit" yaml:"weight_unit"`
 	Price            int         `db:"price" boil:"price" json:"price" toml:"price" yaml:"price"`
 	Currency         string      `db:"currency" boil:"currency" json:"currency" toml:"currency" yaml:"currency"`
 	IsBeef           bool        `db:"is_beef" boil:"is_beef" json:"is_beef" toml:"is_beef" yaml:"is_beef"`
@@ -53,6 +54,7 @@ var StockKeepingUnitColumns = struct {
 	Code             string
 	Description      string
 	Weight           string
+	WeightUnit       string
 	Price            string
 	Currency         string
 	IsBeef           string
@@ -73,6 +75,7 @@ var StockKeepingUnitColumns = struct {
 	Code:             "code",
 	Description:      "description",
 	Weight:           "weight",
+	WeightUnit:       "weight_unit",
 	Price:            "price",
 	Currency:         "currency",
 	IsBeef:           "is_beef",
@@ -97,6 +100,7 @@ var StockKeepingUnitWhere = struct {
 	Code             whereHelperstring
 	Description      whereHelperstring
 	Weight           whereHelperint
+	WeightUnit       whereHelperstring
 	Price            whereHelperint
 	Currency         whereHelperstring
 	IsBeef           whereHelperbool
@@ -117,6 +121,7 @@ var StockKeepingUnitWhere = struct {
 	Code:             whereHelperstring{field: "\"stock_keeping_units\".\"code\""},
 	Description:      whereHelperstring{field: "\"stock_keeping_units\".\"description\""},
 	Weight:           whereHelperint{field: "\"stock_keeping_units\".\"weight\""},
+	WeightUnit:       whereHelperstring{field: "\"stock_keeping_units\".\"weight_unit\""},
 	Price:            whereHelperint{field: "\"stock_keeping_units\".\"price\""},
 	Currency:         whereHelperstring{field: "\"stock_keeping_units\".\"currency\""},
 	IsBeef:           whereHelperbool{field: "\"stock_keeping_units\".\"is_beef\""},
@@ -184,8 +189,8 @@ func (*stockKeepingUnitR) NewStruct() *stockKeepingUnitR {
 type stockKeepingUnitL struct{}
 
 var (
-	stockKeepingUnitAllColumns            = []string{"id", "name", "code", "description", "weight", "price", "currency", "is_beef", "is_point_sku", "is_app_sku", "master_plan_blob_id", "video_blob_id", "loyalty_points", "clone_parent_id", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
-	stockKeepingUnitColumnsWithoutDefault = []string{"name", "code", "description", "currency", "master_plan_blob_id", "video_blob_id", "clone_parent_id", "archived_at", "created_by_id"}
+	stockKeepingUnitAllColumns            = []string{"id", "name", "code", "description", "weight", "weight_unit", "price", "currency", "is_beef", "is_point_sku", "is_app_sku", "master_plan_blob_id", "video_blob_id", "loyalty_points", "clone_parent_id", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
+	stockKeepingUnitColumnsWithoutDefault = []string{"name", "code", "description", "weight_unit", "currency", "master_plan_blob_id", "video_blob_id", "clone_parent_id", "archived_at", "created_by_id"}
 	stockKeepingUnitColumnsWithDefault    = []string{"id", "weight", "price", "is_beef", "is_point_sku", "is_app_sku", "loyalty_points", "archived", "updated_at", "created_at"}
 	stockKeepingUnitPrimaryKeyColumns     = []string{"id"}
 )
