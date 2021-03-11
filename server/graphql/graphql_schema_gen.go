@@ -465,6 +465,7 @@ type ComplexityRoot struct {
 		IsTimeBound       func(childComplexity int) int
 		LoyaltyPoints     func(childComplexity int) int
 		MaximumPeople     func(childComplexity int) int
+		Sku               func(childComplexity int) int
 		SkuID             func(childComplexity int) int
 		Subtasks          func(childComplexity int) int
 		Title             func(childComplexity int) int
@@ -759,6 +760,8 @@ type SettingsResolver interface {
 }
 type TaskResolver interface {
 	FinishDate(ctx context.Context, obj *db.Task) (*time.Time, error)
+
+	Sku(ctx context.Context, obj *db.Task) (*db.StockKeepingUnit, error)
 
 	Subtasks(ctx context.Context, obj *db.Task) ([]*db.Subtask, error)
 }
@@ -3322,6 +3325,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.MaximumPeople(childComplexity), true
 
+	case "Task.sku":
+		if e.complexity.Task.Sku == nil {
+			break
+		}
+
+		return e.complexity.Task.Sku(childComplexity), true
+
 	case "Task.skuID":
 		if e.complexity.Task.SkuID == nil {
 			break
@@ -4700,6 +4710,7 @@ type Task {
 	finishDate: Time
 	maximumPeople: Int!
     skuID: NullString
+	sku: SKU
 	archived: Boolean!
 	createdAt: Time!
 	subtasks: [Subtask!]!
@@ -20514,6 +20525,40 @@ func (ec *executionContext) _Task_skuID(ctx context.Context, field graphql.Colle
 	return ec.marshalONullString2githubᚗcomᚋvolatiletechᚋnullᚐString(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Task_sku(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Task",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().Sku(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*db.StockKeepingUnit)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOSKU2ᚖgenesisᚋdbᚐStockKeepingUnit(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Task_archived(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -28414,6 +28459,17 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "skuID":
 			out.Values[i] = ec._Task_skuID(ctx, field, obj)
+		case "sku":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Task_sku(ctx, field, obj)
+				return res
+			})
 		case "archived":
 			out.Values[i] = ec._Task_archived(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

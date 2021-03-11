@@ -15,6 +15,7 @@ type Task {
 	finishDate: Time
 	maximumPeople: Int!
     skuID: NullString
+	sku: SKU
 	archived: Boolean!
 	createdAt: Time!
 	subtasks: [Subtask!]!

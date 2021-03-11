@@ -559,6 +559,9 @@ type taskResolver struct{ *Resolver }
 func (r *taskResolver) FinishDate(ctx context.Context, obj *db.Task) (*time.Time, error) {
 	panic("not implemented")
 }
+func (r *taskResolver) Sku(ctx context.Context, obj *db.Task) (*db.StockKeepingUnit, error) {
+	panic("not implemented")
+}
 func (r *taskResolver) Subtasks(ctx context.Context, obj *db.Task) ([]*db.Subtask, error) {
 	panic("not implemented")
 }
