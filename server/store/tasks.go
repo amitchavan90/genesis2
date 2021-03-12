@@ -119,6 +119,15 @@ func (s *Tasks) SearchSelect(search graphql.SearchFilter, limit int, offset int)
 	return count, records, nil
 }
 
+// GetSku by skuID
+func (s *Tasks) GetSku(skuID string, txes ...*sql.Tx) (*db.StockKeepingUnit, error) {
+	dat, err := db.StockKeepingUnits(db.StockKeepingUnitWhere.ID.EQ(skuID)).One(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
 // GetSubtasks by taskID
 func (s *Tasks) GetSubtasks(taskID string, txes ...*sql.Tx) (db.SubtaskSlice, error) {
 	dat, err := db.Subtasks(db.SubtaskWhere.TaskID.EQ(null.StringFrom(taskID))).All(s.Conn)
@@ -167,7 +176,7 @@ func (s *Tasks) Get(id uuid.UUID, txes ...*sql.Tx) (*db.Task, error) {
 }
 
 // Insert a task
-func (s *Tasks) Insert(t *db.Task, subtasks []db.Subtask, txes ...*sql.Tx) (*db.Task, error) {
+func (s *Tasks) Insert(t *db.Task, txes ...*sql.Tx) (*db.Task, error) {
 	var err error
 
 	handleTransactions(s.Conn, func(tx *sql.Tx) error {
@@ -179,24 +188,18 @@ func (s *Tasks) Insert(t *db.Task, subtasks []db.Subtask, txes ...*sql.Tx) (*db.
 		return nil, terror.New(err, "")
 	}
 
-	if len(subtasks) >= 0 {
-		for i := range subtasks {
-			stID, _ := uuid.NewV4()
-			subtasks[i].ID = stID.String()
-			subtasks[i].TaskID = null.StringFrom(t.ID)
-
-			handleTransactions(s.Conn, func(tx *sql.Tx) error {
-				return subtasks[i].Insert(tx, boil.Infer())
-			}, txes...)
-
-			err = subtasks[i].Reload(s.Conn)
-			if err != nil {
-				return nil, terror.New(err, "")
-			}
-		}
-	}
-
 	return t, nil
+}
+
+// InsertSubtask skus
+func (s *Tasks) InsertSubtask(st *db.Subtask, txes ...*sql.Tx) (*db.Subtask, error) {
+	err := handleTransactions(s.Conn, func(tx *sql.Tx) error {
+		return st.Insert(tx, boil.Infer())
+	}, txes...)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return st, nil
 }
 
 // Update a task

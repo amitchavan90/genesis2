@@ -24,6 +24,13 @@ query {
           },
           role {
               id
+          },
+          referrals {
+            id,
+            userID,
+            referredByID,
+            isRedemmed,
+            createdAt
           }
       }
       total
@@ -45,6 +52,13 @@ query user {
     },
     role {
         id
+    },
+    referrals {
+      id,
+      userID,
+      referredByID,
+      isRedemmed,
+      createdAt
     }
   }
 }
@@ -62,6 +76,7 @@ mutation userCreate {
             password: "password"
             affiliateOrg: "e39e4131-fd0e-4560-b129-59a4c7fe1f3f"
             mobilePhone: "1234567890"
+            referredByCode: "1234567"
         }
     ) {
         id,

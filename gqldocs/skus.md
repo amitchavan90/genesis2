@@ -18,10 +18,12 @@ query {
           name,
           code,
           description,
+          weight,
+          weightUnit,
+          price,
+          currency,
           isBeef,
           isAppSku,
-          isMiniappSku,
-          isRetailSku,
           isPointSku,
           hasClones,
           masterPlan {
@@ -45,6 +47,14 @@ query {
           photos {
               id
           },
+          categories {
+              id,
+              name
+          },
+          productCategories {
+              id,
+              name
+          },
           productCount
       }
       total
@@ -57,11 +67,31 @@ query {
 mutation skuCreate {
     skuCreate(
         input: {
-            name: "iPhone X"
+            name: "Galaxy S21"
             description: "Smartphone"
+            weight: 3
+            weightUnit: "Kilogram"
+            price: 999,
+            currency: "AUD"
             isBeef: false
             isAppSku: true
             isPointSku: true
+            categories: [
+                {
+                    name: "Cat 1"
+                },
+                {
+                    name: "Cat 2"
+                }
+            ]
+            productCategories: [
+                {
+                    name: "Product Cat 1"
+                },
+                {
+                    name: "Product Cat 2"
+                }
+            ]
         }
     ) {
         id,
@@ -69,7 +99,19 @@ mutation skuCreate {
         description,
         isBeef,
         isAppSku,
-        isPointSku
+        isPointSku,
+        weight,
+        weightUnit,
+        price,
+        currency,
+        categories {
+            id,
+            name
+        },
+        productCategories {
+            id,
+            name
+        }
     }
 }
 `

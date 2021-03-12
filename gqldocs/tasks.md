@@ -14,17 +14,26 @@ query {
     offset: 0
   ) {
       tasks {
-        id,
-        title,
-        description,
-        loyaltyPoints,
-        isTimeBound,
-        isPeopleBound,
-        isProductRelevant,
-        finishDate,
-        maximumPeople,
-        skuID,
-        createdAt
+          id,
+          title,
+          description,
+          isTimeBound,
+          isPeopleBound,
+          isProductRelevant,
+          isFinal,
+          finishDate,
+          maximumPeople,
+          sku {
+             id,
+             name,
+             code
+          },
+          subtasks {
+              id,
+              title,
+              description
+          },
+          createdAt
       }
       total
   }
@@ -44,7 +53,16 @@ query task {
     isProductRelevant,
     finishDate,
     maximumPeople,
-    skuID,
+    sku {
+        id,
+        name,
+        code
+    },
+    subtasks {
+        id,
+        title,
+        description
+    }
     createdAt
   }
 }
@@ -63,6 +81,16 @@ mutation taskCreate {
             isProductRelevant: false
             finishDate: "2021-03-06T15:04:05Z"
             maximumPeople: 10
+            subtasks: [
+                {
+                    title: "Subtask 1"
+                    description: "Subtask One"
+                },
+                {
+                    title: "Subtask 2"
+                    description: "Subtask Two"
+                }
+            ]
         }
     ) {
         title,
@@ -71,9 +99,19 @@ mutation taskCreate {
         isTimeBound,
         isPeopleBound,
         isProductRelevant,
+        isFinal,
         finishDate,
         maximumPeople,
-        skuID
+        sku {
+            id,
+            name,
+            code
+        }
+        subtasks {
+            id,
+            title,
+            description
+        }
     }
 }
 `
