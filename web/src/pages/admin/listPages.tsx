@@ -479,6 +479,27 @@ const UserActivity = () => (
 	/>
 )
 
+const TasksList = () => (
+	<ItemListPage
+		itemName="task"
+		header="Task"
+		query={graphql.query.TASKS}
+		batchActionMutation={graphql.mutation.BATCH_ACTION_SKU}
+		firstColumnValue="title"
+		firstColumnSubValue="finishDate"
+		columns={[
+			{ label: "Products Amount", value: "loyaltyPoints" },
+			{
+				label: "Date Created",
+				value: "createdAt",
+				dateTime: true,
+			},
+		]}
+		actions={ActionItemSet.Archive}
+		createPermission={Perm.TaskCreate}
+		readPermission={Perm.TaskRead}
+	/>
+)
 export const ListPage = {
 	Products,
 	SKUs,
@@ -496,4 +517,5 @@ export const ListPage = {
 
 	Transactions,
 	UserActivity,
+	TasksList
 }

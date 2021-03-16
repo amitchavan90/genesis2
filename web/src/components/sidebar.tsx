@@ -204,7 +204,7 @@ export const SideBar = () => {
 						</div>
 					</>
 				)}
-				{hasPermission(Perm.TaskCreate) && <SideMenuButton index={index++} icon="file-contract" iconLight label="Tasks" url="/portal/taskEdit" altURL="/portal/sku" />}
+			    {hasPermission(Perm.TaskList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="Tasks list" url="/portal/tasks" altURL="/portal/tasks" />}
 			</div>
 		</div>
 	)

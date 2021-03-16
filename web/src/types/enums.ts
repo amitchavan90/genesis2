@@ -73,6 +73,8 @@ export enum Perm {
 	TrackActionArchive = "TrackActionArchive",
 	TrackActionUnarchive = "TrackActionUnarchive",
 
+	TaskList = "TaskList",
+	TaskRead = "TaskRead",
 	TaskCreate = "TaskCreate",
 
 	ContractList = "ContractList",

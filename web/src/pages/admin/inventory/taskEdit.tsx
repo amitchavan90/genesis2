@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "@apollo/react-hooks"
 import { graphql } from "../../../graphql"
 import { useForm } from "react-hook-form"
 import { Textarea } from "baseui/textarea"
-import { FormControl } from "baseui/form-control"
+import { FormControl,FormControlOverrides} from "baseui/form-control"
 import { Input } from "baseui/input"
 import { H1, H3 } from "baseui/typography"
 import { Button } from "baseui/button"
@@ -17,14 +17,18 @@ import { CenteredPage } from "../../../components/common"
 import { invalidateListQueries } from "../../../apollo"
 import { Checkbox } from "baseui/checkbox"
 import { Datepicker } from "baseui/datepicker"
-import { Task} from "../../../types/types"
+import { Task, SubTask} from "../../../types/types"
+import { ItemSelectList } from "../../../components/itemSelectList"
+import { Select, Value } from "baseui/select"
+import { IconName } from "@fortawesome/fontawesome-svg-core"
+
 
 type FormData = {
 	title: string
 	loyaltyPoints: number
-    finishDate: Date
     maximumPeople: number
     skuID: string
+	subtasks : SubTask[]
 }
 
 const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
@@ -39,6 +43,16 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 		border: "1px solid rgba(0, 0, 0, 0.1)",
 		marginBottom: "10px",
 	})
+	const plusCircleMargin = css({
+		marginRight: "10px",
+	})
+
+	const plusCircle = (
+		<div className={plusCircleMargin}>
+			<FontAwesomeIcon icon={["fal", "plus-circle"]} size="lg" />
+		</div>
+	)
+	
 	
 	// Get SKU
 	const [task, setTask] = React.useState<Task>()
@@ -47,17 +61,19 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 	// Form submission
 	const [timedOut, setTimedOut] = React.useState(false)
 	const [description, setDescription] = React.useState("")
-	const [isTimeBound, setIsTimeBound] = React.useState<boolean>()
-	const [isPeopleBound, setIsPeopleBound] = React.useState<boolean>()
-	const [isProductRelevant, setIsProductRelevant] = React.useState<boolean>()
+	const [isTimeBound, setIsTimeBound] = React.useState<boolean>(false)
+	const [isPeopleBound, setIsPeopleBound] = React.useState<boolean>(false)
+	const [isProductRelevant, setIsProductRelevant] = React.useState<boolean>(false)
 	const [finishDate, setfinishDate] = React.useState(new Date())
-    console.log("finishDate---------------->",finishDate)
+	const [sku,setSKU] = React.useState<Value>()
+	const [subTasksCount, setSubTasksCount] = React.useState(isNewTask? 0 : 25)
 	const breakLine = <div className={breakLineStyle} />
 
 	const { register, setValue, handleSubmit, errors, getValues } = useForm<FormData>()
 
-	const onSubmit = handleSubmit(async ({ title, loyaltyPoints, finishDate, maximumPeople, skuID}) => {
+	const onSubmit = handleSubmit(async ({ title, loyaltyPoints, maximumPeople, skuID, subtasks}) => {
 		setTimedOut(false)
+		
 		const input = {
 			title,
 			description,
@@ -67,7 +83,8 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 			loyaltyPoints,
 			finishDate,
 			maximumPeople,
-			//skuID
+			//skuID,
+			subtasks,
 		}
 
 		if (isNewTask) {
@@ -91,6 +108,11 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 		setValue("maximumPeople", task.maximumPeople)
 		setfinishDate(new Date(task.finishDate))
 		//setValue("L280001", task.skuID)
+		setSubTasksCount(task.subtasks.length)
+		task.subtasks.forEach((info, index) => {
+			setValue(`subtasks[${index}].title`, info.title)
+			setValue(`subtasks[${index}].description`, info.description)
+		})
 	}, [task])
 	
 	const editForm = (
@@ -134,7 +156,7 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 					Is Time Bound
 				</Checkbox>
 			</FormControl>
-
+			
 			<FormControl caption="">
 				<Checkbox checked={isPeopleBound} onChange={e => setIsPeopleBound(e.currentTarget.checked)}>
 					Is People Bound
@@ -146,12 +168,14 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 				</Checkbox>
 			</FormControl>
 			{breakLine}
+			{isPeopleBound?
 			<FormControl label="Maximum People" error={errors.maximumPeople ? errors.maximumPeople.message : ""} positive="">
 				<Input name="maximumPeople" type="number" inputRef={register}/>
-			</FormControl>
+			</FormControl>:<div></div>}
 			{/* <FormControl label="Finish Date" error={errors.finishDate ? errors.finishDate.message : ""} positive="">
 				<Input name="finishDate" type="Date" inputRef={register} />
 			</FormControl> */}
+			{isTimeBound?
 			<FormControl label="Finish Date" caption="YYYY/MM/DD" error="" positive="">
 				<div
 					style={{
@@ -161,8 +185,44 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 				>
 					<Datepicker value={finishDate} onChange={({ date }) => setfinishDate(date as Date)} />
 				</div>
-			</FormControl>	
+			</FormControl>:<div></div>}	
+			{/* <FormControl label="Role">
+				<ItemSelectList itemName="role" value={sku} setValue={setSKU} query={graphql.query.ROLES_LIMITED} identifier="name" disableSearch limit={0} />
+			</FormControl> */}
 			{breakLine}
+			<FormControl label={`Sub Tasks (${subTasksCount}/25)`} error="" positive="">
+				<div>
+					{Array.from({ length: subTasksCount }).map((_, index) => (
+						<InputPair
+							key={`sku_info_${index}`}
+							prefix="subtasks"
+							index={index}
+							icon="info-circle"
+							titleInputRef={register({ required: "Required" })}
+							contentInputRef={register({ required: "Required" })}
+							titleError={errors.subtasks && errors.subtasks[index] && errors.subtasks[index].title?.message}
+							contentError={errors.subtasks && errors.subtasks[index] && errors.subtasks[index].description?.message}
+							onDelete={async () => {
+								const subtasks = getValues({ nest: true }).subtasks
+								const newInfo = [...subtasks.slice(0, index), ...subtasks.slice(index + 1)]
+								subtasks.forEach((_, index) => {
+									setValue(`subtasks[${index}].title`, index >= newInfo.length ? "" : newInfo[index].title)
+									setValue(`subtasks[${index}].content`, index >= newInfo.length ? "" : newInfo[index].description)
+								})
+								setSubTasksCount(subTasksCount - 1)
+							}}
+						/>
+					))}
+					{subTasksCount < 25 && (
+						<Button type="button" kind="secondary" onClick={() => setSubTasksCount(subTasksCount + 1)}>
+							{plusCircle} Add SubTasks
+						</Button>
+					)}
+				</div>
+			</FormControl>
+
+			{breakLine}
+			
 			<Spread>
 				<Button type="button" kind="secondary" onClick={() => history.push("/portal/skus")}>
 					Cancel
@@ -187,6 +247,92 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 			) : (<div>view task</div>)}
 			</CenteredPage>
 		)
+	}
+
+	interface InputPairProps {
+		index: number
+		prefix: string
+		icon: IconName
+		titleInputRef: any
+		contentInputRef: any
+		titleError?: string
+		contentError?: string
+		onDelete: () => void
+		label1?: string
+		label2?: string
+	}
+	
+	export const InputPair = (props: InputPairProps) => {
+		const { prefix, index } = props
+		console.log("subtasks------------->",prefix,props.titleInputRef)
+		const [css, theme] = useStyletron()
+		const containerStyle = css({
+			display: "flex",
+			alignItems: "center",
+			padding: "8px 0 8px 10px",
+			backgroundColor: index % 2 == 1 ? "rgba(0, 0, 0, 0.015)" : "unset",
+		})
+		const iconStyle = css({
+			marginRight: "10px",
+		})
+		const half = css({
+			display: "flex",
+			alignItems: "center",
+			width: "50%",
+		})
+	
+		return (
+			<div className={containerStyle}>
+				<div className={half}>
+					<div className={iconStyle}>
+						<FontAwesomeIcon icon={["fas", props.icon]} size="lg" />
+					</div>
+					<FormControl label={props.label1 || "Title"} overrides={InputParFormControlOverrides} error="" positive="">
+						<Input name={`${prefix}[${index}].title`} inputRef={props.titleInputRef} error={props.titleError !== undefined} />
+					</FormControl>
+				</div>
+				<div className={half}>
+					<FormControl label={props.label2 || "Description"} overrides={InputParFormControlOverrides} error="" positive="">
+						<Input name={`${prefix}[${index}].description`} inputRef={props.contentInputRef} error={props.contentError !== undefined} />
+					</FormControl>
+					<Button
+						type="button"
+						kind="minimal"
+						onClick={props.onDelete}
+						overrides={{
+							BaseButton: {
+								style: {
+									color: "grey",
+									":hover": {
+										color: "#d63916",
+									},
+								},
+							},
+						}}
+					>
+						<FontAwesomeIcon icon={["fas", "trash"]} size="lg" />
+					</Button>
+				</div>
+			</div>
+		)
+	}
+
+	const InputParFormControlOverrides: FormControlOverrides = {
+		Label: {
+			style: {
+				marginTop: 0,
+				marginBottom: 0,
+				marginRight: "10px",
+				width: "unset",
+			},
+		},
+		ControlContainer: {
+			style: {
+				marginBottom: 0,
+				marginRight: "20px",
+				width: "100%",
+			},
+		},
 	}
 
 export default taskEdit

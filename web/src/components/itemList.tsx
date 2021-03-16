@@ -90,6 +90,7 @@ interface ItemListProps {
 	contractID?: string
 	userID?: string
 	trackActionID?: string
+	taskID?: string
 
 	/** Additional columns to show in the table
 	 *
@@ -194,6 +195,7 @@ export const ItemList = (props: ItemListProps) => {
 	const [contractID, setContractID] = React.useState(props.contractID)
 	const [userID, setUserID] = React.useState(props.userID)
 	const [trackActionID, setTrackActionID] = React.useState(props.trackActionID)
+	const [taskID, setTaskID] = React.useState(props.taskID)
 
 	const [showModal, setShowModal] = React.useState<boolean>()
 	const [modalColumn, setModalColumn] = React.useState<number>()
@@ -219,6 +221,8 @@ export const ItemList = (props: ItemListProps) => {
 				return graphql.query.USERS
 			case "trackAction":
 				return graphql.query.TRACK_ACTIONS
+			case "trackAction":
+				return graphql.query.TASKS	
 		}
 		return graphql.query.CONTRACTS
 	}
@@ -239,6 +243,7 @@ export const ItemList = (props: ItemListProps) => {
 		setContractID(undefined)
 		setUserID(undefined)
 		setTrackActionID(undefined)
+		setTaskID(undefined)
 
 		switch (column) {
 			case "container":
@@ -271,6 +276,9 @@ export const ItemList = (props: ItemListProps) => {
 			case "trackAction":
 				setTrackActionID(id)
 				break
+			case "task":
+				setTaskID(id)
+				break	
 		}
 	}
 
@@ -314,6 +322,7 @@ export const ItemList = (props: ItemListProps) => {
 			contractID,
 			userID,
 			trackActionID,
+			taskID,
 		},
 	})
 

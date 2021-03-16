@@ -543,12 +543,22 @@ const TICKER_INFO = gql`
 const TASK = gql`
 	query task($code: String!) {
 		task(code: $code) {
-			...TASKFragment
+			...TaskFragment
 		}
 	}
 	${fragment.TASK}
 `
-
+const TASKS = gql`
+	query tasks($search: SearchFilter!, $limit: Int!, $offset: Int!) {
+		tasks(search: $search, limit: $limit, offset: $offset) {
+			tasks {
+				...TaskListFragment
+			}
+			total
+		}
+	}
+	${fragment.TASK_LIST}
+`
 export const query = {
 	ME,
 
@@ -613,5 +623,6 @@ export const query = {
 	FIELDAPP_VERSION,
 	TICKER_INFO,
 
+	TASKS,
 	TASK,
 }

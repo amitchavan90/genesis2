@@ -90,9 +90,9 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	const [timedOut, setTimedOut] = React.useState(false)
 	const [showSuccessModal, setShowSuccessModal] = React.useState(false)
 	const [description, setDescription] = React.useState("")
-	const [isBeef, setIsBeef] = React.useState<boolean>()
-	const [isAppSku, setIsAppSku] = React.useState<boolean>()
-	const [isPointSku, setIsPointSku] = React.useState<boolean>()
+	const [isBeef, setIsBeef] = React.useState<boolean>(false)
+	const [isAppSku, setIsAppSku] = React.useState<boolean>(false)
+	const [isPointSku, setIsPointSku] = React.useState<boolean>(false)
 
 	const [masterPlanFile, setMasterPlanFile] = React.useState<File>()
 	const [masterPlanURL, setMasterPlanURL] = React.useState<string>()
@@ -179,11 +179,11 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 		const input = {
 			name,
-			//brand,
+			brand,
 			price,
-			//point,
+			point,
 			weight,
-			//ingredients,
+			ingredients,
 			code,
 			description,
 			isBeef,
@@ -222,11 +222,11 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 		if (!sku) return
 
 		setValue("name", sku.name)
-		//setValue("brand", sku.brand)
+		setValue("brand", sku.brand)
 		setValue("price", sku.price)
-		//setValue("point", sku.point)
+		setValue("point", sku.point)
 		setValue("weight", sku.weight)
-		//setValue("ingredients", sku.ingredients)
+		setValue("ingredients", sku.ingredients)
 		setValue("code", sku.code)
 		setValue("loyaltyPoints", sku.loyaltyPoints)
 		setDescription(sku.description)
@@ -370,23 +370,27 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 				</Checkbox>
 			</FormControl>
 			{breakLine}
-			<FormControl label="Price" error={errors.price ? errors.price.message : ""} positive="">
-				<Input name="price" type="number" inputRef={register({ required: "Required" })} />
-			</FormControl>
-			{/* <FormControl label="Point" error={errors.point ? errors.point.message : ""} positive="">
+			
+			{isPointSku?
+			 <FormControl label="Point" error={errors.point ? errors.point.message : ""} positive="">
 				<Input name="point" type="number" inputRef={register({ required: "Required" })} />
-			</FormControl> */}
+			</FormControl>:
+			<FormControl label="Price" error={errors.price ? errors.price.message : ""} positive="">
+			<Input name="price" type="number" inputRef={register({ required: "Required" })} />
+			</FormControl>
+			}
 			{breakLine}
-			{/* <FormControl label="Brand" error={errors.brand ? errors.brand.message : ""} positive="">
+			<FormControl label="Brand" error={errors.brand ? errors.brand.message : ""} positive="">
 				<Input name="brand" inputRef={register({ required: "Required" })} />
-			</FormControl> */}
+			</FormControl>
 			<FormControl label="Weight" error={errors.weight ? errors.weight.message : ""} positive="">
 				<Input name="weight" type="number" inputRef={register({ required: "Required" })} />
 			</FormControl>
-			{/* <FormControl label="Ingredients" error={errors.ingredients ? errors.ingredients.message : ""} positive="">
+			<FormControl label="Ingredients" error={errors.ingredients ? errors.ingredients.message : ""} positive="">
 				<Input name="ingredients" inputRef={register({ required: "Required" })} />
-			</FormControl> */}
+			</FormControl>
 			{breakLine}
+			
 
 			<ImageUpload.Single
 				// client requested to rename it to Hero Image

@@ -116,7 +116,8 @@ const PortalInner = () => {
 							{hasPermission(Perm.TrackActionUpdate) && <Route path={"/portal/trackAction/:code"} component={TrackActionEdit} />}
 							{hasPermission(Perm.TrackActionList) && <Route path={"/portal/trackActions"} component={ListPage.TrackActions} />}
 
-							{hasPermission(Perm.TaskCreate) && <Route path={"/portal/taskEdit"} component={TaskEdit} />}
+							{hasPermission(Perm.TaskCreate) && <Route path={"/portal/task/:id"} component={TaskEdit} />}
+							{hasPermission(Perm.TaskList) && <Route path={"/portal/tasks"} component={ListPage.TasksList} />}
 							<Route path={"/portal/"} component={Dashboard} />
 						</Switch>
 					</div>

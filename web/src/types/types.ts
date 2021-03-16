@@ -66,11 +66,12 @@ export interface SKUContent {
 export interface SKU {
 	id: string
 	name: string
-	//brand :string
+	brand :string
 	price: number
-	//point: number
+	point: number
 	weight: number
-	//ingredients: string
+	ingredients: string
+	category: string
 	code: string
 	description: string
 	isBeef: boolean
@@ -93,6 +94,17 @@ export interface SKUClone {
 	depth: number
 }
 
+export interface SKURefer{
+	id: string
+	name: string
+	code: string
+}
+
+export interface SubTask {
+	title: string
+	description: string
+}
+
 export interface Task{
     title:string
     description:String
@@ -102,7 +114,8 @@ export interface Task{
     isProductRelevant: boolean
     finishDate:Date
     maximumPeople:number
-    skuID:string
+    skuID:SKURefer
+	subtasks:SubTask[]
 }
 
 export interface Container {

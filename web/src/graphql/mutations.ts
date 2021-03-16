@@ -463,7 +463,7 @@ const FLUSH_PENDING_TRANSACTIONS = gql`
 const CREATE_TASK = gql`
 	mutation taskCreate($input: UpdateTask!) {
 		taskCreate(input: $input) {
-			...TASKFragment
+			...TaskFragment
 		}
 	}
 	${fragment.TASK}
