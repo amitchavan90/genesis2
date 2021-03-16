@@ -28,6 +28,8 @@ type Contract struct {
 	Name         string    `db:"name" boil:"name" json:"name" toml:"name" yaml:"name"`
 	Description  string    `db:"description" boil:"description" json:"description" toml:"description" yaml:"description"`
 	SupplierName string    `db:"supplier_name" boil:"supplier_name" json:"supplier_name" toml:"supplier_name" yaml:"supplier_name"`
+	Latitude     float64   `db:"latitude" boil:"latitude" json:"latitude" toml:"latitude" yaml:"latitude"`
+	Longitude    float64   `db:"longitude" boil:"longitude" json:"longitude" toml:"longitude" yaml:"longitude"`
 	DateSigned   null.Time `db:"date_signed" boil:"date_signed" json:"date_signed,omitempty" toml:"date_signed" yaml:"date_signed,omitempty"`
 	Archived     bool      `db:"archived" boil:"archived" json:"archived" toml:"archived" yaml:"archived"`
 	ArchivedAt   null.Time `db:"archived_at" boil:"archived_at" json:"archived_at,omitempty" toml:"archived_at" yaml:"archived_at,omitempty"`
@@ -45,6 +47,8 @@ var ContractColumns = struct {
 	Name         string
 	Description  string
 	SupplierName string
+	Latitude     string
+	Longitude    string
 	DateSigned   string
 	Archived     string
 	ArchivedAt   string
@@ -57,6 +61,8 @@ var ContractColumns = struct {
 	Name:         "name",
 	Description:  "description",
 	SupplierName: "supplier_name",
+	Latitude:     "latitude",
+	Longitude:    "longitude",
 	DateSigned:   "date_signed",
 	Archived:     "archived",
 	ArchivedAt:   "archived_at",
@@ -67,12 +73,36 @@ var ContractColumns = struct {
 
 // Generated where
 
+type whereHelperfloat64 struct{ field string }
+
+func (w whereHelperfloat64) EQ(x float64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperfloat64) NEQ(x float64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.NEQ, x)
+}
+func (w whereHelperfloat64) LT(x float64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperfloat64) LTE(x float64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelperfloat64) GT(x float64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperfloat64) GTE(x float64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+func (w whereHelperfloat64) IN(slice []float64) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+
 var ContractWhere = struct {
 	ID           whereHelperstring
 	Code         whereHelperstring
 	Name         whereHelperstring
 	Description  whereHelperstring
 	SupplierName whereHelperstring
+	Latitude     whereHelperfloat64
+	Longitude    whereHelperfloat64
 	DateSigned   whereHelpernull_Time
 	Archived     whereHelperbool
 	ArchivedAt   whereHelpernull_Time
@@ -85,6 +115,8 @@ var ContractWhere = struct {
 	Name:         whereHelperstring{field: "\"contracts\".\"name\""},
 	Description:  whereHelperstring{field: "\"contracts\".\"description\""},
 	SupplierName: whereHelperstring{field: "\"contracts\".\"supplier_name\""},
+	Latitude:     whereHelperfloat64{field: "\"contracts\".\"latitude\""},
+	Longitude:    whereHelperfloat64{field: "\"contracts\".\"longitude\""},
 	DateSigned:   whereHelpernull_Time{field: "\"contracts\".\"date_signed\""},
 	Archived:     whereHelperbool{field: "\"contracts\".\"archived\""},
 	ArchivedAt:   whereHelpernull_Time{field: "\"contracts\".\"archived_at\""},
@@ -117,8 +149,8 @@ func (*contractR) NewStruct() *contractR {
 type contractL struct{}
 
 var (
-	contractAllColumns            = []string{"id", "code", "name", "description", "supplier_name", "date_signed", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
-	contractColumnsWithoutDefault = []string{"code", "name", "description", "supplier_name", "date_signed", "archived_at", "created_by_id"}
+	contractAllColumns            = []string{"id", "code", "name", "description", "supplier_name", "latitude", "longitude", "date_signed", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
+	contractColumnsWithoutDefault = []string{"code", "name", "description", "supplier_name", "latitude", "longitude", "date_signed", "archived_at", "created_by_id"}
 	contractColumnsWithDefault    = []string{"id", "archived", "updated_at", "created_at"}
 	contractPrimaryKeyColumns     = []string{"id"}
 )

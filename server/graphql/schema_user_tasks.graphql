@@ -1,0 +1,38 @@
+# type UserSubtask {
+# 	id: ID!
+# 	subtaskID: String!
+# 	userTaskID: String!
+# 	isComplete: Boolean!
+# 	createdAt: Time!
+# }
+type UserTask {
+	id: ID!
+	task: Task!
+	user: User!
+	status: String!
+	isComplete: Boolean!
+	createdAt: Time!
+}
+
+type UserTasksResult {
+	userTasks: [UserTask!]!
+	total: Int!
+}
+
+# input UpdateUserSubtask {
+# 	userTaskID: String!
+# }
+
+input UpdateUserTask {
+	taskID: String!
+}
+
+extend type Query {
+	userTasks(search: SearchFilter!, limit: Int!, offset: Int!): UserTasksResult! @hasPerm(p: UserTaskList)
+	userTask(id: String): UserTask! @hasPerm(p: UserTaskRead)
+}
+
+extend type Mutation {
+	userTaskCreate(input: UpdateUserTask!): UserTask! @hasPerm(p: UserTaskCreate)
+	userTaskUpdate(id: ID!, input: UpdateUserTask!): UserTask! @hasPerm(p: UserTaskUpdate)
+}

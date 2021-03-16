@@ -26,9 +26,6 @@ type Product struct {
 	ID                  string      `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
 	Code                string      `db:"code" boil:"code" json:"code" toml:"code" yaml:"code"`
 	Description         string      `db:"description" boil:"description" json:"description" toml:"description" yaml:"description"`
-	Weight              int         `db:"weight" boil:"weight" json:"weight" toml:"weight" yaml:"weight"`
-	Price               int         `db:"price" boil:"price" json:"price" toml:"price" yaml:"price"`
-	Currency            string      `db:"currency" boil:"currency" json:"currency" toml:"currency" yaml:"currency"`
 	RegisterID          string      `db:"register_id" boil:"register_id" json:"register_id" toml:"register_id" yaml:"register_id"`
 	IsBeef              bool        `db:"is_beef" boil:"is_beef" json:"is_beef" toml:"is_beef" yaml:"is_beef"`
 	IsPointProduct      bool        `db:"is_point_product" boil:"is_point_product" json:"is_point_product" toml:"is_point_product" yaml:"is_point_product"`
@@ -56,9 +53,6 @@ var ProductColumns = struct {
 	ID                  string
 	Code                string
 	Description         string
-	Weight              string
-	Price               string
-	Currency            string
 	RegisterID          string
 	IsBeef              string
 	IsPointProduct      string
@@ -81,9 +75,6 @@ var ProductColumns = struct {
 	ID:                  "id",
 	Code:                "code",
 	Description:         "description",
-	Weight:              "weight",
-	Price:               "price",
-	Currency:            "currency",
 	RegisterID:          "register_id",
 	IsBeef:              "is_beef",
 	IsPointProduct:      "is_point_product",
@@ -110,9 +101,6 @@ var ProductWhere = struct {
 	ID                  whereHelperstring
 	Code                whereHelperstring
 	Description         whereHelperstring
-	Weight              whereHelperint
-	Price               whereHelperint
-	Currency            whereHelperstring
 	RegisterID          whereHelperstring
 	IsBeef              whereHelperbool
 	IsPointProduct      whereHelperbool
@@ -135,9 +123,6 @@ var ProductWhere = struct {
 	ID:                  whereHelperstring{field: "\"products\".\"id\""},
 	Code:                whereHelperstring{field: "\"products\".\"code\""},
 	Description:         whereHelperstring{field: "\"products\".\"description\""},
-	Weight:              whereHelperint{field: "\"products\".\"weight\""},
-	Price:               whereHelperint{field: "\"products\".\"price\""},
-	Currency:            whereHelperstring{field: "\"products\".\"currency\""},
 	RegisterID:          whereHelperstring{field: "\"products\".\"register_id\""},
 	IsBeef:              whereHelperbool{field: "\"products\".\"is_beef\""},
 	IsPointProduct:      whereHelperbool{field: "\"products\".\"is_point_product\""},
@@ -200,9 +185,9 @@ func (*productR) NewStruct() *productR {
 type productL struct{}
 
 var (
-	productAllColumns            = []string{"id", "code", "description", "weight", "price", "currency", "register_id", "is_beef", "is_point_product", "is_app_product", "loyalty_points", "loyalty_points_expire", "sku_id", "carton_id", "order_id", "contract_id", "distributor_id", "close_register_id", "transaction_hash", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
-	productColumnsWithoutDefault = []string{"code", "currency", "sku_id", "carton_id", "order_id", "contract_id", "distributor_id", "close_register_id", "transaction_hash", "archived_at", "created_by_id"}
-	productColumnsWithDefault    = []string{"id", "description", "weight", "price", "register_id", "is_beef", "is_point_product", "is_app_product", "loyalty_points", "loyalty_points_expire", "archived", "updated_at", "created_at"}
+	productAllColumns            = []string{"id", "code", "description", "register_id", "is_beef", "is_point_product", "is_app_product", "loyalty_points", "loyalty_points_expire", "sku_id", "carton_id", "order_id", "contract_id", "distributor_id", "close_register_id", "transaction_hash", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
+	productColumnsWithoutDefault = []string{"code", "sku_id", "carton_id", "order_id", "contract_id", "distributor_id", "close_register_id", "transaction_hash", "archived_at", "created_by_id"}
+	productColumnsWithDefault    = []string{"id", "description", "register_id", "is_beef", "is_point_product", "is_app_product", "loyalty_points", "loyalty_points_expire", "archived", "updated_at", "created_at"}
 	productPrimaryKeyColumns     = []string{"id"}
 )
 

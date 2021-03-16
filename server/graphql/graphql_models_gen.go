@@ -269,7 +269,9 @@ type UpdateRole struct {
 type UpdateSku struct {
 	Name              *null.String             `json:"name"`
 	Code              *null.String             `json:"code"`
+	Brand             *null.String             `json:"brand"`
 	Description       *null.String             `json:"description"`
+	Ingredients       *null.String             `json:"ingredients"`
 	Weight            *null.Int                `json:"weight"`
 	WeightUnit        *null.String             `json:"weightUnit"`
 	Price             *null.Int                `json:"price"`
@@ -328,9 +330,18 @@ type UpdateUser struct {
 	ReferredByCode *null.String `json:"referredByCode"`
 }
 
+type UpdateUserTask struct {
+	TaskID string `json:"taskID"`
+}
+
 type UserActivityResult struct {
 	UserActivities []*db.UserActivity `json:"userActivities"`
 	Total          int                `json:"total"`
+}
+
+type UserTasksResult struct {
+	UserTasks []*db.UserTask `json:"userTasks"`
+	Total     int            `json:"total"`
 }
 
 type UsersResult struct {

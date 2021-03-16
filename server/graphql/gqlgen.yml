@@ -4,6 +4,7 @@ schema:
   - schema_users.graphql
   - schema_referrals.graphql
   - schema_tasks.graphql
+  - schema_user_tasks.graphql
   - schema_skus.graphql
   - schema_orders.graphql
   - schema_containers.graphql
@@ -46,6 +47,10 @@ models:
     model: genesis/db.Task
   Subtask:
     model: genesis/db.Subtask
+  UserTask:
+    model: genesis/db.UserTask
+  UserSubtask:
+    model: genesis/db.UserSubtask
   Organisation:
     model: genesis/db.Organisation
   SKU:

@@ -259,8 +259,14 @@ func (r *mutationResolver) SkuCreate(ctx context.Context, input graphql.UpdateSk
 	if input.Name != nil {
 		u.Name = input.Name.String
 	}
+	if input.Brand != nil {
+		u.Brand = input.Brand.String
+	}
 	if input.Description != nil {
 		u.Description = input.Description.String
+	}
+	if input.Ingredients != nil {
+		u.Ingredients = input.Ingredients.String
 	}
 	if input.LoyaltyPoints != nil {
 		u.LoyaltyPoints = input.LoyaltyPoints.Int

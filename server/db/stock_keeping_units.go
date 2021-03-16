@@ -26,17 +26,20 @@ type StockKeepingUnit struct {
 	ID               string      `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
 	Name             string      `db:"name" boil:"name" json:"name" toml:"name" yaml:"name"`
 	Code             string      `db:"code" boil:"code" json:"code" toml:"code" yaml:"code"`
+	Brand            string      `db:"brand" boil:"brand" json:"brand" toml:"brand" yaml:"brand"`
+	Ingredients      string      `db:"ingredients" boil:"ingredients" json:"ingredients" toml:"ingredients" yaml:"ingredients"`
 	Description      string      `db:"description" boil:"description" json:"description" toml:"description" yaml:"description"`
 	Weight           int         `db:"weight" boil:"weight" json:"weight" toml:"weight" yaml:"weight"`
 	WeightUnit       string      `db:"weight_unit" boil:"weight_unit" json:"weight_unit" toml:"weight_unit" yaml:"weight_unit"`
 	Price            int         `db:"price" boil:"price" json:"price" toml:"price" yaml:"price"`
+	PurchasePoints   int         `db:"purchase_points" boil:"purchase_points" json:"purchase_points" toml:"purchase_points" yaml:"purchase_points"`
+	LoyaltyPoints    int         `db:"loyalty_points" boil:"loyalty_points" json:"loyalty_points" toml:"loyalty_points" yaml:"loyalty_points"`
 	Currency         string      `db:"currency" boil:"currency" json:"currency" toml:"currency" yaml:"currency"`
 	IsBeef           bool        `db:"is_beef" boil:"is_beef" json:"is_beef" toml:"is_beef" yaml:"is_beef"`
 	IsPointSku       bool        `db:"is_point_sku" boil:"is_point_sku" json:"is_point_sku" toml:"is_point_sku" yaml:"is_point_sku"`
 	IsAppSku         bool        `db:"is_app_sku" boil:"is_app_sku" json:"is_app_sku" toml:"is_app_sku" yaml:"is_app_sku"`
 	MasterPlanBlobID null.String `db:"master_plan_blob_id" boil:"master_plan_blob_id" json:"master_plan_blob_id,omitempty" toml:"master_plan_blob_id" yaml:"master_plan_blob_id,omitempty"`
 	VideoBlobID      null.String `db:"video_blob_id" boil:"video_blob_id" json:"video_blob_id,omitempty" toml:"video_blob_id" yaml:"video_blob_id,omitempty"`
-	LoyaltyPoints    int         `db:"loyalty_points" boil:"loyalty_points" json:"loyalty_points" toml:"loyalty_points" yaml:"loyalty_points"`
 	CloneParentID    null.String `db:"clone_parent_id" boil:"clone_parent_id" json:"clone_parent_id,omitempty" toml:"clone_parent_id" yaml:"clone_parent_id,omitempty"`
 	Archived         bool        `db:"archived" boil:"archived" json:"archived" toml:"archived" yaml:"archived"`
 	ArchivedAt       null.Time   `db:"archived_at" boil:"archived_at" json:"archived_at,omitempty" toml:"archived_at" yaml:"archived_at,omitempty"`
@@ -52,17 +55,20 @@ var StockKeepingUnitColumns = struct {
 	ID               string
 	Name             string
 	Code             string
+	Brand            string
+	Ingredients      string
 	Description      string
 	Weight           string
 	WeightUnit       string
 	Price            string
+	PurchasePoints   string
+	LoyaltyPoints    string
 	Currency         string
 	IsBeef           string
 	IsPointSku       string
 	IsAppSku         string
 	MasterPlanBlobID string
 	VideoBlobID      string
-	LoyaltyPoints    string
 	CloneParentID    string
 	Archived         string
 	ArchivedAt       string
@@ -73,17 +79,20 @@ var StockKeepingUnitColumns = struct {
 	ID:               "id",
 	Name:             "name",
 	Code:             "code",
+	Brand:            "brand",
+	Ingredients:      "ingredients",
 	Description:      "description",
 	Weight:           "weight",
 	WeightUnit:       "weight_unit",
 	Price:            "price",
+	PurchasePoints:   "purchase_points",
+	LoyaltyPoints:    "loyalty_points",
 	Currency:         "currency",
 	IsBeef:           "is_beef",
 	IsPointSku:       "is_point_sku",
 	IsAppSku:         "is_app_sku",
 	MasterPlanBlobID: "master_plan_blob_id",
 	VideoBlobID:      "video_blob_id",
-	LoyaltyPoints:    "loyalty_points",
 	CloneParentID:    "clone_parent_id",
 	Archived:         "archived",
 	ArchivedAt:       "archived_at",
@@ -98,17 +107,20 @@ var StockKeepingUnitWhere = struct {
 	ID               whereHelperstring
 	Name             whereHelperstring
 	Code             whereHelperstring
+	Brand            whereHelperstring
+	Ingredients      whereHelperstring
 	Description      whereHelperstring
 	Weight           whereHelperint
 	WeightUnit       whereHelperstring
 	Price            whereHelperint
+	PurchasePoints   whereHelperint
+	LoyaltyPoints    whereHelperint
 	Currency         whereHelperstring
 	IsBeef           whereHelperbool
 	IsPointSku       whereHelperbool
 	IsAppSku         whereHelperbool
 	MasterPlanBlobID whereHelpernull_String
 	VideoBlobID      whereHelpernull_String
-	LoyaltyPoints    whereHelperint
 	CloneParentID    whereHelpernull_String
 	Archived         whereHelperbool
 	ArchivedAt       whereHelpernull_Time
@@ -119,17 +131,20 @@ var StockKeepingUnitWhere = struct {
 	ID:               whereHelperstring{field: "\"stock_keeping_units\".\"id\""},
 	Name:             whereHelperstring{field: "\"stock_keeping_units\".\"name\""},
 	Code:             whereHelperstring{field: "\"stock_keeping_units\".\"code\""},
+	Brand:            whereHelperstring{field: "\"stock_keeping_units\".\"brand\""},
+	Ingredients:      whereHelperstring{field: "\"stock_keeping_units\".\"ingredients\""},
 	Description:      whereHelperstring{field: "\"stock_keeping_units\".\"description\""},
 	Weight:           whereHelperint{field: "\"stock_keeping_units\".\"weight\""},
 	WeightUnit:       whereHelperstring{field: "\"stock_keeping_units\".\"weight_unit\""},
 	Price:            whereHelperint{field: "\"stock_keeping_units\".\"price\""},
+	PurchasePoints:   whereHelperint{field: "\"stock_keeping_units\".\"purchase_points\""},
+	LoyaltyPoints:    whereHelperint{field: "\"stock_keeping_units\".\"loyalty_points\""},
 	Currency:         whereHelperstring{field: "\"stock_keeping_units\".\"currency\""},
 	IsBeef:           whereHelperbool{field: "\"stock_keeping_units\".\"is_beef\""},
 	IsPointSku:       whereHelperbool{field: "\"stock_keeping_units\".\"is_point_sku\""},
 	IsAppSku:         whereHelperbool{field: "\"stock_keeping_units\".\"is_app_sku\""},
 	MasterPlanBlobID: whereHelpernull_String{field: "\"stock_keeping_units\".\"master_plan_blob_id\""},
 	VideoBlobID:      whereHelpernull_String{field: "\"stock_keeping_units\".\"video_blob_id\""},
-	LoyaltyPoints:    whereHelperint{field: "\"stock_keeping_units\".\"loyalty_points\""},
 	CloneParentID:    whereHelpernull_String{field: "\"stock_keeping_units\".\"clone_parent_id\""},
 	Archived:         whereHelperbool{field: "\"stock_keeping_units\".\"archived\""},
 	ArchivedAt:       whereHelpernull_Time{field: "\"stock_keeping_units\".\"archived_at\""},
@@ -189,9 +204,9 @@ func (*stockKeepingUnitR) NewStruct() *stockKeepingUnitR {
 type stockKeepingUnitL struct{}
 
 var (
-	stockKeepingUnitAllColumns            = []string{"id", "name", "code", "description", "weight", "weight_unit", "price", "currency", "is_beef", "is_point_sku", "is_app_sku", "master_plan_blob_id", "video_blob_id", "loyalty_points", "clone_parent_id", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
-	stockKeepingUnitColumnsWithoutDefault = []string{"name", "code", "description", "weight_unit", "currency", "master_plan_blob_id", "video_blob_id", "clone_parent_id", "archived_at", "created_by_id"}
-	stockKeepingUnitColumnsWithDefault    = []string{"id", "weight", "price", "is_beef", "is_point_sku", "is_app_sku", "loyalty_points", "archived", "updated_at", "created_at"}
+	stockKeepingUnitAllColumns            = []string{"id", "name", "code", "brand", "ingredients", "description", "weight", "weight_unit", "price", "purchase_points", "loyalty_points", "currency", "is_beef", "is_point_sku", "is_app_sku", "master_plan_blob_id", "video_blob_id", "clone_parent_id", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
+	stockKeepingUnitColumnsWithoutDefault = []string{"name", "code", "brand", "ingredients", "description", "weight_unit", "currency", "master_plan_blob_id", "video_blob_id", "clone_parent_id", "archived_at", "created_by_id"}
+	stockKeepingUnitColumnsWithDefault    = []string{"id", "weight", "price", "purchase_points", "loyalty_points", "is_beef", "is_point_sku", "is_app_sku", "archived", "updated_at", "created_at"}
 	stockKeepingUnitPrimaryKeyColumns     = []string{"id"}
 )
 

@@ -280,6 +280,7 @@ func main() {
 				userStore := store.NewUserStore(conn)
 				referralStore := store.NewReferralStore(conn)
 				taskStore := store.NewTaskStore(conn)
+				userTaskStore := store.NewUserTaskStore(conn)
 				roleStore := store.NewRoleStore(conn)
 				blobStore := store.NewBlobStore(conn)
 				loyaltyStore := store.NewLoyaltyStore(conn)
@@ -401,6 +402,7 @@ func main() {
 					userStore,
 					referralStore,
 					taskStore,
+					userTaskStore,
 					roleStore,
 					blobStore,
 					loyaltyStore,

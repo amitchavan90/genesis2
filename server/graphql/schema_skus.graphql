@@ -19,7 +19,9 @@ type SKU {
 	id: ID!
 	name: String!
 	code: String!
+	brand: String!
 	description: String!
+	ingredients: String!
 	weight: Int!
 	weightUnit: String!
 	price: Int!
@@ -60,7 +62,9 @@ input UpdateProductCategory {
 input UpdateSKU {
 	name: NullString
 	code: NullString
+	brand: NullString
 	description: NullString
+	ingredients: NullString
 
 	weight: NullInt
 	weightUnit: NullString
