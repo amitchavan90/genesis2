@@ -76,6 +76,9 @@ func (r *mutationResolver) ContractCreate(ctx context.Context, input graphql.Upd
 		u.DateSigned = *input.DateSigned
 	}
 
+	u.Latitude = input.Latitude
+	u.Longitude = input.Longitude
+
 	created, err := r.ContractStore.Insert(u)
 	if err != nil {
 		return nil, terror.New(err, "create contract")

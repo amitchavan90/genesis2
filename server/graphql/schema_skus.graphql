@@ -19,15 +19,18 @@ type SKU {
 	id: ID!
 	name: String!
 	code: String!
+	brand: String!
 	description: String!
+	ingredients: String!
 	weight: Int!
 	weightUnit: String!
 	price: Int!
+	purchasePoints: Int!
+	loyaltyPoints: Int!
 	currency: String!
 	isBeef: Boolean!
 	isPointSku: Boolean!
 	isAppSku: Boolean!
-	loyaltyPoints: Int!
 	archived: Boolean!
 	createdAt: Time!
 
@@ -60,19 +63,22 @@ input UpdateProductCategory {
 input UpdateSKU {
 	name: NullString
 	code: NullString
+	brand: NullString
 	description: NullString
+	ingredients: NullString
 
 	weight: NullInt
 	weightUnit: NullString
 	price: NullInt
 	currency: NullString
+	purchasePoints: NullInt
+	loyaltyPoints: NullInt
 
 	isBeef: NullBool
 	isRetailSku: NullBool
 	isPointSku: NullBool
 	isAppSku: NullBool
 	isMiniappSku: NullBool
-	loyaltyPoints: NullInt
 
 	masterPlanBlobID: NullString
 	videoBlobID: NullString

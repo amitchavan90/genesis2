@@ -57,6 +57,7 @@ type ResolverRoot interface {
 	User() UserResolver
 	UserActivity() UserActivityResolver
 	UserLoyaltyActivity() UserLoyaltyActivityResolver
+	UserTask() UserTaskResolver
 }
 
 type DirectiveRoot struct {
@@ -132,6 +133,8 @@ type ComplexityRoot struct {
 		DateSigned   func(childComplexity int) int
 		Description  func(childComplexity int) int
 		ID           func(childComplexity int) int
+		Latitude     func(childComplexity int) int
+		Longitude    func(childComplexity int) int
 		Name         func(childComplexity int) int
 		SupplierName func(childComplexity int) int
 	}
@@ -245,6 +248,8 @@ type ComplexityRoot struct {
 		TrackActionUpdate        func(childComplexity int, id string, input UpdateTrackAction) int
 		UserArchive              func(childComplexity int, id string) int
 		UserCreate               func(childComplexity int, input UpdateUser) int
+		UserTaskCreate           func(childComplexity int, input UpdateUserTask) int
+		UserTaskUpdate           func(childComplexity int, id string, input UpdateUserTask) int
 		UserUnarchive            func(childComplexity int, id string) int
 		UserUpdate               func(childComplexity int, id string, input UpdateUser) int
 	}
@@ -365,6 +370,8 @@ type ComplexityRoot struct {
 		Transactions             func(childComplexity int, search SearchFilter, limit int, offset int, productID *string, cartonID *string, trackActionID *string) int
 		User                     func(childComplexity int, email *string, wechatID *string) int
 		UserActivities           func(childComplexity int, search SearchFilter, limit int, offset int, userID *string) int
+		UserTask                 func(childComplexity int, id *string) int
+		UserTasks                func(childComplexity int, search SearchFilter, limit int, offset int) int
 		Users                    func(childComplexity int, search SearchFilter, limit int, offset int) int
 		VerifyResetToken         func(childComplexity int, token string, email *null.String) int
 	}
@@ -399,6 +406,7 @@ type ComplexityRoot struct {
 
 	Sku struct {
 		Archived          func(childComplexity int) int
+		Brand             func(childComplexity int) int
 		Categories        func(childComplexity int) int
 		CloneParentID     func(childComplexity int) int
 		Code              func(childComplexity int) int
@@ -407,6 +415,7 @@ type ComplexityRoot struct {
 		Description       func(childComplexity int) int
 		HasClones         func(childComplexity int) int
 		ID                func(childComplexity int) int
+		Ingredients       func(childComplexity int) int
 		IsAppSku          func(childComplexity int) int
 		IsBeef            func(childComplexity int) int
 		IsPointSku        func(childComplexity int) int
@@ -418,6 +427,7 @@ type ComplexityRoot struct {
 		ProductCategories func(childComplexity int) int
 		ProductCount      func(childComplexity int) int
 		ProductInfo       func(childComplexity int) int
+		PurchasePoints    func(childComplexity int) int
 		Urls              func(childComplexity int) int
 		Video             func(childComplexity int) int
 		Weight            func(childComplexity int) int
@@ -575,6 +585,20 @@ type ComplexityRoot struct {
 		User            func(childComplexity int) int
 	}
 
+	UserTask struct {
+		CreatedAt  func(childComplexity int) int
+		ID         func(childComplexity int) int
+		IsComplete func(childComplexity int) int
+		Status     func(childComplexity int) int
+		Task       func(childComplexity int) int
+		User       func(childComplexity int) int
+	}
+
+	UserTasksResult struct {
+		Total     func(childComplexity int) int
+		UserTasks func(childComplexity int) int
+	}
+
 	UsersResult struct {
 		Total func(childComplexity int) int
 		Users func(childComplexity int) int
@@ -618,6 +642,8 @@ type MutationResolver interface {
 	TaskUpdate(ctx context.Context, id string, input UpdateTask) (*db.Task, error)
 	TaskArchive(ctx context.Context, id string) (*db.Task, error)
 	TaskUnarchive(ctx context.Context, id string) (*db.Task, error)
+	UserTaskCreate(ctx context.Context, input UpdateUserTask) (*db.UserTask, error)
+	UserTaskUpdate(ctx context.Context, id string, input UpdateUserTask) (*db.UserTask, error)
 	SkuCreate(ctx context.Context, input UpdateSku) (*db.StockKeepingUnit, error)
 	SkuUpdate(ctx context.Context, id string, input UpdateSku) (*db.StockKeepingUnit, error)
 	SkuArchive(ctx context.Context, id string) (*db.StockKeepingUnit, error)
@@ -705,6 +731,8 @@ type QueryResolver interface {
 	Referral(ctx context.Context, userID *string) (*db.Referral, error)
 	Tasks(ctx context.Context, search SearchFilter, limit int, offset int) (*TasksResult, error)
 	Task(ctx context.Context, id *string) (*db.Task, error)
+	UserTasks(ctx context.Context, search SearchFilter, limit int, offset int) (*UserTasksResult, error)
+	UserTask(ctx context.Context, id *string) (*db.UserTask, error)
 	Skus(ctx context.Context, search SearchFilter, limit int, offset int) (*SKUResult, error)
 	Sku(ctx context.Context, code string) (*db.StockKeepingUnit, error)
 	SkuByID(ctx context.Context, id string) (*db.StockKeepingUnit, error)
@@ -797,6 +825,10 @@ type UserActivityResolver interface {
 type UserLoyaltyActivityResolver interface {
 	User(ctx context.Context, obj *db.UserLoyaltyActivity) (*db.User, error)
 	Product(ctx context.Context, obj *db.UserLoyaltyActivity) (*db.Product, error)
+}
+type UserTaskResolver interface {
+	Task(ctx context.Context, obj *db.UserTask) (*db.Task, error)
+	User(ctx context.Context, obj *db.UserTask) (*db.User, error)
 }
 
 type executableSchema struct {
@@ -1107,6 +1139,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Contract.ID(childComplexity), true
+
+	case "Contract.latitude":
+		if e.complexity.Contract.Latitude == nil {
+			break
+		}
+
+		return e.complexity.Contract.Latitude(childComplexity), true
+
+	case "Contract.longitude":
+		if e.complexity.Contract.Longitude == nil {
+			break
+		}
+
+		return e.complexity.Contract.Longitude(childComplexity), true
 
 	case "Contract.name":
 		if e.complexity.Contract.Name == nil {
@@ -2036,6 +2082,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UserCreate(childComplexity, args["input"].(UpdateUser)), true
 
+	case "Mutation.userTaskCreate":
+		if e.complexity.Mutation.UserTaskCreate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_userTaskCreate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UserTaskCreate(childComplexity, args["input"].(UpdateUserTask)), true
+
+	case "Mutation.userTaskUpdate":
+		if e.complexity.Mutation.UserTaskUpdate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_userTaskUpdate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UserTaskUpdate(childComplexity, args["id"].(string), args["input"].(UpdateUserTask)), true
+
 	case "Mutation.userUnarchive":
 		if e.complexity.Mutation.UserUnarchive == nil {
 			break
@@ -2846,6 +2916,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.UserActivities(childComplexity, args["search"].(SearchFilter), args["limit"].(int), args["offset"].(int), args["userID"].(*string)), true
 
+	case "Query.userTask":
+		if e.complexity.Query.UserTask == nil {
+			break
+		}
+
+		args, err := ec.field_Query_userTask_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UserTask(childComplexity, args["id"].(*string)), true
+
+	case "Query.userTasks":
+		if e.complexity.Query.UserTasks == nil {
+			break
+		}
+
+		args, err := ec.field_Query_userTasks_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UserTasks(childComplexity, args["search"].(SearchFilter), args["limit"].(int), args["offset"].(int)), true
+
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
 			break
@@ -2989,6 +3083,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Sku.Archived(childComplexity), true
 
+	case "SKU.brand":
+		if e.complexity.Sku.Brand == nil {
+			break
+		}
+
+		return e.complexity.Sku.Brand(childComplexity), true
+
 	case "SKU.categories":
 		if e.complexity.Sku.Categories == nil {
 			break
@@ -3044,6 +3145,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Sku.ID(childComplexity), true
+
+	case "SKU.ingredients":
+		if e.complexity.Sku.Ingredients == nil {
+			break
+		}
+
+		return e.complexity.Sku.Ingredients(childComplexity), true
 
 	case "SKU.isAppSku":
 		if e.complexity.Sku.IsAppSku == nil {
@@ -3121,6 +3229,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Sku.ProductInfo(childComplexity), true
+
+	case "SKU.purchasePoints":
+		if e.complexity.Sku.PurchasePoints == nil {
+			break
+		}
+
+		return e.complexity.Sku.PurchasePoints(childComplexity), true
 
 	case "SKU.urls":
 		if e.complexity.Sku.Urls == nil {
@@ -3850,6 +3965,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserLoyaltyActivity.User(childComplexity), true
 
+	case "UserTask.createdAt":
+		if e.complexity.UserTask.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.UserTask.CreatedAt(childComplexity), true
+
+	case "UserTask.id":
+		if e.complexity.UserTask.ID == nil {
+			break
+		}
+
+		return e.complexity.UserTask.ID(childComplexity), true
+
+	case "UserTask.isComplete":
+		if e.complexity.UserTask.IsComplete == nil {
+			break
+		}
+
+		return e.complexity.UserTask.IsComplete(childComplexity), true
+
+	case "UserTask.status":
+		if e.complexity.UserTask.Status == nil {
+			break
+		}
+
+		return e.complexity.UserTask.Status(childComplexity), true
+
+	case "UserTask.task":
+		if e.complexity.UserTask.Task == nil {
+			break
+		}
+
+		return e.complexity.UserTask.Task(childComplexity), true
+
+	case "UserTask.user":
+		if e.complexity.UserTask.User == nil {
+			break
+		}
+
+		return e.complexity.UserTask.User(childComplexity), true
+
+	case "UserTasksResult.total":
+		if e.complexity.UserTasksResult.Total == nil {
+			break
+		}
+
+		return e.complexity.UserTasksResult.Total(childComplexity), true
+
+	case "UserTasksResult.userTasks":
+		if e.complexity.UserTasksResult.UserTasks == nil {
+			break
+		}
+
+		return e.complexity.UserTasksResult.UserTasks(childComplexity), true
+
 	case "UsersResult.total":
 		if e.complexity.UsersResult.Total == nil {
 			break
@@ -4291,6 +4462,8 @@ extend type Mutation {
 	code: String!
 	name: String!
 	description: String!
+	latitude: Float!
+	longitude: Float!
 	supplierName: String!
 	dateSigned: NullTime
 
@@ -4307,6 +4480,8 @@ type ContractResult {
 input UpdateContract {
 	name: NullString
 	description: NullString
+	latitude: Float!
+	longitude: Float!
 	supplierName: NullString
 	dateSigned: NullTime
 }
@@ -4606,15 +4781,18 @@ type SKU {
 	id: ID!
 	name: String!
 	code: String!
+	brand: String!
 	description: String!
+	ingredients: String!
 	weight: Int!
 	weightUnit: String!
 	price: Int!
+	purchasePoints: Int!
+	loyaltyPoints: Int!
 	currency: String!
 	isBeef: Boolean!
 	isPointSku: Boolean!
 	isAppSku: Boolean!
-	loyaltyPoints: Int!
 	archived: Boolean!
 	createdAt: Time!
 
@@ -4647,19 +4825,22 @@ input UpdateProductCategory {
 input UpdateSKU {
 	name: NullString
 	code: NullString
+	brand: NullString
 	description: NullString
+	ingredients: NullString
 
 	weight: NullInt
 	weightUnit: NullString
 	price: NullInt
 	currency: NullString
+	purchasePoints: NullInt
+	loyaltyPoints: NullInt
 
 	isBeef: NullBool
 	isRetailSku: NullBool
 	isPointSku: NullBool
 	isAppSku: NullBool
 	isMiniappSku: NullBool
-	loyaltyPoints: NullInt
 
 	masterPlanBlobID: NullString
 	videoBlobID: NullString
@@ -4907,6 +5088,45 @@ type UserActivityResult {
 
 extend type Query {
 	userActivities(search: SearchFilter!, limit: Int!, offset: Int!, userID: String): UserActivityResult! @hasPerm(p: ActivityListUserActivity)
+}
+`},
+	&ast.Source{Name: "schema_user_tasks.graphql", Input: `# type UserSubtask {
+# 	id: ID!
+# 	subtaskID: String!
+# 	userTaskID: String!
+# 	isComplete: Boolean!
+# 	createdAt: Time!
+# }
+type UserTask {
+	id: ID!
+	task: Task!
+	user: User!
+	status: String!
+	isComplete: Boolean!
+	createdAt: Time!
+}
+
+type UserTasksResult {
+	userTasks: [UserTask!]!
+	total: Int!
+}
+
+# input UpdateUserSubtask {
+# 	userTaskID: String!
+# }
+
+input UpdateUserTask {
+	taskID: String!
+}
+
+extend type Query {
+	userTasks(search: SearchFilter!, limit: Int!, offset: Int!): UserTasksResult! @hasPerm(p: UserTaskList)
+	userTask(id: String): UserTask! @hasPerm(p: UserTaskRead)
+}
+
+extend type Mutation {
+	userTaskCreate(input: UpdateUserTask!): UserTask! @hasPerm(p: UserTaskCreate)
+	userTaskUpdate(id: ID!, input: UpdateUserTask!): UserTask! @hasPerm(p: UserTaskUpdate)
 }
 `},
 	&ast.Source{Name: "schema_users.graphql", Input: `type Organisation {
@@ -6103,6 +6323,42 @@ func (ec *executionContext) field_Mutation_userCreate_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_userTaskCreate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 UpdateUserTask
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNUpdateUserTask2genesisᚋgraphqlᚐUpdateUserTask(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_userTaskUpdate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 UpdateUserTask
+	if tmp, ok := rawArgs["input"]; ok {
+		arg1, err = ec.unmarshalNUpdateUserTask2genesisᚋgraphqlᚐUpdateUserTask(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_userUnarchive_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -6972,6 +7228,50 @@ func (ec *executionContext) field_Query_userActivities_args(ctx context.Context,
 		}
 	}
 	args["userID"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_userTask_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_userTasks_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 SearchFilter
+	if tmp, ok := rawArgs["search"]; ok {
+		arg0, err = ec.unmarshalNSearchFilter2genesisᚋgraphqlᚐSearchFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["search"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["limit"]; ok {
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg1
+	var arg2 int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
 	return args, nil
 }
 
@@ -8542,6 +8842,80 @@ func (ec *executionContext) _Contract_description(ctx context.Context, field gra
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Contract_latitude(ctx context.Context, field graphql.CollectedField, obj *db.Contract) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Contract",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Latitude, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Contract_longitude(ctx context.Context, field graphql.CollectedField, obj *db.Contract) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Contract",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Longitude, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Contract_supplierName(ctx context.Context, field graphql.CollectedField, obj *db.Contract) (ret graphql.Marshaler) {
@@ -10786,6 +11160,142 @@ func (ec *executionContext) _Mutation_taskUnarchive(ctx context.Context, field g
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNTask2ᚖgenesisᚋdbᚐTask(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_userTaskCreate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_userTaskCreate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UserTaskCreate(rctx, args["input"].(UpdateUserTask))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "UserTaskCreate")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasPerm == nil {
+				return nil, errors.New("directive hasPerm is not implemented")
+			}
+			return ec.directives.HasPerm(ctx, nil, directive0, p)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*db.UserTask); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *genesis/db.UserTask`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*db.UserTask)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUserTask2ᚖgenesisᚋdbᚐUserTask(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_userTaskUpdate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_userTaskUpdate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UserTaskUpdate(rctx, args["id"].(string), args["input"].(UpdateUserTask))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "UserTaskUpdate")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasPerm == nil {
+				return nil, errors.New("directive hasPerm is not implemented")
+			}
+			return ec.directives.HasPerm(ctx, nil, directive0, p)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*db.UserTask); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *genesis/db.UserTask`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*db.UserTask)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUserTask2ᚖgenesisᚋdbᚐUserTask(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_skuCreate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -16374,6 +16884,142 @@ func (ec *executionContext) _Query_task(ctx context.Context, field graphql.Colle
 	return ec.marshalNTask2ᚖgenesisᚋdbᚐTask(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_userTasks(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_userTasks_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().UserTasks(rctx, args["search"].(SearchFilter), args["limit"].(int), args["offset"].(int))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "UserTaskList")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasPerm == nil {
+				return nil, errors.New("directive hasPerm is not implemented")
+			}
+			return ec.directives.HasPerm(ctx, nil, directive0, p)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*UserTasksResult); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *genesis/graphql.UserTasksResult`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*UserTasksResult)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUserTasksResult2ᚖgenesisᚋgraphqlᚐUserTasksResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_userTask(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_userTask_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().UserTask(rctx, args["id"].(*string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "UserTaskRead")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasPerm == nil {
+				return nil, errors.New("directive hasPerm is not implemented")
+			}
+			return ec.directives.HasPerm(ctx, nil, directive0, p)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*db.UserTask); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *genesis/db.UserTask`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*db.UserTask)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUserTask2ᚖgenesisᚋdbᚐUserTask(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_skus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -18838,6 +19484,43 @@ func (ec *executionContext) _SKU_code(ctx context.Context, field graphql.Collect
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _SKU_brand(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SKU",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Brand, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _SKU_description(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -18858,6 +19541,43 @@ func (ec *executionContext) _SKU_description(ctx context.Context, field graphql.
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SKU_ingredients(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SKU",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Ingredients, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -18969,6 +19689,80 @@ func (ec *executionContext) _SKU_price(ctx context.Context, field graphql.Collec
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Price, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SKU_purchasePoints(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SKU",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PurchasePoints, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SKU_loyaltyPoints(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SKU",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LoyaltyPoints, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -19132,43 +19926,6 @@ func (ec *executionContext) _SKU_isAppSku(ctx context.Context, field graphql.Col
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SKU_loyaltyPoints(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "SKU",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.LoyaltyPoints, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _SKU_archived(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
@@ -23237,6 +23994,302 @@ func (ec *executionContext) _UserLoyaltyActivity_createdAt(ctx context.Context, 
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _UserTask_id(ctx context.Context, field graphql.CollectedField, obj *db.UserTask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserTask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserTask_task(ctx context.Context, field graphql.CollectedField, obj *db.UserTask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserTask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.UserTask().Task(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*db.Task)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNTask2ᚖgenesisᚋdbᚐTask(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserTask_user(ctx context.Context, field graphql.CollectedField, obj *db.UserTask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserTask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.UserTask().User(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*db.User)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUser2ᚖgenesisᚋdbᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserTask_status(ctx context.Context, field graphql.CollectedField, obj *db.UserTask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserTask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserTask_isComplete(ctx context.Context, field graphql.CollectedField, obj *db.UserTask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserTask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsComplete, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserTask_createdAt(ctx context.Context, field graphql.CollectedField, obj *db.UserTask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserTask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserTasksResult_userTasks(ctx context.Context, field graphql.CollectedField, obj *UserTasksResult) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserTasksResult",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserTasks, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*db.UserTask)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUserTask2ᚕᚖgenesisᚋdbᚐUserTaskᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserTasksResult_total(ctx context.Context, field graphql.CollectedField, obj *UserTasksResult) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserTasksResult",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _UsersResult_users(ctx context.Context, field graphql.CollectedField, obj *UsersResult) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -24936,6 +25989,18 @@ func (ec *executionContext) unmarshalInputUpdateContract(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
+		case "latitude":
+			var err error
+			it.Latitude, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "longitude":
+			var err error
+			it.Longitude, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "supplierName":
 			var err error
 			it.SupplierName, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
@@ -25212,9 +26277,21 @@ func (ec *executionContext) unmarshalInputUpdateSKU(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "brand":
+			var err error
+			it.Brand, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "description":
 			var err error
 			it.Description, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "ingredients":
+			var err error
+			it.Ingredients, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25239,6 +26316,18 @@ func (ec *executionContext) unmarshalInputUpdateSKU(ctx context.Context, obj int
 		case "currency":
 			var err error
 			it.Currency, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "purchasePoints":
+			var err error
+			it.PurchasePoints, err = ec.unmarshalONullInt2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐInt(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "loyaltyPoints":
+			var err error
+			it.LoyaltyPoints, err = ec.unmarshalONullInt2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐInt(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25269,12 +26358,6 @@ func (ec *executionContext) unmarshalInputUpdateSKU(ctx context.Context, obj int
 		case "isMiniappSku":
 			var err error
 			it.IsMiniappSku, err = ec.unmarshalONullBool2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐBool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "loyaltyPoints":
-			var err error
-			it.LoyaltyPoints, err = ec.unmarshalONullInt2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐInt(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25527,6 +26610,24 @@ func (ec *executionContext) unmarshalInputUpdateUser(ctx context.Context, obj in
 		case "referredByCode":
 			var err error
 			it.ReferredByCode, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateUserTask(ctx context.Context, obj interface{}) (UpdateUserTask, error) {
+	var it UpdateUserTask
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "taskID":
+			var err error
+			it.TaskID, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25969,6 +27070,16 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "latitude":
+			out.Values[i] = ec._Contract_latitude(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "longitude":
+			out.Values[i] = ec._Contract_longitude(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "supplierName":
 			out.Values[i] = ec._Contract_supplierName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -26370,6 +27481,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "taskUnarchive":
 			out.Values[i] = ec._Mutation_taskUnarchive(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "userTaskCreate":
+			out.Values[i] = ec._Mutation_userTaskCreate(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "userTaskUpdate":
+			out.Values[i] = ec._Mutation_userTaskUpdate(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -27381,6 +28502,34 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "userTasks":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_userTasks(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "userTask":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_userTask(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "skus":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -27986,8 +29135,18 @@ func (ec *executionContext) _SKU(ctx context.Context, sel ast.SelectionSet, obj 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "brand":
+			out.Values[i] = ec._SKU_brand(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "description":
 			out.Values[i] = ec._SKU_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "ingredients":
+			out.Values[i] = ec._SKU_ingredients(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -28003,6 +29162,16 @@ func (ec *executionContext) _SKU(ctx context.Context, sel ast.SelectionSet, obj 
 			}
 		case "price":
 			out.Values[i] = ec._SKU_price(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "purchasePoints":
+			out.Values[i] = ec._SKU_purchasePoints(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "loyaltyPoints":
+			out.Values[i] = ec._SKU_loyaltyPoints(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -28023,11 +29192,6 @@ func (ec *executionContext) _SKU(ctx context.Context, sel ast.SelectionSet, obj 
 			}
 		case "isAppSku":
 			out.Values[i] = ec._SKU_isAppSku(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "loyaltyPoints":
-			out.Values[i] = ec._SKU_loyaltyPoints(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -29162,6 +30326,108 @@ func (ec *executionContext) _UserLoyaltyActivity(ctx context.Context, sel ast.Se
 	return out
 }
 
+var userTaskImplementors = []string{"UserTask"}
+
+func (ec *executionContext) _UserTask(ctx context.Context, sel ast.SelectionSet, obj *db.UserTask) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, userTaskImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserTask")
+		case "id":
+			out.Values[i] = ec._UserTask_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "task":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._UserTask_task(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "user":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._UserTask_user(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "status":
+			out.Values[i] = ec._UserTask_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "isComplete":
+			out.Values[i] = ec._UserTask_isComplete(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "createdAt":
+			out.Values[i] = ec._UserTask_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var userTasksResultImplementors = []string{"UserTasksResult"}
+
+func (ec *executionContext) _UserTasksResult(ctx context.Context, sel ast.SelectionSet, obj *UserTasksResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, userTasksResultImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserTasksResult")
+		case "userTasks":
+			out.Values[i] = ec._UserTasksResult_userTasks(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "total":
+			out.Values[i] = ec._UserTasksResult_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var usersResultImplementors = []string{"UsersResult"}
 
 func (ec *executionContext) _UsersResult(ctx context.Context, sel ast.SelectionSet, obj *UsersResult) graphql.Marshaler {
@@ -29852,6 +31118,20 @@ func (ec *executionContext) marshalNDistributorResult2ᚖgenesisᚋgraphqlᚐDis
 		return graphql.Null
 	}
 	return ec._DistributorResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	return graphql.UnmarshalFloat(v)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloat(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalNGetObjectResponse2genesisᚋgraphqlᚐGetObjectResponse(ctx context.Context, sel ast.SelectionSet, v GetObjectResponse) graphql.Marshaler {
@@ -31006,6 +32286,10 @@ func (ec *executionContext) unmarshalNUpdateUser2genesisᚋgraphqlᚐUpdateUser(
 	return ec.unmarshalInputUpdateUser(ctx, v)
 }
 
+func (ec *executionContext) unmarshalNUpdateUserTask2genesisᚋgraphqlᚐUpdateUserTask(ctx context.Context, v interface{}) (UpdateUserTask, error) {
+	return ec.unmarshalInputUpdateUserTask(ctx, v)
+}
+
 func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (graphql.Upload, error) {
 	return graphql.UnmarshalUpload(v)
 }
@@ -31232,6 +32516,71 @@ func (ec *executionContext) marshalNUserLoyaltyActivity2ᚖgenesisᚋdbᚐUserLo
 		return graphql.Null
 	}
 	return ec._UserLoyaltyActivity(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUserTask2genesisᚋdbᚐUserTask(ctx context.Context, sel ast.SelectionSet, v db.UserTask) graphql.Marshaler {
+	return ec._UserTask(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserTask2ᚕᚖgenesisᚋdbᚐUserTaskᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.UserTask) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUserTask2ᚖgenesisᚋdbᚐUserTask(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNUserTask2ᚖgenesisᚋdbᚐUserTask(ctx context.Context, sel ast.SelectionSet, v *db.UserTask) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._UserTask(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUserTasksResult2genesisᚋgraphqlᚐUserTasksResult(ctx context.Context, sel ast.SelectionSet, v UserTasksResult) graphql.Marshaler {
+	return ec._UserTasksResult(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserTasksResult2ᚖgenesisᚋgraphqlᚐUserTasksResult(ctx context.Context, sel ast.SelectionSet, v *UserTasksResult) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._UserTasksResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNUsersResult2genesisᚋgraphqlᚐUsersResult(ctx context.Context, sel ast.SelectionSet, v UsersResult) graphql.Marshaler {

@@ -3,6 +3,8 @@ type Contract {
 	code: String!
 	name: String!
 	description: String!
+	latitude: Float!
+	longitude: Float!
 	supplierName: String!
 	dateSigned: NullTime
 
@@ -19,6 +21,8 @@ type ContractResult {
 input UpdateContract {
 	name: NullString
 	description: NullString
+	latitude: Float!
+	longitude: Float!
 	supplierName: NullString
 	dateSigned: NullTime
 }

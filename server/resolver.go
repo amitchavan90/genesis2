@@ -29,6 +29,7 @@ type Resolver struct {
 	UserStore         UserStorer
 	ReferralStore     ReferralStorer
 	TaskStore         TaskStorer
+	UserTaskStore     UserTaskStorer
 	RoleStore         RoleStorer
 	BlobStore         BlobStorer
 	ContractStore     ContractStorer

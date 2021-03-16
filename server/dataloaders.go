@@ -29,6 +29,15 @@ const ReferralLoaderKey ContextKey = "referral_loader"
 // TaskLoaderKey declares a statically typed key for context reference in other packages
 const TaskLoaderKey ContextKey = "task_loader"
 
+// SubtaskLoaderKey declares a statically typed key for context reference in other packages
+const SubtaskLoaderKey ContextKey = "subtask_loader"
+
+// UserTaskLoaderKey declares a statically typed key for context reference in other packages
+const UserTaskLoaderKey ContextKey = "user_task_loader"
+
+// UserSubtaskLoaderKey declares a statically typed key for context reference in other packages
+const UserSubtaskLoaderKey ContextKey = "user_subtask_loader"
+
 // RoleLoaderKey declares a statically typed key for context reference in other packages
 const RoleLoaderKey ContextKey = "role_loader"
 
@@ -40,6 +49,12 @@ const OrganisationUsersLoaderKey ContextKey = "organisation_users_loader"
 
 // SKULoaderKey declares a statically typed key for context reference in other packages
 const SKULoaderKey ContextKey = "sku_loader"
+
+// CategoryLoaderKey declares a statically typed key for context reference in other packages
+const CategoryLoaderKey ContextKey = "category_loader"
+
+// ProductCategoryLoaderKey declares a statically typed key for context reference in other packages
+const ProductCategoryLoaderKey ContextKey = "product_category_loader"
 
 // OrderLoaderKey declares a statically typed key for context reference in other packages
 const OrderLoaderKey ContextKey = "order_loader"
@@ -86,6 +101,21 @@ func TaskLoaderFromContext(ctx context.Context, id uuid.UUID) (*db.Task, error) 
 	return ctx.Value(TaskLoaderKey).(*dataloaders.TaskLoader).Load(id.String())
 }
 
+// SubtaskLoaderFromContext runs the dataloader inside the context
+func SubtaskLoaderFromContext(ctx context.Context, id uuid.UUID) (*db.Subtask, error) {
+	return ctx.Value(SubtaskLoaderKey).(*dataloaders.SubtaskLoader).Load(id.String())
+}
+
+// UserTaskLoaderFromContext runs the dataloader inside the context
+func UserTaskLoaderFromContext(ctx context.Context, id uuid.UUID) (*db.UserTask, error) {
+	return ctx.Value(UserTaskLoaderKey).(*dataloaders.UserTaskLoader).Load(id.String())
+}
+
+// UserSubtaskLoaderFromContext runs the dataloader inside the context
+func UserSubtaskLoaderFromContext(ctx context.Context, id uuid.UUID) (*db.UserSubtask, error) {
+	return ctx.Value(UserSubtaskLoaderKey).(*dataloaders.UserSubtaskLoader).Load(id.String())
+}
+
 // RoleLoaderFromContext runs the dataloader inside the context
 func RoleLoaderFromContext(ctx context.Context, id uuid.UUID) (*db.Role, error) {
 	return ctx.Value(RoleLoaderKey).(*dataloaders.RoleLoader).Load(id.String())
@@ -104,6 +134,16 @@ func OrganisationLoaderFromContext(ctx context.Context, id uuid.UUID) (*db.Organ
 // SKULoaderFromContext runs the dataloader inside the context
 func SKULoaderFromContext(ctx context.Context, id uuid.UUID) (*db.StockKeepingUnit, error) {
 	return ctx.Value(SKULoaderKey).(*dataloaders.SKULoader).Load(id.String())
+}
+
+// CategoryLoaderFromContext runs the dataloader inside the context
+func CategoryLoaderFromContext(ctx context.Context, id uuid.UUID) (*db.Category, error) {
+	return ctx.Value(CategoryLoaderKey).(*dataloaders.CategoryLoader).Load(id.String())
+}
+
+// ProductCategoryLoaderFromContext runs the dataloader inside the context
+func ProductCategoryLoaderFromContext(ctx context.Context, id uuid.UUID) (*db.ProductCategory, error) {
+	return ctx.Value(ProductCategoryLoaderKey).(*dataloaders.ProductCategoryLoader).Load(id.String())
 }
 
 // OrderLoaderFromContext runs the dataloader inside the context
@@ -163,8 +203,9 @@ func WithDataloaders(
 	ProductStorer ProductStorer,
 	OrganisationStorer OrganisationStorer,
 	UserStorer UserStorer,
-	referralStore ReferralStorer,
-	taskStore TaskStorer,
+	ReferralStore ReferralStorer,
+	TaskStore TaskStorer,
+	UserTaskStore UserTaskStorer,
 	RoleStorer RoleStorer,
 	ContractStorer ContractStorer,
 	TransactionStorer TransactionStorer,
@@ -363,6 +404,7 @@ func DataloaderMiddleware(
 	userStore UserStorer,
 	referralStore ReferralStorer,
 	taskStore TaskStorer,
+	userTaskStore UserTaskStorer,
 	roleStore RoleStorer,
 	contractStore ContractStorer,
 	transactionStorer TransactionStorer,
@@ -384,6 +426,7 @@ func DataloaderMiddleware(
 				userStore,
 				referralStore,
 				taskStore,
+				userTaskStore,
 				roleStore,
 				contractStore,
 				transactionStorer,

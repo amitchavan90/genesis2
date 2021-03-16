@@ -215,6 +215,8 @@ type UpdateContainer struct {
 type UpdateContract struct {
 	Name         *null.String `json:"name"`
 	Description  *null.String `json:"description"`
+	Latitude     float64      `json:"latitude"`
+	Longitude    float64      `json:"longitude"`
 	SupplierName *null.String `json:"supplierName"`
 	DateSigned   *null.Time   `json:"dateSigned"`
 }
@@ -269,17 +271,20 @@ type UpdateRole struct {
 type UpdateSku struct {
 	Name              *null.String             `json:"name"`
 	Code              *null.String             `json:"code"`
+	Brand             *null.String             `json:"brand"`
 	Description       *null.String             `json:"description"`
+	Ingredients       *null.String             `json:"ingredients"`
 	Weight            *null.Int                `json:"weight"`
 	WeightUnit        *null.String             `json:"weightUnit"`
 	Price             *null.Int                `json:"price"`
 	Currency          *null.String             `json:"currency"`
+	PurchasePoints    *null.Int                `json:"purchasePoints"`
+	LoyaltyPoints     *null.Int                `json:"loyaltyPoints"`
 	IsBeef            *null.Bool               `json:"isBeef"`
 	IsRetailSku       *null.Bool               `json:"isRetailSku"`
 	IsPointSku        *null.Bool               `json:"isPointSku"`
 	IsAppSku          *null.Bool               `json:"isAppSku"`
 	IsMiniappSku      *null.Bool               `json:"isMiniappSku"`
-	LoyaltyPoints     *null.Int                `json:"loyaltyPoints"`
 	MasterPlanBlobID  *null.String             `json:"masterPlanBlobID"`
 	VideoBlobID       *null.String             `json:"videoBlobID"`
 	Urls              []*SKUContentInput       `json:"urls"`
@@ -328,9 +333,18 @@ type UpdateUser struct {
 	ReferredByCode *null.String `json:"referredByCode"`
 }
 
+type UpdateUserTask struct {
+	TaskID string `json:"taskID"`
+}
+
 type UserActivityResult struct {
 	UserActivities []*db.UserActivity `json:"userActivities"`
 	Total          int                `json:"total"`
+}
+
+type UserTasksResult struct {
+	UserTasks []*db.UserTask `json:"userTasks"`
+	Total     int            `json:"total"`
 }
 
 type UsersResult struct {

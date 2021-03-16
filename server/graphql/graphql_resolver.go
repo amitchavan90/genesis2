@@ -55,6 +55,9 @@ func (r *Resolver) Settings() SettingsResolver {
 func (r *Resolver) Task() TaskResolver {
 	return &taskResolver{r}
 }
+func (r *Resolver) UserTask() UserTaskResolver {
+	return &userTaskResolver{r}
+}
 func (r *Resolver) TrackAction() TrackActionResolver {
 	return &trackActionResolver{r}
 }
@@ -170,6 +173,12 @@ func (r *mutationResolver) TaskArchive(ctx context.Context, id string) (*db.Task
 	panic("not implemented")
 }
 func (r *mutationResolver) TaskUnarchive(ctx context.Context, id string) (*db.Task, error) {
+	panic("not implemented")
+}
+func (r *mutationResolver) UserTaskCreate(ctx context.Context, input UpdateUserTask) (*db.UserTask, error) {
+	panic("not implemented")
+}
+func (r *mutationResolver) UserTaskUpdate(ctx context.Context, id string, input UpdateUserTask) (*db.UserTask, error) {
 	panic("not implemented")
 }
 func (r *mutationResolver) SkuCreate(ctx context.Context, input UpdateSku) (*db.StockKeepingUnit, error) {
@@ -388,6 +397,12 @@ func (r *queryResolver) Tasks(ctx context.Context, search SearchFilter, limit in
 func (r *queryResolver) Task(ctx context.Context, id *string) (*db.Task, error) {
 	panic("not implemented")
 }
+func (r *queryResolver) UserTasks(ctx context.Context, search SearchFilter, limit int, offset int) (*UserTasksResult, error) {
+	panic("not implemented")
+}
+func (r *queryResolver) UserTask(ctx context.Context, id *string) (*db.UserTask, error) {
+	panic("not implemented")
+}
 func (r *queryResolver) Roles(ctx context.Context, search SearchFilter, limit int, offset int, excludeSuper bool) (*RolesResult, error) {
 	panic("not implemented")
 }
@@ -563,6 +578,15 @@ func (r *taskResolver) Sku(ctx context.Context, obj *db.Task) (*db.StockKeepingU
 	panic("not implemented")
 }
 func (r *taskResolver) Subtasks(ctx context.Context, obj *db.Task) ([]*db.Subtask, error) {
+	panic("not implemented")
+}
+
+type userTaskResolver struct{ *Resolver }
+
+func (r *userTaskResolver) Task(ctx context.Context, obj *db.UserTask) (*db.Task, error) {
+	panic("not implemented")
+}
+func (r *userTaskResolver) User(ctx context.Context, obj *db.UserTask) (*db.User, error) {
 	panic("not implemented")
 }
 

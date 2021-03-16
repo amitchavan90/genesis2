@@ -105,7 +105,25 @@ func (s *UserTasks) SearchSelect(search graphql.SearchFilter, limit int, offset 
 	return count, records, nil
 }
 
-// GetUser by userTaskID
+// GetTask by taskID
+func (s *UserTasks) GetTask(taskID string, txes ...*sql.Tx) (*db.Task, error) {
+	dat, err := db.Tasks(db.TaskWhere.ID.EQ(taskID)).One(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
+// GetUser by userID
+func (s *UserTasks) GetUser(userID string, txes ...*sql.Tx) (*db.User, error) {
+	dat, err := db.Users(db.TaskWhere.ID.EQ(userID)).One(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
+// GetSubtasks by userTaskID
 func (s *UserTasks) GetSubtasks(userTaskID string, txes ...*sql.Tx) (db.UserSubtaskSlice, error) {
 	dat, err := db.UserSubtasks(db.UserSubtaskWhere.UserTaskID.EQ(null.StringFrom(userTaskID))).All(s.Conn)
 	if err != nil {
@@ -153,7 +171,7 @@ func (s *UserTasks) Get(id uuid.UUID, txes ...*sql.Tx) (*db.UserTask, error) {
 }
 
 // Insert a task
-func (s *UserTasks) Insert(t *db.UserTask, subtasks []db.UserSubtask, txes ...*sql.Tx) (*db.UserTask, error) {
+func (s *UserTasks) Insert(t *db.UserTask, txes ...*sql.Tx) (*db.UserTask, error) {
 	var err error
 
 	handleTransactions(s.Conn, func(tx *sql.Tx) error {
@@ -165,24 +183,18 @@ func (s *UserTasks) Insert(t *db.UserTask, subtasks []db.UserSubtask, txes ...*s
 		return nil, terror.New(err, "")
 	}
 
-	if len(subtasks) >= 0 {
-		for i := range subtasks {
-			stID, _ := uuid.NewV4()
-			subtasks[i].ID = stID.String()
-			subtasks[i].UserTaskID = null.StringFrom(t.ID)
-
-			handleTransactions(s.Conn, func(tx *sql.Tx) error {
-				return subtasks[i].Insert(tx, boil.Infer())
-			}, txes...)
-
-			err = subtasks[i].Reload(s.Conn)
-			if err != nil {
-				return nil, terror.New(err, "")
-			}
-		}
-	}
-
 	return t, nil
+}
+
+// InsertSubtask skus
+func (s *UserTasks) InsertSubtask(st *db.UserSubtask, txes ...*sql.Tx) (*db.UserSubtask, error) {
+	err := handleTransactions(s.Conn, func(tx *sql.Tx) error {
+		return st.Insert(tx, boil.Infer())
+	}, txes...)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return st, nil
 }
 
 // Update a task

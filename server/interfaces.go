@@ -284,6 +284,21 @@ type TaskStorer interface {
 	Unarchive(id uuid.UUID, txes ...*sql.Tx) (*db.Task, error)
 }
 
+// UserTaskStorer collects all role methods
+type UserTaskStorer interface {
+	Get(id uuid.UUID, txes ...*sql.Tx) (*db.UserTask, error)
+	GetMany(keys []string, txes ...*sql.Tx) (db.UserTaskSlice, []error)
+	GetSubtasks(userTaskID string, txes ...*sql.Tx) (db.UserSubtaskSlice, error)
+	GetTask(taskID string, txes ...*sql.Tx) (*db.Task, error)
+	GetUser(userID string, txes ...*sql.Tx) (*db.User, error)
+	All(txes ...*sql.Tx) (db.UserTaskSlice, error)
+	Count() (int64, error)
+	SearchSelect(search graphql.SearchFilter, limit int, offset int) (int64, []*db.UserTask, error)
+	Insert(record *db.UserTask, tx ...*sql.Tx) (*db.UserTask, error)
+	InsertSubtask(st *db.UserSubtask, txes ...*sql.Tx) (*db.UserSubtask, error)
+	Update(record *db.UserTask, tx ...*sql.Tx) (*db.UserTask, error)
+}
+
 // LoyaltyStorer collects all loyalty methods
 type LoyaltyStorer interface {
 	GetByProductID(id uuid.UUID) (*db.UserLoyaltyActivity, error)
