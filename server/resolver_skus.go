@@ -294,8 +294,10 @@ func (r *mutationResolver) SkuCreate(ctx context.Context, input graphql.UpdateSk
 	u.IsAppSku = input.IsAppSku.Bool
 	u.Weight = input.Weight.Int
 	u.WeightUnit = input.WeightUnit.String
-	u.Price = input.Price.Int
 	u.Currency = input.Currency.String
+	u.Price = input.Price.Int
+	u.PurchasePoints = input.PurchasePoints.Int
+	u.LoyaltyPoints = input.LoyaltyPoints.Int
 
 	created, err := r.SKUStore.Insert(u)
 	if err != nil {

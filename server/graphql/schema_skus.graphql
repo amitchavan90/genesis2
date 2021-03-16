@@ -25,11 +25,12 @@ type SKU {
 	weight: Int!
 	weightUnit: String!
 	price: Int!
+	purchasePoints: Int!
+	loyaltyPoints: Int!
 	currency: String!
 	isBeef: Boolean!
 	isPointSku: Boolean!
 	isAppSku: Boolean!
-	loyaltyPoints: Int!
 	archived: Boolean!
 	createdAt: Time!
 
@@ -70,13 +71,14 @@ input UpdateSKU {
 	weightUnit: NullString
 	price: NullInt
 	currency: NullString
+	purchasePoints: NullInt
+	loyaltyPoints: NullInt
 
 	isBeef: NullBool
 	isRetailSku: NullBool
 	isPointSku: NullBool
 	isAppSku: NullBool
 	isMiniappSku: NullBool
-	loyaltyPoints: NullInt
 
 	masterPlanBlobID: NullString
 	videoBlobID: NullString

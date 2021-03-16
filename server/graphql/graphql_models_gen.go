@@ -215,6 +215,8 @@ type UpdateContainer struct {
 type UpdateContract struct {
 	Name         *null.String `json:"name"`
 	Description  *null.String `json:"description"`
+	Latitude     float64      `json:"latitude"`
+	Longitude    float64      `json:"longitude"`
 	SupplierName *null.String `json:"supplierName"`
 	DateSigned   *null.Time   `json:"dateSigned"`
 }
@@ -276,12 +278,13 @@ type UpdateSku struct {
 	WeightUnit        *null.String             `json:"weightUnit"`
 	Price             *null.Int                `json:"price"`
 	Currency          *null.String             `json:"currency"`
+	PurchasePoints    *null.Int                `json:"purchasePoints"`
+	LoyaltyPoints     *null.Int                `json:"loyaltyPoints"`
 	IsBeef            *null.Bool               `json:"isBeef"`
 	IsRetailSku       *null.Bool               `json:"isRetailSku"`
 	IsPointSku        *null.Bool               `json:"isPointSku"`
 	IsAppSku          *null.Bool               `json:"isAppSku"`
 	IsMiniappSku      *null.Bool               `json:"isMiniappSku"`
-	LoyaltyPoints     *null.Int                `json:"loyaltyPoints"`
 	MasterPlanBlobID  *null.String             `json:"masterPlanBlobID"`
 	VideoBlobID       *null.String             `json:"videoBlobID"`
 	Urls              []*SKUContentInput       `json:"urls"`

@@ -133,6 +133,8 @@ type ComplexityRoot struct {
 		DateSigned   func(childComplexity int) int
 		Description  func(childComplexity int) int
 		ID           func(childComplexity int) int
+		Latitude     func(childComplexity int) int
+		Longitude    func(childComplexity int) int
 		Name         func(childComplexity int) int
 		SupplierName func(childComplexity int) int
 	}
@@ -425,6 +427,7 @@ type ComplexityRoot struct {
 		ProductCategories func(childComplexity int) int
 		ProductCount      func(childComplexity int) int
 		ProductInfo       func(childComplexity int) int
+		PurchasePoints    func(childComplexity int) int
 		Urls              func(childComplexity int) int
 		Video             func(childComplexity int) int
 		Weight            func(childComplexity int) int
@@ -1136,6 +1139,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Contract.ID(childComplexity), true
+
+	case "Contract.latitude":
+		if e.complexity.Contract.Latitude == nil {
+			break
+		}
+
+		return e.complexity.Contract.Latitude(childComplexity), true
+
+	case "Contract.longitude":
+		if e.complexity.Contract.Longitude == nil {
+			break
+		}
+
+		return e.complexity.Contract.Longitude(childComplexity), true
 
 	case "Contract.name":
 		if e.complexity.Contract.Name == nil {
@@ -3213,6 +3230,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Sku.ProductInfo(childComplexity), true
 
+	case "SKU.purchasePoints":
+		if e.complexity.Sku.PurchasePoints == nil {
+			break
+		}
+
+		return e.complexity.Sku.PurchasePoints(childComplexity), true
+
 	case "SKU.urls":
 		if e.complexity.Sku.Urls == nil {
 			break
@@ -4438,6 +4462,8 @@ extend type Mutation {
 	code: String!
 	name: String!
 	description: String!
+	latitude: Float!
+	longitude: Float!
 	supplierName: String!
 	dateSigned: NullTime
 
@@ -4454,6 +4480,8 @@ type ContractResult {
 input UpdateContract {
 	name: NullString
 	description: NullString
+	latitude: Float!
+	longitude: Float!
 	supplierName: NullString
 	dateSigned: NullTime
 }
@@ -4759,11 +4787,12 @@ type SKU {
 	weight: Int!
 	weightUnit: String!
 	price: Int!
+	purchasePoints: Int!
+	loyaltyPoints: Int!
 	currency: String!
 	isBeef: Boolean!
 	isPointSku: Boolean!
 	isAppSku: Boolean!
-	loyaltyPoints: Int!
 	archived: Boolean!
 	createdAt: Time!
 
@@ -4804,13 +4833,14 @@ input UpdateSKU {
 	weightUnit: NullString
 	price: NullInt
 	currency: NullString
+	purchasePoints: NullInt
+	loyaltyPoints: NullInt
 
 	isBeef: NullBool
 	isRetailSku: NullBool
 	isPointSku: NullBool
 	isAppSku: NullBool
 	isMiniappSku: NullBool
-	loyaltyPoints: NullInt
 
 	masterPlanBlobID: NullString
 	videoBlobID: NullString
@@ -8812,6 +8842,80 @@ func (ec *executionContext) _Contract_description(ctx context.Context, field gra
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Contract_latitude(ctx context.Context, field graphql.CollectedField, obj *db.Contract) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Contract",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Latitude, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Contract_longitude(ctx context.Context, field graphql.CollectedField, obj *db.Contract) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Contract",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Longitude, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Contract_supplierName(ctx context.Context, field graphql.CollectedField, obj *db.Contract) (ret graphql.Marshaler) {
@@ -19602,6 +19706,80 @@ func (ec *executionContext) _SKU_price(ctx context.Context, field graphql.Collec
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _SKU_purchasePoints(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SKU",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PurchasePoints, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SKU_loyaltyPoints(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SKU",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LoyaltyPoints, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _SKU_currency(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -19748,43 +19926,6 @@ func (ec *executionContext) _SKU_isAppSku(ctx context.Context, field graphql.Col
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SKU_loyaltyPoints(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "SKU",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.LoyaltyPoints, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _SKU_archived(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
@@ -25848,6 +25989,18 @@ func (ec *executionContext) unmarshalInputUpdateContract(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
+		case "latitude":
+			var err error
+			it.Latitude, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "longitude":
+			var err error
+			it.Longitude, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "supplierName":
 			var err error
 			it.SupplierName, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
@@ -26166,6 +26319,18 @@ func (ec *executionContext) unmarshalInputUpdateSKU(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "purchasePoints":
+			var err error
+			it.PurchasePoints, err = ec.unmarshalONullInt2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐInt(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "loyaltyPoints":
+			var err error
+			it.LoyaltyPoints, err = ec.unmarshalONullInt2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐInt(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "isBeef":
 			var err error
 			it.IsBeef, err = ec.unmarshalONullBool2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐBool(ctx, v)
@@ -26193,12 +26358,6 @@ func (ec *executionContext) unmarshalInputUpdateSKU(ctx context.Context, obj int
 		case "isMiniappSku":
 			var err error
 			it.IsMiniappSku, err = ec.unmarshalONullBool2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐBool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "loyaltyPoints":
-			var err error
-			it.LoyaltyPoints, err = ec.unmarshalONullInt2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐInt(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -26908,6 +27067,16 @@ func (ec *executionContext) _Contract(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "description":
 			out.Values[i] = ec._Contract_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "latitude":
+			out.Values[i] = ec._Contract_latitude(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "longitude":
+			out.Values[i] = ec._Contract_longitude(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -28996,6 +29165,16 @@ func (ec *executionContext) _SKU(ctx context.Context, sel ast.SelectionSet, obj 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "purchasePoints":
+			out.Values[i] = ec._SKU_purchasePoints(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "loyaltyPoints":
+			out.Values[i] = ec._SKU_loyaltyPoints(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "currency":
 			out.Values[i] = ec._SKU_currency(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -29013,11 +29192,6 @@ func (ec *executionContext) _SKU(ctx context.Context, sel ast.SelectionSet, obj 
 			}
 		case "isAppSku":
 			out.Values[i] = ec._SKU_isAppSku(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "loyaltyPoints":
-			out.Values[i] = ec._SKU_loyaltyPoints(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -30944,6 +31118,20 @@ func (ec *executionContext) marshalNDistributorResult2ᚖgenesisᚋgraphqlᚐDis
 		return graphql.Null
 	}
 	return ec._DistributorResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	return graphql.UnmarshalFloat(v)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloat(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalNGetObjectResponse2genesisᚋgraphqlᚐGetObjectResponse(ctx context.Context, sel ast.SelectionSet, v GetObjectResponse) graphql.Marshaler {
