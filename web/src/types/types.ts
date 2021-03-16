@@ -63,15 +63,19 @@ export interface SKUContent {
 	content: string
 }
 
+export interface SKUCategory {
+	name: string
+}
+
 export interface SKU {
 	id: string
 	name: string
 	brand :string
 	price: number
-	point: number
+	purchasePoints: number
 	weight: number
 	ingredients: string
-	category: string
+	category: []
 	code: string
 	description: string
 	isBeef: boolean

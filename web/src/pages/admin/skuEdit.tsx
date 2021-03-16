@@ -31,12 +31,13 @@ import { invalidateListQueries } from "../../apollo"
 import { SKUCloneTree } from "../../components/skuCloneTree"
 import { Checkbox } from "baseui/checkbox"
 import { promiseTimeout, TIMED_OUT } from "../../helpers/timeout"
+import { Select } from "baseui/select";
 
 type FormData = {
 	name: string
 	brand :string
 	price: number
-	point: number
+	purchasePoints: number
 	weight: number
 	ingredients: string
 	code: string
@@ -110,7 +111,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 	const { register, setValue, handleSubmit, errors, getValues } = useForm<FormData>()
 
-	const onSubmit = handleSubmit(async ({ name,brand, price, point, weight, ingredients, code, urls, productInfo, loyaltyPoints }) => {
+	const onSubmit = handleSubmit(async ({ name,brand, price, purchasePoints, weight, ingredients, code, urls, productInfo, loyaltyPoints }) => {
 		setTimedOut(false)
 
 		// Upload Master Plan
@@ -181,7 +182,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 			name,
 			brand,
 			price,
-			point,
+			purchasePoints,
 			weight,
 			ingredients,
 			code,
@@ -224,7 +225,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 		setValue("name", sku.name)
 		setValue("brand", sku.brand)
 		setValue("price", sku.price)
-		setValue("point", sku.point)
+		setValue("purchasePoints", sku.purchasePoints)
 		setValue("weight", sku.weight)
 		setValue("ingredients", sku.ingredients)
 		setValue("code", sku.code)
@@ -372,8 +373,8 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 			{breakLine}
 			
 			{isPointSku?
-			 <FormControl label="Point" error={errors.point ? errors.point.message : ""} positive="">
-				<Input name="point" type="number" inputRef={register({ required: "Required" })} />
+			 <FormControl label="Purchase Points" error={errors.purchasePoints ? errors.purchasePoints.message : ""} positive="">
+				<Input name="purchasePoints" type="number" inputRef={register({ required: "Required" })} />
 			</FormControl>:
 			<FormControl label="Price" error={errors.price ? errors.price.message : ""} positive="">
 			<Input name="price" type="number" inputRef={register({ required: "Required" })} />

@@ -65,7 +65,7 @@ const SKU = gql`
 		weight
 		price
 		brand
-		point
+		purchasePoints
 		ingredients
 		archived
 		productCount
@@ -479,6 +479,10 @@ const TASK = gql`
 		title,
 		description,
 		loyaltyPoints,
+		weight,
+		price,
+		purchasePoints,
+		ingredients,
 		isTimeBound,
 		isPeopleBound,
 		isProductRelevant,
