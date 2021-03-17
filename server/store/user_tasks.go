@@ -114,9 +114,18 @@ func (s *UserTasks) GetTask(taskID string, txes ...*sql.Tx) (*db.Task, error) {
 	return dat, nil
 }
 
+// GetUserSubtask by subTaskID
+func (s *UserTasks) GetSubtask(subTaskID string, txes ...*sql.Tx) (*db.Subtask, error) {
+	dat, err := db.Subtasks(db.SubtaskWhere.ID.EQ(subTaskID)).One(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
 // GetUser by userID
 func (s *UserTasks) GetUser(userID string, txes ...*sql.Tx) (*db.User, error) {
-	dat, err := db.Users(db.TaskWhere.ID.EQ(userID)).One(s.Conn)
+	dat, err := db.Users(db.UserWhere.ID.EQ(userID)).One(s.Conn)
 	if err != nil {
 		return nil, terror.New(err, "")
 	}

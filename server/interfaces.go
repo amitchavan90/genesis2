@@ -289,6 +289,7 @@ type UserTaskStorer interface {
 	Get(id uuid.UUID, txes ...*sql.Tx) (*db.UserTask, error)
 	GetMany(keys []string, txes ...*sql.Tx) (db.UserTaskSlice, []error)
 	GetSubtasks(userTaskID string, txes ...*sql.Tx) (db.UserSubtaskSlice, error)
+	GetSubtask(subTaskID string, txes ...*sql.Tx) (*db.Subtask, error)
 	GetTask(taskID string, txes ...*sql.Tx) (*db.Task, error)
 	GetUser(userID string, txes ...*sql.Tx) (*db.User, error)
 	All(txes ...*sql.Tx) (db.UserTaskSlice, error)
@@ -297,6 +298,16 @@ type UserTaskStorer interface {
 	Insert(record *db.UserTask, tx ...*sql.Tx) (*db.UserTask, error)
 	InsertSubtask(st *db.UserSubtask, txes ...*sql.Tx) (*db.UserSubtask, error)
 	Update(record *db.UserTask, tx ...*sql.Tx) (*db.UserTask, error)
+}
+
+// UserSubtaskStorer collects all role methods
+type UserSubtaskStorer interface {
+	Get(id uuid.UUID, txes ...*sql.Tx) (*db.UserSubtask, error)
+	GetMany(keys []string, txes ...*sql.Tx) (db.UserSubtaskSlice, []error)
+	All(txes ...*sql.Tx) (db.UserSubtaskSlice, error)
+	Count() (int64, error)
+	Insert(record *db.UserSubtask, tx ...*sql.Tx) (*db.UserSubtask, error)
+	Update(record *db.UserSubtask, tx ...*sql.Tx) (*db.UserSubtask, error)
 }
 
 // LoyaltyStorer collects all loyalty methods

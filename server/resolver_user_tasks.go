@@ -24,7 +24,7 @@ type userTaskResolver struct{ *Resolver }
 func (r *userTaskResolver) Task(ctx context.Context, obj *db.UserTask) (*db.Task, error) {
 	result, err := r.UserTaskStore.GetTask(obj.TaskID.String)
 	if err != nil {
-		return nil, terror.New(err, "get sku")
+		return nil, terror.New(err, "get task")
 	}
 	return result, nil
 }
@@ -32,7 +32,15 @@ func (r *userTaskResolver) Task(ctx context.Context, obj *db.UserTask) (*db.Task
 func (r *userTaskResolver) User(ctx context.Context, obj *db.UserTask) (*db.User, error) {
 	result, err := r.UserTaskStore.GetUser(obj.UserID)
 	if err != nil {
-		return nil, terror.New(err, "get sku")
+		return nil, terror.New(err, "get user")
+	}
+	return result, nil
+}
+
+func (r *userTaskResolver) UserSubtasks(ctx context.Context, obj *db.UserTask) ([]*db.UserSubtask, error) {
+	result, err := r.UserTaskStore.GetSubtasks(obj.ID)
+	if err != nil {
+		return nil, terror.New(err, "get user")
 	}
 	return result, nil
 }
@@ -76,7 +84,7 @@ func (r *mutationResolver) UserTaskCreate(ctx context.Context, input graphql.Upd
 	userTaskID, _ := uuid.NewV4()
 	ut.ID = userTaskID.String()
 
-	if input.TaskID != "" {
+	if input.TaskID == "" {
 		return nil, terror.New(terror.ErrParse, "create userTask: Task ID is required")
 	}
 
@@ -117,12 +125,14 @@ func (r *mutationResolver) UserTaskCreate(ctx context.Context, input graphql.Upd
 	// Add subuserTask
 	if len(subtasks) >= 0 {
 		for i := range subtasks {
-			st := &db.UserSubtask{}
+			ust := &db.UserSubtask{}
 			id, _ := uuid.NewV4()
-			st.ID = id.String()
-			st.UserTaskID = null.StringFrom(created.ID)
-			st.SubtaskID = null.StringFrom(subtasks[i].ID)
-			_, err = r.UserTaskStore.InsertSubtask(st)
+			ust.ID = id.String()
+			ust.UserTaskID = null.StringFrom(created.ID)
+			ust.SubtaskID = null.StringFrom(subtasks[i].ID)
+			ust.Status = "Incomplete"
+			ust.IsComplete = false
+			_, err = r.UserTaskStore.InsertSubtask(ust)
 			if err != nil {
 				return nil, terror.New(err, "create subuserTask")
 			}

@@ -589,6 +589,9 @@ func (r *userTaskResolver) Task(ctx context.Context, obj *db.UserTask) (*db.Task
 func (r *userTaskResolver) User(ctx context.Context, obj *db.UserTask) (*db.User, error) {
 	panic("not implemented")
 }
+func (r *userTaskResolver) UserSubtasks(ctx context.Context, obj *db.UserTask) ([]*db.UserSubtask, error) {
+	panic("not implemented")
+}
 
 type trackActionResolver struct{ *Resolver }
 

@@ -585,13 +585,21 @@ type ComplexityRoot struct {
 		User            func(childComplexity int) int
 	}
 
-	UserTask struct {
+	UserSubtask struct {
 		CreatedAt  func(childComplexity int) int
 		ID         func(childComplexity int) int
 		IsComplete func(childComplexity int) int
 		Status     func(childComplexity int) int
-		Task       func(childComplexity int) int
-		User       func(childComplexity int) int
+	}
+
+	UserTask struct {
+		CreatedAt    func(childComplexity int) int
+		ID           func(childComplexity int) int
+		IsComplete   func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Task         func(childComplexity int) int
+		User         func(childComplexity int) int
+		UserSubtasks func(childComplexity int) int
 	}
 
 	UserTasksResult struct {
@@ -829,6 +837,8 @@ type UserLoyaltyActivityResolver interface {
 type UserTaskResolver interface {
 	Task(ctx context.Context, obj *db.UserTask) (*db.Task, error)
 	User(ctx context.Context, obj *db.UserTask) (*db.User, error)
+
+	UserSubtasks(ctx context.Context, obj *db.UserTask) ([]*db.UserSubtask, error)
 }
 
 type executableSchema struct {
@@ -3965,6 +3975,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserLoyaltyActivity.User(childComplexity), true
 
+	case "UserSubtask.createdAt":
+		if e.complexity.UserSubtask.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.UserSubtask.CreatedAt(childComplexity), true
+
+	case "UserSubtask.id":
+		if e.complexity.UserSubtask.ID == nil {
+			break
+		}
+
+		return e.complexity.UserSubtask.ID(childComplexity), true
+
+	case "UserSubtask.isComplete":
+		if e.complexity.UserSubtask.IsComplete == nil {
+			break
+		}
+
+		return e.complexity.UserSubtask.IsComplete(childComplexity), true
+
+	case "UserSubtask.status":
+		if e.complexity.UserSubtask.Status == nil {
+			break
+		}
+
+		return e.complexity.UserSubtask.Status(childComplexity), true
+
 	case "UserTask.createdAt":
 		if e.complexity.UserTask.CreatedAt == nil {
 			break
@@ -4006,6 +4044,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserTask.User(childComplexity), true
+
+	case "UserTask.userSubtasks":
+		if e.complexity.UserTask.UserSubtasks == nil {
+			break
+		}
+
+		return e.complexity.UserTask.UserSubtasks(childComplexity), true
 
 	case "UserTasksResult.total":
 		if e.complexity.UserTasksResult.Total == nil {
@@ -5090,19 +5135,20 @@ extend type Query {
 	userActivities(search: SearchFilter!, limit: Int!, offset: Int!, userID: String): UserActivityResult! @hasPerm(p: ActivityListUserActivity)
 }
 `},
-	&ast.Source{Name: "schema_user_tasks.graphql", Input: `# type UserSubtask {
-# 	id: ID!
-# 	subtaskID: String!
-# 	userTaskID: String!
-# 	isComplete: Boolean!
-# 	createdAt: Time!
-# }
+	&ast.Source{Name: "schema_user_tasks.graphql", Input: `type UserSubtask {
+	id: ID!
+	# subtask: Subtask
+	isComplete: Boolean!
+	status: String!
+	createdAt: Time!
+}
 type UserTask {
 	id: ID!
 	task: Task!
 	user: User!
 	status: String!
 	isComplete: Boolean!
+	userSubtasks: [UserSubtask!]!
 	createdAt: Time!
 }
 
@@ -5110,10 +5156,6 @@ type UserTasksResult {
 	userTasks: [UserTask!]!
 	total: Int!
 }
-
-# input UpdateUserSubtask {
-# 	userTaskID: String!
-# }
 
 input UpdateUserTask {
 	taskID: String!
@@ -23994,6 +24036,154 @@ func (ec *executionContext) _UserLoyaltyActivity_createdAt(ctx context.Context, 
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _UserSubtask_id(ctx context.Context, field graphql.CollectedField, obj *db.UserSubtask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserSubtask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserSubtask_isComplete(ctx context.Context, field graphql.CollectedField, obj *db.UserSubtask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserSubtask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsComplete, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserSubtask_status(ctx context.Context, field graphql.CollectedField, obj *db.UserSubtask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserSubtask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserSubtask_createdAt(ctx context.Context, field graphql.CollectedField, obj *db.UserSubtask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserSubtask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _UserTask_id(ctx context.Context, field graphql.CollectedField, obj *db.UserTask) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -24177,6 +24367,43 @@ func (ec *executionContext) _UserTask_isComplete(ctx context.Context, field grap
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserTask_userSubtasks(ctx context.Context, field graphql.CollectedField, obj *db.UserTask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserTask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.UserTask().UserSubtasks(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*db.UserSubtask)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUserSubtask2ᚕᚖgenesisᚋdbᚐUserSubtaskᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserTask_createdAt(ctx context.Context, field graphql.CollectedField, obj *db.UserTask) (ret graphql.Marshaler) {
@@ -30326,6 +30553,48 @@ func (ec *executionContext) _UserLoyaltyActivity(ctx context.Context, sel ast.Se
 	return out
 }
 
+var userSubtaskImplementors = []string{"UserSubtask"}
+
+func (ec *executionContext) _UserSubtask(ctx context.Context, sel ast.SelectionSet, obj *db.UserSubtask) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, userSubtaskImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserSubtask")
+		case "id":
+			out.Values[i] = ec._UserSubtask_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isComplete":
+			out.Values[i] = ec._UserSubtask_isComplete(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "status":
+			out.Values[i] = ec._UserSubtask_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._UserSubtask_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var userTaskImplementors = []string{"UserTask"}
 
 func (ec *executionContext) _UserTask(ctx context.Context, sel ast.SelectionSet, obj *db.UserTask) graphql.Marshaler {
@@ -30380,6 +30649,20 @@ func (ec *executionContext) _UserTask(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "userSubtasks":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._UserTask_userSubtasks(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "createdAt":
 			out.Values[i] = ec._UserTask_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -32516,6 +32799,57 @@ func (ec *executionContext) marshalNUserLoyaltyActivity2ᚖgenesisᚋdbᚐUserLo
 		return graphql.Null
 	}
 	return ec._UserLoyaltyActivity(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUserSubtask2genesisᚋdbᚐUserSubtask(ctx context.Context, sel ast.SelectionSet, v db.UserSubtask) graphql.Marshaler {
+	return ec._UserSubtask(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserSubtask2ᚕᚖgenesisᚋdbᚐUserSubtaskᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.UserSubtask) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUserSubtask2ᚖgenesisᚋdbᚐUserSubtask(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNUserSubtask2ᚖgenesisᚋdbᚐUserSubtask(ctx context.Context, sel ast.SelectionSet, v *db.UserSubtask) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._UserSubtask(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNUserTask2genesisᚋdbᚐUserTask(ctx context.Context, sel ast.SelectionSet, v db.UserTask) graphql.Marshaler {
