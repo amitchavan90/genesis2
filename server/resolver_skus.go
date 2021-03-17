@@ -288,16 +288,46 @@ func (r *mutationResolver) SkuCreate(ctx context.Context, input graphql.UpdateSk
 	if input.CloneParentID != nil {
 		u.CloneParentID = *input.CloneParentID
 	}
+	if input.LoyaltyPoints != nil {
+		u.LoyaltyPoints = input.LoyaltyPoints.Int
+	} else {
+		u.LoyaltyPoints = 0
+	}
+	if input.Currency != nil {
+		u.Currency = input.Currency.String
+	} else {
+		u.Currency = "AUD"
+	}
+	if !input.IsPointSku.Bool {
+		if input.Price != nil {
+			u.Price = input.Price.Int
+		} else {
+			return nil, terror.New(err, "create sku: Price required")
+		}
+		u.PurchasePoints = 0
+	}
+	if input.IsPointSku.Bool {
+		if input.PurchasePoints != nil {
+			u.PurchasePoints = input.PurchasePoints.Int
+		} else {
+			return nil, terror.New(err, "create sku: Purchase Points required")
+		}
+		u.Price = 0
+	}
+	if input.WeightUnit != nil {
+		u.WeightUnit = input.WeightUnit.String
+	} else {
+		u.WeightUnit = "Kilograms"
+	}
+	if input.Weight != nil {
+		u.Weight = input.Weight.Int
+	} else {
+		u.Weight = 0
+	}
 
 	u.IsBeef = input.IsBeef.Bool
 	u.IsPointSku = input.IsPointSku.Bool
 	u.IsAppSku = input.IsAppSku.Bool
-	u.Weight = input.Weight.Int
-	u.WeightUnit = input.WeightUnit.String
-	u.Currency = input.Currency.String
-	u.Price = input.Price.Int
-	u.PurchasePoints = input.PurchasePoints.Int
-	u.LoyaltyPoints = input.LoyaltyPoints.Int
 
 	created, err := r.SKUStore.Insert(u)
 	if err != nil {

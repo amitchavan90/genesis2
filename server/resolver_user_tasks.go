@@ -117,12 +117,14 @@ func (r *mutationResolver) UserTaskCreate(ctx context.Context, input graphql.Upd
 	// Add subuserTask
 	if len(subtasks) >= 0 {
 		for i := range subtasks {
-			st := &db.UserSubtask{}
+			ust := &db.UserSubtask{}
 			id, _ := uuid.NewV4()
-			st.ID = id.String()
-			st.UserTaskID = null.StringFrom(created.ID)
-			st.SubtaskID = null.StringFrom(subtasks[i].ID)
-			_, err = r.UserTaskStore.InsertSubtask(st)
+			ust.ID = id.String()
+			ust.UserTaskID = null.StringFrom(created.ID)
+			ust.SubtaskID = null.StringFrom(subtasks[i].ID)
+			ust.Status = "Incomplete"
+			ust.IsComplete = false
+			_, err = r.UserTaskStore.InsertSubtask(ust)
 			if err != nil {
 				return nil, terror.New(err, "create subuserTask")
 			}
