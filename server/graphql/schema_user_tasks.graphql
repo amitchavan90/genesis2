@@ -2,6 +2,7 @@ type UserSubtask {
 	id: ID!
 	# subtask: Subtask
 	isComplete: Boolean!
+	status: String!
 	createdAt: Time!
 }
 type UserTask {

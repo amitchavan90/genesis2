@@ -589,6 +589,7 @@ type ComplexityRoot struct {
 		CreatedAt  func(childComplexity int) int
 		ID         func(childComplexity int) int
 		IsComplete func(childComplexity int) int
+		Status     func(childComplexity int) int
 	}
 
 	UserTask struct {
@@ -3995,6 +3996,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserSubtask.IsComplete(childComplexity), true
 
+	case "UserSubtask.status":
+		if e.complexity.UserSubtask.Status == nil {
+			break
+		}
+
+		return e.complexity.UserSubtask.Status(childComplexity), true
+
 	case "UserTask.createdAt":
 		if e.complexity.UserTask.CreatedAt == nil {
 			break
@@ -5131,6 +5139,7 @@ extend type Query {
 	id: ID!
 	# subtask: Subtask
 	isComplete: Boolean!
+	status: String!
 	createdAt: Time!
 }
 type UserTask {
@@ -24101,6 +24110,43 @@ func (ec *executionContext) _UserSubtask_isComplete(ctx context.Context, field g
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _UserSubtask_status(ctx context.Context, field graphql.CollectedField, obj *db.UserSubtask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserSubtask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _UserSubtask_createdAt(ctx context.Context, field graphql.CollectedField, obj *db.UserSubtask) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -30525,6 +30571,11 @@ func (ec *executionContext) _UserSubtask(ctx context.Context, sel ast.SelectionS
 			}
 		case "isComplete":
 			out.Values[i] = ec._UserSubtask_isComplete(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "status":
+			out.Values[i] = ec._UserSubtask_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
