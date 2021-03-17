@@ -1,16 +1,16 @@
-# type UserSubtask {
-# 	id: ID!
-# 	subtaskID: String!
-# 	userTaskID: String!
-# 	isComplete: Boolean!
-# 	createdAt: Time!
-# }
+type UserSubtask {
+	id: ID!
+	# subtask: Subtask
+	isComplete: Boolean!
+	createdAt: Time!
+}
 type UserTask {
 	id: ID!
 	task: Task!
 	user: User!
 	status: String!
 	isComplete: Boolean!
+	userSubtasks: [UserSubtask!]!
 	createdAt: Time!
 }
 
@@ -18,10 +18,6 @@ type UserTasksResult {
 	userTasks: [UserTask!]!
 	total: Int!
 }
-
-# input UpdateUserSubtask {
-# 	userTaskID: String!
-# }
 
 input UpdateUserTask {
 	taskID: String!
