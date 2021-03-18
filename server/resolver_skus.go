@@ -409,8 +409,14 @@ func (r *mutationResolver) SkuUpdate(ctx context.Context, id string, input graph
 	if input.Name != nil {
 		u.Name = input.Name.String
 	}
+	if input.Brand != nil {
+		u.Brand = input.Brand.String
+	}
 	if input.Description != nil {
 		u.Description = input.Description.String
+	}
+	if input.Ingredients != nil {
+		u.Ingredients = input.Ingredients.String
 	}
 	if input.LoyaltyPoints != nil {
 		u.LoyaltyPoints = input.LoyaltyPoints.Int
@@ -429,6 +435,49 @@ func (r *mutationResolver) SkuUpdate(ctx context.Context, id string, input graph
 			u.VideoBlobID = *input.VideoBlobID
 		}
 	}
+	if input.CloneParentID != nil {
+		u.CloneParentID = *input.CloneParentID
+	}
+	if input.LoyaltyPoints != nil {
+		u.LoyaltyPoints = input.LoyaltyPoints.Int
+	} else {
+		u.LoyaltyPoints = 0
+	}
+	if input.Currency != nil {
+		u.Currency = input.Currency.String
+	} else {
+		u.Currency = "AUD"
+	}
+	if !input.IsPointSku.Bool {
+		if input.Price != nil {
+			u.Price = input.Price.Int
+		} else {
+			return nil, terror.New(err, "create sku: Price required")
+		}
+		u.PurchasePoints = 0
+	}
+	if input.IsPointSku.Bool {
+		if input.PurchasePoints != nil {
+			u.PurchasePoints = input.PurchasePoints.Int
+		} else {
+			return nil, terror.New(err, "create sku: Purchase Points required")
+		}
+		u.Price = 0
+	}
+	if input.WeightUnit != nil {
+		u.WeightUnit = input.WeightUnit.String
+	} else {
+		u.WeightUnit = "Kilograms"
+	}
+	if input.Weight != nil {
+		u.Weight = input.Weight.Int
+	} else {
+		u.Weight = 0
+	}
+
+	u.IsBeef = input.IsBeef.Bool
+	u.IsPointSku = input.IsPointSku.Bool
+	u.IsAppSku = input.IsAppSku.Bool
 
 	updated, err := r.SKUStore.Update(u)
 	if err != nil {

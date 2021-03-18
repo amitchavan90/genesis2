@@ -377,11 +377,11 @@ type ComplexityRoot struct {
 	}
 
 	Referral struct {
-		CreatedAt    func(childComplexity int) int
-		ID           func(childComplexity int) int
-		IsRedemmed   func(childComplexity int) int
-		ReferredByID func(childComplexity int) int
-		UserID       func(childComplexity int) int
+		CreatedAt  func(childComplexity int) int
+		ID         func(childComplexity int) int
+		IsRedemmed func(childComplexity int) int
+		Referee    func(childComplexity int) int
+		User       func(childComplexity int) int
 	}
 
 	ReferralsResult struct {
@@ -770,7 +770,8 @@ type QueryResolver interface {
 	UserActivities(ctx context.Context, search SearchFilter, limit int, offset int, userID *string) (*UserActivityResult, error)
 }
 type ReferralResolver interface {
-	ReferredByID(ctx context.Context, obj *db.Referral) (string, error)
+	User(ctx context.Context, obj *db.Referral) (*db.User, error)
+	Referee(ctx context.Context, obj *db.Referral) (*db.User, error)
 }
 type RoleResolver interface {
 	Permissions(ctx context.Context, obj *db.Role) ([]Perm, error)
@@ -2995,19 +2996,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Referral.IsRedemmed(childComplexity), true
 
-	case "Referral.referredByID":
-		if e.complexity.Referral.ReferredByID == nil {
+	case "Referral.referee":
+		if e.complexity.Referral.Referee == nil {
 			break
 		}
 
-		return e.complexity.Referral.ReferredByID(childComplexity), true
+		return e.complexity.Referral.Referee(childComplexity), true
 
-	case "Referral.userID":
-		if e.complexity.Referral.UserID == nil {
+	case "Referral.user":
+		if e.complexity.Referral.User == nil {
 			break
 		}
 
-		return e.complexity.Referral.UserID(childComplexity), true
+		return e.complexity.Referral.User(childComplexity), true
 
 	case "ReferralsResult.referrals":
 		if e.complexity.ReferralsResult.Referrals == nil {
@@ -4756,8 +4757,8 @@ extend type Mutation {
 `},
 	&ast.Source{Name: "schema_referrals.graphql", Input: `type Referral {
 	id: ID!
-	userID: String!
-	referredByID: String!
+	user: User
+	referee: User
 	isRedemmed: Boolean!
 	createdAt: Time!
 }
@@ -18866,44 +18867,7 @@ func (ec *executionContext) _Referral_id(ctx context.Context, field graphql.Coll
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Referral_userID(ctx context.Context, field graphql.CollectedField, obj *db.Referral) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "Referral",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UserID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Referral_referredByID(ctx context.Context, field graphql.CollectedField, obj *db.Referral) (ret graphql.Marshaler) {
+func (ec *executionContext) _Referral_user(ctx context.Context, field graphql.CollectedField, obj *db.Referral) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -18922,22 +18886,53 @@ func (ec *executionContext) _Referral_referredByID(ctx context.Context, field gr
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Referral().ReferredByID(rctx, obj)
+		return ec.resolvers.Referral().User(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*db.User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚖgenesisᚋdbᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Referral_referee(ctx context.Context, field graphql.CollectedField, obj *db.Referral) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Referral",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Referral().Referee(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*db.User)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOUser2ᚖgenesisᚋdbᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Referral_isRedemmed(ctx context.Context, field graphql.CollectedField, obj *db.Referral) (ret graphql.Marshaler) {
@@ -29163,12 +29158,7 @@ func (ec *executionContext) _Referral(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "userID":
-			out.Values[i] = ec._Referral_userID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "referredByID":
+		case "user":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -29176,10 +29166,18 @@ func (ec *executionContext) _Referral(ctx context.Context, sel ast.SelectionSet,
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Referral_referredByID(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
+				res = ec._Referral_user(ctx, field, obj)
+				return res
+			})
+		case "referee":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Referral_referee(ctx, field, obj)
 				return res
 			})
 		case "isRedemmed":

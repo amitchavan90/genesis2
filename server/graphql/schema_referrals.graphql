@@ -1,7 +1,7 @@
 type Referral {
 	id: ID!
-	userID: String!
-	referredByID: String!
+	user: User
+	referee: User
 	isRedemmed: Boolean!
 	createdAt: Time!
 }

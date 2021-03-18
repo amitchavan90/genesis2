@@ -107,6 +107,24 @@ func (s *Referrals) SearchSelect(search graphql.SearchFilter, limit int, offset 
 // 	return dat, nil
 // }
 
+// GetReferee returns a referral given an userID
+func (s *Referrals) GetReferee(refereeID string, txes ...*sql.Tx) (*db.User, error) {
+	dat, err := db.Users(db.UserWhere.ID.EQ(refereeID)).One(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
+// GetUser returns a referral given an userID
+func (s *Referrals) GetUser(userID string, txes ...*sql.Tx) (*db.User, error) {
+	dat, err := db.Users(db.UserWhere.ID.EQ(userID)).One(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
 // GetMany referrals given a list of IDs
 func (s *Referrals) GetMany(keys []string, txes ...*sql.Tx) (db.ReferralSlice, []error) {
 	fmt.Println("Referral Resolvers: GetMany")

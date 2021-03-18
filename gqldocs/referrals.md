@@ -15,10 +15,19 @@ query {
   ) {
       referrals {
           id,
-          userID,
-          referredByID,
+          referee {
+              id,
+              firstName,
+              lastName,
+              referralCode
+          },
           isRedemmed,
-          createdAt
+          createdAt,
+          user {
+              firstName,
+              lastName,
+              email
+          }
       }
       total
   }
@@ -30,10 +39,19 @@ query {
 query referral {
   referral(userID: "bd7c3b92-c127-47ab-bb44-f22ec4cfe448") {
     id,
-    userID,
-    referredByID,
+    referee {
+        id,
+        firstName,
+        lastName,
+        referralCode
+    },
     isRedemmed,
-    createdAt
+    createdAt,
+    user {
+        firstName,
+        lastName,
+        email
+    }
   }
 }
 `

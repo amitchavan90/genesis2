@@ -511,7 +511,10 @@ func (r *queryResolver) UserActivities(ctx context.Context, search SearchFilter,
 
 type referralResolver struct{ *Resolver }
 
-func (r *referralResolver) ReferredByID(ctx context.Context, obj *db.Referral) (string, error) {
+func (r *referralResolver) User(ctx context.Context, obj *db.Referral) (*db.User, error) {
+	panic("not implemented")
+}
+func (r *referralResolver) Referee(ctx context.Context, obj *db.Referral) (*db.User, error) {
 	panic("not implemented")
 }
 

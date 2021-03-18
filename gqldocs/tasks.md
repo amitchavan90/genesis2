@@ -5,7 +5,7 @@
 #### TASK - Query List Sample
 `
 query {
-  tasks(
+  userTasks(
     search: {
       sortBy: DateCreated,
       sortDir: Ascending
@@ -13,25 +13,25 @@ query {
     limit: 100,
     offset: 0
   ) {
-      tasks {
+      userTasks {
           id,
-          title,
-          description,
-          isTimeBound,
-          isPeopleBound,
-          isProductRelevant,
-          isFinal,
-          finishDate,
-          maximumPeople,
-          sku {
-             id,
-             name,
-             code
-          },
-          subtasks {
+          isComplete,
+          status,
+          task {
               id,
               title,
-              description
+              description,
+          },
+          user {
+              id,
+              firstName,
+              lastName,
+              email
+          }
+          userSubtasks {
+              id,
+              isComplete,
+              status
           },
           createdAt
       }
@@ -70,48 +70,32 @@ query task {
 
 #### TASK - Mutation Query Example
 `
-mutation taskCreate {
-    taskCreate(
+mutation userTaskCreate {
+    userTaskCreate(
         input: {
-            title: "Task Title"
-            description: "Task Description"
-            loyaltyPoints: 50
-            isTimeBound: true
-            isPeopleBound: true
-            isProductRelevant: false
-            finishDate: "2021-03-06T15:04:05Z"
-            maximumPeople: 10
-            subtasks: [
-                {
-                    title: "Subtask 1"
-                    description: "Subtask One"
-                },
-                {
-                    title: "Subtask 2"
-                    description: "Subtask Two"
-                }
-            ]
+            taskID: "64f611f2-475a-4276-9b9a-1dcc5536f3ce"
         }
     ) {
-        title,
-        description,
-        loyaltyPoints,
-        isTimeBound,
-        isPeopleBound,
-        isProductRelevant,
-        isFinal,
-        finishDate,
-        maximumPeople,
-        sku {
-            id,
-            name,
-            code
-        }
-        subtasks {
+        id,
+        isComplete,
+        status,
+        task {
             id,
             title,
             description
-        }
+        },
+        user {
+            id,
+            firstName,
+            lastName,
+            email
+        },
+        subtasks {
+            id,
+            isComplete,
+            status
+        },
+        createdAt
     }
 }
 `
