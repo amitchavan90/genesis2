@@ -240,7 +240,8 @@ type UserStorer interface {
 // ReferralStorer collects all refereal methods
 type ReferralStorer interface {
 	BeginTransaction() (*sql.Tx, error)
-	// GetByReferee(email string, txes ...*sql.Tx) (*db.Referral, error)
+	GetReferee(refereeID string, txes ...*sql.Tx) (*db.User, error)
+	GetUser(userID string, txes ...*sql.Tx) (*db.User, error)
 	// GetByReferredByID(refByID null.String, txes ...*sql.Tx) (*db.Referral, error)
 	GetByUserID(userID string, txes ...*sql.Tx) (*db.Referral, error)
 	Get(id uuid.UUID, txes ...*sql.Tx) (*db.Referral, error)

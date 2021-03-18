@@ -19,12 +19,20 @@ func (r *Resolver) Referral() graphql.ReferralResolver {
 
 type referralResolver struct{ *Resolver }
 
-func (r *referralResolver) ReferredByID(ctx context.Context, obj *db.Referral) (string, error) {
-	ref, err := r.ReferralStore.GetByUserID(obj.UserID)
+func (r *referralResolver) User(ctx context.Context, obj *db.Referral) (*db.User, error) {
+	result, err := r.ReferralStore.GetUser(obj.UserID)
 	if err != nil {
-		return "", terror.New(err, "")
+		return nil, terror.New(err, "")
 	}
-	return ref.ReferredByID.String, nil
+	return result, nil
+}
+
+func (r *referralResolver) Referee(ctx context.Context, obj *db.Referral) (*db.User, error) {
+	result, err := r.ReferralStore.GetReferee(obj.ReferredByID.String)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return result, nil
 }
 
 ///////////////

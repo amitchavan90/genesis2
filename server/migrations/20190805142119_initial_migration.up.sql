@@ -419,4 +419,14 @@ CREATE TABLE user_loyalty_activities (
     transaction_hash text,
     created_at timestamptz NOT NULL DEFAULT NOW()
 );
+-- Purchase
+CREATE TABLE user_purchase_activities (
+    id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid (),
+    user_id uuid NOT NULL REFERENCES users (id),
+    product_id uuid REFERENCES products (id),
+    loyalty_points int NOT NULL, -- sku points + bonus points
+    message text NOT NULL DEFAULT '',
+    transaction_hash text,
+    created_at timestamptz NOT NULL DEFAULT NOW()
+);
 COMMIT;
