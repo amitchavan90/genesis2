@@ -77,6 +77,8 @@ export enum Perm {
 	TaskRead = "TaskRead",
 	TaskCreate = "TaskCreate",
 
+	ReferralList = "ReferralList",
+
 	ContractList = "ContractList",
 	ContractRead = "ContractRead",
 	ContractCreate = "ContractCreate",

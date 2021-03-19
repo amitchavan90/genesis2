@@ -18,9 +18,11 @@ import { invalidateListQueries } from "../../../apollo"
 import { Checkbox } from "baseui/checkbox"
 import { Datepicker } from "baseui/datepicker"
 import { Task, SubTask} from "../../../types/types"
-import { ItemSelectList } from "../../../components/itemSelectList"
+import { SKUSelectList } from "../../../components/itemSelectList"
 import { Select, Value } from "baseui/select"
 import { IconName } from "@fortawesome/fontawesome-svg-core"
+import { Modal, ModalButton, ModalFooter, ModalHeader } from "baseui/modal"
+import { promiseTimeout, TIMED_OUT } from "../../../helpers/timeout"
 
 
 type FormData = {
@@ -33,9 +35,10 @@ type FormData = {
 
 const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 	console.log("i am in task update")
-
+	const code = props.match.params.code
 	const isNewTask = "new"
 	const history = useHistory()
+	const [showPreviewModal, setShowPreviewModal] = React.useState<boolean>()
 
 	//style
 	const [css, theme] = useStyletron()
@@ -54,18 +57,20 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 	)
 	
 	
-	// Get SKU
+	// Get TASK
 	const [task, setTask] = React.useState<Task>()
 	// Mutations
-	const [updateTask, mutUpdateTask] = useMutation(isNewTask ? graphql.mutation.CREATE_TASK : graphql.mutation.UPDATE_SKU)
+	const [updateTask, mutUpdateTask] = useMutation(isNewTask ? graphql.mutation.CREATE_TASK : graphql.mutation.UPDATE_TASK)
 	// Form submission
 	const [timedOut, setTimedOut] = React.useState(false)
+	const [showSuccessModal, setShowSuccessModal] = React.useState(false)
 	const [description, setDescription] = React.useState("")
 	const [isTimeBound, setIsTimeBound] = React.useState<boolean>(false)
 	const [isPeopleBound, setIsPeopleBound] = React.useState<boolean>(false)
 	const [isProductRelevant, setIsProductRelevant] = React.useState<boolean>(false)
 	const [finishDate, setfinishDate] = React.useState(new Date())
-	const [sku,setSKU] = React.useState<Value>()
+	const [sku, setSKU] = React.useState<Value>()
+
 	const [subTasksCount, setSubTasksCount] = React.useState(isNewTask? 0 : 25)
 	const breakLine = <div className={breakLineStyle} />
 
@@ -83,7 +88,7 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 			loyaltyPoints,
 			finishDate,
 			maximumPeople,
-			//skuID,
+			skuID: sku && sku.length > 0 ? sku[0].id : "-",
 			subtasks,
 		}
 
@@ -93,11 +98,11 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 				variables: { input },
 				update: (cache: any) => invalidateListQueries(cache, "tasks"),
 			})
-		} else if (1) {
-			// promiseTimeout(updateTask({ variables: { id: sku.id, input } })).catch(reason => {
-			// 	if (reason !== TIMED_OUT) return
-			// 	setTimedOut(true)
-			// })
+		} else if (task) {
+			promiseTimeout(updateTask({ variables: { id: task.id, input } })).catch(reason => {
+				if (reason !== TIMED_OUT) return
+				setTimedOut(true)
+			})
 		}
 	})
 
@@ -107,13 +112,31 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 		setValue("loyaltyPoints", task.loyaltyPoints)
 		setValue("maximumPeople", task.maximumPeople)
 		setfinishDate(new Date(task.finishDate))
-		//setValue("L280001", task.skuID)
+		if (task.sku) setSKU([{ id: task.sku.id, label: task.sku.code }])
 		setSubTasksCount(task.subtasks.length)
 		task.subtasks.forEach((info, index) => {
 			setValue(`subtasks[${index}].title`, info.title)
 			setValue(`subtasks[${index}].description`, info.description)
 		})
 	}, [task])
+
+	// On mutation (update/create task)
+	React.useEffect(() => {
+		if (!mutUpdateTask.data) return
+
+		if (isNewTask) {
+			if (!mutUpdateTask.data.taskCreate) return
+			setShowSuccessModal(true)
+			history.replace(`/portal/task/${mutUpdateTask.data.taskCreate.id}`)
+			return
+		}
+
+		if (!mutUpdateTask.data.taskUpdate) return
+
+		setTask(mutUpdateTask.data.taskUpdate)
+		setShowSuccessModal(true)
+		setTimedOut(false)
+	}, [mutUpdateTask])
 	
 	const editForm = (
 		<form onSubmit={onSubmit}>
@@ -172,9 +195,6 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 			<FormControl label="Maximum People" error={errors.maximumPeople ? errors.maximumPeople.message : ""} positive="">
 				<Input name="maximumPeople" type="number" inputRef={register}/>
 			</FormControl>:<div></div>}
-			{/* <FormControl label="Finish Date" error={errors.finishDate ? errors.finishDate.message : ""} positive="">
-				<Input name="finishDate" type="Date" inputRef={register} />
-			</FormControl> */}
 			{isTimeBound?
 			<FormControl label="Finish Date" caption="YYYY/MM/DD" error="" positive="">
 				<div
@@ -186,9 +206,10 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 					<Datepicker value={finishDate} onChange={({ date }) => setfinishDate(date as Date)} />
 				</div>
 			</FormControl>:<div></div>}	
-			{/* <FormControl label="Role">
-				<ItemSelectList itemName="role" value={sku} setValue={setSKU} query={graphql.query.ROLES_LIMITED} identifier="name" disableSearch limit={0} />
-			</FormControl> */}
+			{isProductRelevant?
+			<FormControl label="SKU">
+				<SKUSelectList value={sku} setValue={setSKU} />
+			</FormControl>:<div></div>}
 			{breakLine}
 			<FormControl label={`Sub Tasks (${subTasksCount}/25)`} error="" positive="">
 				<div>
@@ -224,7 +245,7 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 			{breakLine}
 			
 			<Spread>
-				<Button type="button" kind="secondary" onClick={() => history.push("/portal/skus")}>
+				<Button type="button" kind="secondary" onClick={() => history.push("/portal/tasks")}>
 					Cancel
 				</Button>
 
@@ -238,6 +259,7 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 		// Successfully created order
 		return (
 			<CenteredPage>
+		
 				<Spaced>
 					<FontAwesomeIcon icon={["fal", "file-contract"]} size="3x" />
 					<H1>{isNewTask ? "New Task" : "Edit Task"}</H1>
@@ -245,6 +267,23 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 				{isNewTask ? (
 				editForm
 			) : (<div>view task</div>)}
+			
+			<Modal isOpen={showPreviewModal} onClose={() => setShowPreviewModal(false)}>
+				
+			</Modal>
+
+			{/* Success Modal */}
+			<Modal onClose={() => setShowSuccessModal(false)} isOpen={showSuccessModal}>
+				<ModalHeader>
+					<span>
+						<FontAwesomeIcon icon={["fas", "check"]} />
+						<span style={{ marginLeft: "10px" }}>Task Updated Successfully</span>
+					</span>
+				</ModalHeader>
+				<ModalFooter>
+					<ModalButton onClick={() => setShowSuccessModal(false)}>OK</ModalButton>
+				</ModalFooter>
+			</Modal>
 			</CenteredPage>
 		)
 	}
@@ -264,7 +303,6 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 	
 	export const InputPair = (props: InputPairProps) => {
 		const { prefix, index } = props
-		console.log("subtasks------------->",prefix,props.titleInputRef)
 		const [css, theme] = useStyletron()
 		const containerStyle = css({
 			display: "flex",

@@ -484,7 +484,7 @@ const TasksList = () => (
 		itemName="task"
 		header="Task"
 		query={graphql.query.TASKS}
-		batchActionMutation={graphql.mutation.BATCH_ACTION_SKU}
+		batchActionMutation={graphql.mutation.BATCH_ACTION_TASK}
 		firstColumnValue="title"
 		firstColumnSubValue="finishDate"
 		columns={[
@@ -498,6 +498,32 @@ const TasksList = () => (
 		actions={ActionItemSet.Archive}
 		createPermission={Perm.TaskCreate}
 		readPermission={Perm.TaskRead}
+	/>
+)
+
+const ReferralList = () => (
+	<ItemListPage
+		itemName="referral"
+		header="Referral"
+		query={graphql.query.REFERRALS}
+		batchActionMutation={graphql.mutation.BATCH_ACTION_SKU}
+		firstColumnValue="isRedemmed"
+		firstColumnSubValue="createdAt"
+		columns={[
+			{ label: "UserFristName", value: "user" ,subValues: ["firstName"]},
+			{ label: "UserLastName", value: "user" ,subValues: ["lastName"]},
+			{ label: "RefralCode", value: "referee" ,subValues: ["referralCode"]},
+			{ label: "RefereeFristName", value: "referee" ,subValues: ["firstName"]},
+			{ label: "RefereeLastName", value: "referee" ,subValues: ["lastName"]},
+			{
+				label: "Date Created",
+				value: "createdAt",
+				dateTime: true,
+			},
+		]}
+		actions={ActionItemSet.Archive}
+		//createPermission={Perm.TaskCreate}
+		//readPermission={Perm.TaskRead}
 	/>
 )
 export const ListPage = {
@@ -517,5 +543,6 @@ export const ListPage = {
 
 	Transactions,
 	UserActivity,
-	TasksList
+	TasksList,
+	ReferralList
 }

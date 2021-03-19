@@ -98,18 +98,13 @@ export interface SKUClone {
 	depth: number
 }
 
-export interface SKURefer{
-	id: string
-	name: string
-	code: string
-}
-
 export interface SubTask {
 	title: string
 	description: string
 }
 
 export interface Task{
+	id:string
     title:string
     description:String
     loyaltyPoints:number
@@ -118,7 +113,7 @@ export interface Task{
     isProductRelevant: boolean
     finishDate:Date
     maximumPeople:number
-    skuID:SKURefer
+	sku: SKU
 	subtasks:SubTask[]
 }
 

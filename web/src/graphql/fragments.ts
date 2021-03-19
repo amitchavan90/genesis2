@@ -62,9 +62,10 @@ const SKU = gql`
 		isBeef
 		isPointSku
 		isAppSku
+		brand
+		ingredients
 		weight
 		price
-		brand
 		purchasePoints
 		ingredients
 		archived
@@ -479,16 +480,17 @@ const TASK = gql`
 		title,
 		description,
 		loyaltyPoints,
-		weight,
-		price,
-		purchasePoints,
-		ingredients,
 		isTimeBound,
 		isPeopleBound,
 		isProductRelevant,
 		finishDate,
 		maximumPeople,
 		skuID,
+		sku {
+			id,
+			name,
+			code
+		},
 		createdAt
 	}
 `
@@ -506,7 +508,23 @@ const TASK_LIST = gql`
 			createdAt
 	}
 `
-
+const REFERRAL_LIST = gql`
+fragment ReferralListFragment on Referral{
+	id,
+    referee {
+        id,
+        firstName,
+        lastName,
+        referralCode
+    },
+    isRedemmed,
+    createdAt,
+    user {
+        firstName,
+        lastName,
+        email
+    }
+}`
 
 export const fragment = {
 	USER,
@@ -541,4 +559,6 @@ export const fragment = {
 
 	TASK,
 	TASK_LIST,
+
+	REFERRAL_LIST
 }

@@ -559,6 +559,18 @@ const TASKS = gql`
 	}
 	${fragment.TASK_LIST}
 `
+
+const REFERRALS = gql`
+	query referrals($search: SearchFilter!, $limit: Int!, $offset: Int!) {
+		referrals(search: $search, limit: $limit, offset: $offset) {
+			referrals {
+				...ReferralListFragment         
+			}
+			total
+		}
+	}
+	${fragment.REFERRAL_LIST}
+`
 export const query = {
 	ME,
 
@@ -625,4 +637,6 @@ export const query = {
 
 	TASKS,
 	TASK,
+
+	REFERRALS
 }

@@ -91,9 +91,11 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	const [timedOut, setTimedOut] = React.useState(false)
 	const [showSuccessModal, setShowSuccessModal] = React.useState(false)
 	const [description, setDescription] = React.useState("")
-	const [isBeef, setIsBeef] = React.useState<boolean>(false)
-	const [isAppSku, setIsAppSku] = React.useState<boolean>(false)
-	const [isPointSku, setIsPointSku] = React.useState<boolean>(false)
+	const [isBeef, setIsBeef] = React.useState<boolean>()
+	const [isAppSku, setIsAppSku] = React.useState<boolean>()
+	const [isPointSku, setIsPointSku] = React.useState<boolean>()
+
+	const [purchasePoints, setPurchasePoints] = React.useState<number>()
 
 	const [masterPlanFile, setMasterPlanFile] = React.useState<File>()
 	const [masterPlanURL, setMasterPlanURL] = React.useState<string>()
@@ -113,7 +115,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 	const onSubmit = handleSubmit(async ({ name,brand, price, purchasePoints, weight, ingredients, code, urls, productInfo, loyaltyPoints }) => {
 		setTimedOut(false)
-
+		console.log("purchasePoints----------->",purchasePoints);
 		// Upload Master Plan
 		let masterPlanBlobID: string | null = null
 		if (uploadMasterPlan) {
@@ -181,8 +183,6 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 		const input = {
 			name,
 			brand,
-			price,
-			purchasePoints,
 			weight,
 			ingredients,
 			code,
@@ -190,6 +190,8 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 			isBeef,
 			isAppSku,
 			isPointSku,
+			price: price || 0,
+			purchasePoints: purchasePoints || 0,
 			masterPlanBlobID,
 			videoBlobID,
 			photoBlobIDs,
@@ -206,6 +208,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 				update: (cache: any) => invalidateListQueries(cache, "skus"),
 			})
 		} else if (sku) {
+			console.log("update-------->",sku);
 			promiseTimeout(updateSKU({ variables: { id: sku.id, input } })).catch(reason => {
 				if (reason !== TIMED_OUT) return
 				setTimedOut(true)
@@ -221,17 +224,19 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	React.useEffect(() => {
 		if (activeKey != "#details") return
 		if (!sku) return
-
+	
 		setValue("name", sku.name)
 		setValue("brand", sku.brand)
 		setValue("price", sku.price)
-		setValue("purchasePoints", sku.purchasePoints)
+		setPurchasePoints(sku.purchasePoints)
 		setValue("weight", sku.weight)
 		setValue("ingredients", sku.ingredients)
 		setValue("code", sku.code)
 		setValue("loyaltyPoints", sku.loyaltyPoints)
 		setDescription(sku.description)
 		setIsBeef(sku.isBeef)
+		setIsAppSku(sku.isAppSku)
+		setIsPointSku(sku.isPointSku)
 		if (sku.masterPlan) setMasterPlanURL(sku.masterPlan.file_url)
 		if (sku.video) setVideoURL(sku.video.file_url)
 		setPhotos(sku.photos)
@@ -259,7 +264,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 			history.replace(`/portal/sku/${mutUpdateSKU.data.skuCreate.code}`)
 			return
 		}
-
+		
 		if (!mutUpdateSKU.data.skuUpdate) return
 
 		setSKU(mutUpdateSKU.data.skuUpdate)
@@ -358,6 +363,21 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 					Is Beef
 				</Checkbox>
 			</FormControl>
+			{isBeef?
+			<ImageUpload.Single
+				// client requested to rename it to Hero Image
+				label="GIF image"
+				name="masterPlan"
+				imageURL={!masterPlanURL || uploadMasterPlan?.removeImage ? "" : masterPlanURL}
+				setImageUploader={imageUploader => setUploadMasterPlan(imageUploader)}
+				imageRemoved={uploadMasterPlan?.removeImage}
+				file={masterPlanFile}
+				setFile={(file?: File) => setMasterPlanFile(file)}
+				previewHeight="200px"
+				caption="Please select a gif file"
+				maxFileSize={1e7}
+				clearable
+			/>:<div></div>}
 
 			<FormControl caption="">
 				<Checkbox checked={isAppSku} onChange={e => setIsAppSku(e.currentTarget.checked)}>
@@ -372,18 +392,33 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 			</FormControl>
 			{breakLine}
 			
-			{isPointSku?
-			 <FormControl label="Purchase Points" error={errors.purchasePoints ? errors.purchasePoints.message : ""} positive="">
-				<Input name="purchasePoints" type="number" inputRef={register({ required: "Required" })} />
-			</FormControl>:
+			{!isPointSku?
 			<FormControl label="Price" error={errors.price ? errors.price.message : ""} positive="">
-			<Input name="price" type="number" inputRef={register({ required: "Required" })} />
+				<Input name="price" type="number" inputRef={register} />
 			</FormControl>
+			:
+			<FormControl label="PurchasePoints" error={errors.purchasePoints ? errors.purchasePoints.message : ""} positive="">
+				<Input name="purchasePoints" type="number" inputRef={register} />
+	   		</FormControl>
 			}
 			{breakLine}
 			<FormControl label="Brand" error={errors.brand ? errors.brand.message : ""} positive="">
-				<Input name="brand" inputRef={register({ required: "Required" })} />
+				<Input name="brnad"  inputRef={register({ required: "Required" })} />
 			</FormControl>
+			<ImageUpload.Single
+				// client requested to rename it to Hero Image
+				label="Brand logo"
+				name="masterPlan"
+				imageURL={!masterPlanURL || uploadMasterPlan?.removeImage ? "" : masterPlanURL}
+				setImageUploader={imageUploader => setUploadMasterPlan(imageUploader)}
+				imageRemoved={uploadMasterPlan?.removeImage}
+				file={masterPlanFile}
+				setFile={(file?: File) => setMasterPlanFile(file)}
+				previewHeight="200px"
+				caption="Please select a jpg/png file smaller than 10MB"
+				maxFileSize={1e7}
+				clearable
+			/>
 			<FormControl label="Weight" error={errors.weight ? errors.weight.message : ""} positive="">
 				<Input name="weight" type="number" inputRef={register({ required: "Required" })} />
 			</FormControl>

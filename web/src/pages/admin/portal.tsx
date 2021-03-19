@@ -118,6 +118,8 @@ const PortalInner = () => {
 
 							{hasPermission(Perm.TaskCreate) && <Route path={"/portal/task/:id"} component={TaskEdit} />}
 							{hasPermission(Perm.TaskList) && <Route path={"/portal/tasks"} component={ListPage.TasksList} />}
+
+							{hasPermission(Perm.ReferralList) && <Route path={"/portal/referrals"} component={ListPage.ReferralList} />}
 							<Route path={"/portal/"} component={Dashboard} />
 						</Switch>
 					</div>
