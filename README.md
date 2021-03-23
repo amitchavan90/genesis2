@@ -58,14 +58,18 @@ Genesis requires the following pieces:
    - `geth account new`
    
    - Set a password
-   ```in file server/cmd/platform/main.go, line 79, for variable blockchainPrivatekeypassword, replace "tiger" with the password you just set
+   ```
+   in file server/cmd/platform/main.go, line 79, for variable blockchainPrivatekeypassword, replace "tiger" with the password you just set
    
-   after setting the password, you will get some output, which specifies the "Public address of the key", and "Path of the secret key file", which will look something like this "/home/tiger/.ethereum/keystore/UTC--2021-01-23T07-11-12.748956556Z--68ed5c4fe3c98389cfc1312e58155c6fd8d24e44"```
+   after setting the password, you will get some output, which specifies the "Public address of the key", and "Path of the secret key file", which will look something like this "/home/tiger/.ethereum/keystore/UTC--2021-01-23T07-11-12.748956556Z--68ed5c4fe3c98389cfc1312e58155c6fd8d24e44"
+   ```
    
    - cat the path of the secret key file from the above step
    
-   - ```cat $PATH_OF_SECRET_KEY_FILE | base64 -w 0```
-   ```this will give you a base64 output```
+   - `cat $PATH_OF_SECRET_KEY_FILE | base64 -w 0`
+   ```
+   this will give you a base64 output
+   ```
   
    - Set the output to GENESIS_BLOCKCHAIN_PRIVATEKEYBYTES
    ```See below```
