@@ -133,7 +133,7 @@ func (r *mutationResolver) TaskCreate(ctx context.Context, input graphql.UpdateT
 
 	created, err := r.TaskStore.Insert(t)
 	if err != nil {
-		return nil, terror.New(err, "create task")
+		return nil, terror.New(err, "create task: Error while inserting new task in db")
 	}
 
 	// Add subtask

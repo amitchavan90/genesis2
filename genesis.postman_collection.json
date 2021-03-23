@@ -1,0 +1,562 @@
+{
+	"info": {
+		"_postman_id": "e4c13772-ab1a-4b03-806e-eca2843ca3e1",
+		"name": "genesis",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"superadmin@example.com\",\n    \"password\": \"******\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/api/auth/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				},
+				"description": "Login returns header with Set-Cookie, where jwt token is defined"
+			},
+			"response": []
+		},
+		{
+			"name": "Referral List",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiI3NzYwZmI3ZS0yZjFmLTRhNGItODhhOC1lNTAxZmYwZjMwOGEiLCJ0b2tlbklkIjoiYzhlNWNlNTItYjBiYy00MDlhLWE0YjctNzE5NjQyYmI1ZTYzIiwidWlkIjoiMTdlNTIzYzUtNDA1Zi00YzRjLWFlODctOGYzNGYyMzU4ZWM1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Y9VHqsW_BOaMBJx4mcC9yEnsjT1mF9xUVrlthsaXIys; Path=/; Expires=Thu, 15 Apr 2021 14:04:30 GMT; HttpOnly; SameSite=None"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n  referrals(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      referrals {\n          id,\n          referee {\n              id,\n              firstName,\n              lastName,\n              referralCode\n          },\n          isRedemmed,\n          createdAt,\n          user {\n              firstName,\n              lastName,\n              email\n          }\n      }\n      total\n  }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "User LIst",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n  users(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      users {\n          id,\n          email,\n          firstName,\n          lastName,\n          mobilePhone,\n          organisation {\n              id\n          },\n          role {\n              id\n          },\n          referrals {\n            id,\n            user {\n                id,\n                firstName\n            },\n            referee {\n                id,\n                firstName,\n                referralCode\n            },\n            isRedemmed,\n            createdAt\n          }\n      }\n      total\n  }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "User Task List",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n  userTasks(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      userTasks {\n          id,\n          isComplete,\n          status,\n          task {\n              id,\n              title,\n              description,\n          },\n          user {\n              id,\n              firstName,\n              lastName,\n              email\n          }\n          userSubtasks {\n              id,\n              isComplete,\n              status\n          },\n          createdAt\n      }\n      total\n  }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "User Task Create",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation userTaskCreate {\n    userTaskCreate(\n        input: {\n            taskID: \"45690607-4ff8-4dbd-ba52-6441d0003e36\"\n        }\n    ) {\n        id,\n        isComplete,\n        status,\n        task {\n            id,\n            code,\n            title,\n            description\n        },\n        user {\n            id,\n            firstName,\n            lastName,\n            email\n        },\n        userSubtasks {\n            id\n        }\n        createdAt\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "Task List",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n  tasks(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      tasks {\n          id,\n          code,\n          title,\n          description,\n          isTimeBound,\n          isPeopleBound,\n          isProductRelevant,\n          isFinal,\n          finishDate,\n          maximumPeople,\n          skuID,\n          subtasks {\n              id,\n              title,\n              description\n          },\n          createdAt\n      }\n      total\n  }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "Task Get By ID",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query task {\n  task(id: \"45690607-4ff8-4dbd-ba52-6441d0003e36\") {\n    id,\n    title,\n    description,\n    loyaltyPoints,\n    isTimeBound,\n    isPeopleBound,\n    isProductRelevant,\n    finishDate,\n    maximumPeople,\n    skuID,\n    subtasks {\n        id,\n        title,\n        description\n    }\n    createdAt\n  }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "Task Create",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation taskCreate {\n    taskCreate(\n        input: {\n            title: \"Task 1\"\n            description: \"Task One\"\n            loyaltyPoints: 50\n            isTimeBound: true\n            isPeopleBound: true\n            isProductRelevant: false\n            finishDate: \"2021-04-06T15:04:05Z\"\n            maximumPeople: 10\n            subtasks: [\n                {\n                    title: \"Subtask 1\"\n                    description: \"Subtask One\"\n                },\n                {\n                    title: \"Subtask 2\"\n                    description: \"Subtask Two\"\n                }\n            ]\n        }\n    ) {\n        id,\n        code,\n        title,\n        description,\n        loyaltyPoints,\n        isTimeBound,\n        isPeopleBound,\n        isProductRelevant,\n        isFinal,\n        finishDate,\n        maximumPeople,\n        skuID,\n        subtasks {\n            id,\n            title,\n            description\n        }\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "SKU List",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiN2Q0ZmRiMDktZDlhZS00NDg3LThiYzUtODczNDAxZGQwMDZmIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Gm_pA--TZoC-eV4gtH4sRGIEGcGU0R5z5bIHpZEsNog; Path=/; Expires=Thu, 22 Apr 2021 13:05:19 GMT; HttpOnly; SameSite=NoneQC"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n  skus(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      skus {\n          id,\n          name,\n          code,\n          description,\n          weight,\n          weightUnit,\n          price,\n          currency,\n          isBeef,\n          isAppSku,\n          isPointSku,\n          hasClones,\n          masterPlan {\n              id\n          },\n          video {\n              id\n          }\n          loyaltyPoints,\n          cloneParentID,\n          archived,\n          createdAt,\n          urls {\n              title,\n              content\n          },\n          productInfo {\n              title,\n              content\n          },\n          photos {\n              id\n          },\n          categories {\n              id,\n              name\n          },\n          productCategories {\n              id,\n              name\n          },\n          productCount\n      }\n      total\n  }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "Product Create",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiN2Q0ZmRiMDktZDlhZS00NDg3LThiYzUtODczNDAxZGQwMDZmIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Gm_pA--TZoC-eV4gtH4sRGIEGcGU0R5z5bIHpZEsNog; Path=/; Expires=Thu, 22 Apr 2021 13:05:19 GMT; HttpOnly; SameSite=NoneQC"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation productCreate {\n    productCreate(\n        input: {\n            skuID: \"d9be308d-5bde-47ae-abd9-6b2e0f17b94a\",\n            description: \"Sample Description\"\n        }\n    ) {\n        id,\n        code,\n        registerID,\n        loyaltyPoints,\n        sku {\n            id,\n            code,\n            name\n        }\n\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "Product List",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiN2Q0ZmRiMDktZDlhZS00NDg3LThiYzUtODczNDAxZGQwMDZmIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Gm_pA--TZoC-eV4gtH4sRGIEGcGU0R5z5bIHpZEsNog; Path=/; Expires=Thu, 22 Apr 2021 13:05:19 GMT; HttpOnly; SameSite=NoneQC"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n  products(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      products {\n          id,\n          code,\n          registerID,\n          loyaltyPoints,\n          sku {\n              id,\n              code,\n              name\n          }\n      }\n      total\n  }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "SKU Create",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiN2Q0ZmRiMDktZDlhZS00NDg3LThiYzUtODczNDAxZGQwMDZmIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Gm_pA--TZoC-eV4gtH4sRGIEGcGU0R5z5bIHpZEsNog; Path=/; Expires=Thu, 22 Apr 2021 13:05:19 GMT; HttpOnly; SameSite=NoneQC"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation skuCreate {\n    skuCreate(\n        input: {\n            name: \"iPhone XI\"\n            brand: \"Apple\"\n            description: \"Smartphone\"\n            weight: 3\n            weightUnit: \"Kilogram\"\n            price: 999,\n            purchasePoints: 100,\n            loyaltyPoints: 10\n            currency: \"AUD\"\n            isBeef: false\n            isAppSku: true\n            isPointSku: true\n            categories: [\n                {\n                    name: \"Cat 1\"\n                },\n                {\n                    name: \"Cat 2\"\n                }\n            ]\n            productCategories: [\n                {\n                    name: \"Product Cat 1\"\n                },\n                {\n                    name: \"Product Cat 2\"\n                }\n            ]\n        }\n    ) {\n        id,\n        code,\n        name,\n        brand,\n        description,\n        isBeef,\n        isAppSku,\n        isPointSku,\n        weight,\n        weightUnit,\n        purchasePoints,\n        loyaltyPoints,\n        price,\n        currency,\n        categories {\n            id,\n            name\n        },\n        productCategories {\n            id,\n            name\n        }\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "User Purchase Activity List",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiN2Q0ZmRiMDktZDlhZS00NDg3LThiYzUtODczNDAxZGQwMDZmIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Gm_pA--TZoC-eV4gtH4sRGIEGcGU0R5z5bIHpZEsNog; Path=/; Expires=Thu, 22 Apr 2021 13:05:19 GMT; HttpOnly; SameSite=NoneQC"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n  userPurchaseActivities(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      userPurchaseActivities {\n          id,\n          loyaltyPoints,\n          user {\n              id,\n              firstName,\n              lastName,\n              email\n          },\n          product {\n              id\n          }\n          createdAt\n      }\n      total\n  }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "User Purchase Activity Create",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiN2Q0ZmRiMDktZDlhZS00NDg3LThiYzUtODczNDAxZGQwMDZmIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Gm_pA--TZoC-eV4gtH4sRGIEGcGU0R5z5bIHpZEsNog; Path=/; Expires=Thu, 22 Apr 2021 13:05:19 GMT; HttpOnly; SameSite=NoneQC"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation userPurchaseActivityCreate {\n    userPurchaseActivityCreate(\n        input: {\n            productID: \"37c39456-b81a-452d-80eb-6d2046a201fc\",\n        }\n    ) {\n        id,\n        code,\n        loyaltyPoints,\n        user {\n            id,\n            firstName\n        }\n        product {\n            id,\n            code,\n            registerID,\n            loyaltyPoints,\n        }\n\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "User Create",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation userCreate {\n    userCreate(\n        input: {\n            email: \"tiger@example.com\"\n            firstName: \"Tiger\"\n            lastName: \"Darbey\"\n            roleID: \"91464930-c501-4918-b61f-0f8fb1d25450\"\n            password: \"tiger$123\"\n            mobilePhone: \"1234567891\"\n        }\n    ) {\n        id,\n        email,\n        firstName,\n        lastName,\n        referralCode\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User Get By Email",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query user {\n  user(email: \"tiger@example.com\") {\n    id,\n    email,\n    firstName,\n    lastName,\n    mobilePhone,\n    organisation {\n        id\n    },\n    role {\n        id\n    },\n    referrals {\n      id,\n      user {\n          id\n      },\n      referee {\n          id\n      },\n      isRedemmed,\n      createdAt\n    }\n  }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

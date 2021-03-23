@@ -106,11 +106,7 @@ func (r *mutationResolver) UserTaskCreate(ctx context.Context, input graphql.Upd
 		return nil, terror.New(terror.ErrParse, "create userTask: Error while fetching user")
 	}
 
-	// get user
-	// user, err := r.UserTaskStore.GetUser(input.UserID)
-	// if err != nil {
-	// 	return nil, terror.New(terror.ErrParse, "create userTask: Task with given ID is not found")
-	// }
+	// Verify if user already opted for task --- TODO
 
 	ut.TaskID = null.StringFrom(task.ID)
 	ut.UserID = userID.String()

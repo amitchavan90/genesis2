@@ -262,7 +262,10 @@ func (r *mutationResolver) ProductCreate(ctx context.Context, input graphql.Upda
 	p := &db.Product{
 		Code:        productCode,
 		CreatedByID: user.ID,
-		Description: input.Description.String,
+		// Description: input.Description.String,
+	}
+	if input.Description != nil {
+		p.Description = input.Description.String
 	}
 	if input.CartonID != nil {
 		if len(input.CartonID.String) <= 1 {
