@@ -1,5 +1,6 @@
 type UserPurchaseActivity {
 	id: ID!
+	code: String!
     user: User
 	product: Product
     loyaltyPoints: Int!

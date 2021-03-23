@@ -2,6 +2,7 @@ package genesis
 
 import (
 	"context"
+	"fmt"
 	"genesis/db"
 	"genesis/graphql"
 	"time"
@@ -80,11 +81,19 @@ func (r *queryResolver) Tasks(ctx context.Context, search graphql.SearchFilter, 
 
 // TaskCreate creates an task
 func (r *mutationResolver) TaskCreate(ctx context.Context, input graphql.UpdateTask) (*db.Task, error) {
-	// Create Task
-	t := &db.Task{}
+	// Get Task count (for Task Code)
+	count, err := r.TaskStore.Count()
+	if err != nil {
+		return nil, terror.New(err, "create task: Error while fetching task count from db")
+	}
 
-	taskID, _ := uuid.NewV4()
-	t.ID = taskID.String()
+	// Create Task
+	t := &db.Task{
+		Code: fmt.Sprintf("T%05d", count),
+	}
+
+	taskUUID, _ := uuid.NewV4()
+	t.ID = taskUUID.String()
 
 	if input.Title != "" {
 		t.Title = input.Title

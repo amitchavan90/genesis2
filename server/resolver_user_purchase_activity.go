@@ -2,6 +2,7 @@ package genesis
 
 import (
 	"context"
+	"fmt"
 	"genesis/db"
 	"genesis/graphql"
 
@@ -70,8 +71,16 @@ func (r *queryResolver) UserPurchaseActivities(ctx context.Context, search graph
 
 // UserPurchaseActivityCreate creates an task
 func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input graphql.UpdateUserPurchaseActivity) (*db.UserPurchaseActivity, error) {
+	// Get UserPurchaseActivity count (for UserPurchaseActivity Code)
+	count, err := r.UserPurchaseActivityStore.Count()
+	if err != nil {
+		return nil, terror.New(err, "create task: Error while fetching task count from db")
+	}
+
 	// Create UserPurchaseActivity
-	t := &db.UserPurchaseActivity{}
+	t := &db.UserPurchaseActivity{
+		Code: fmt.Sprintf("P%05d", count),
+	}
 
 	purchaseID, _ := uuid.NewV4()
 	t.ID = purchaseID.String()
