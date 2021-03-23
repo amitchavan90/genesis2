@@ -333,6 +333,10 @@ type UpdateUser struct {
 	ReferredByCode *null.String `json:"referredByCode"`
 }
 
+type UpdateUserPurchaseActivity struct {
+	ProductID *null.String `json:"productID"`
+}
+
 type UpdateUserTask struct {
 	TaskID string `json:"taskID"`
 }
@@ -340,6 +344,11 @@ type UpdateUserTask struct {
 type UserActivityResult struct {
 	UserActivities []*db.UserActivity `json:"userActivities"`
 	Total          int                `json:"total"`
+}
+
+type UserPurchaseActivityResult struct {
+	UserPurchaseActivities []*db.UserPurchaseActivity `json:"userPurchaseActivities"`
+	Total                  int                        `json:"total"`
 }
 
 type UserTasksResult struct {
@@ -652,6 +661,10 @@ const (
 	PermDistributorUnarchive           Perm = "DistributorUnarchive"
 	PermActivityListBlockchainActivity Perm = "ActivityListBlockchainActivity"
 	PermActivityListUserActivity       Perm = "ActivityListUserActivity"
+	PermUserPurchaseActivityList       Perm = "UserPurchaseActivityList"
+	PermUserPurchaseActivityCreate     Perm = "UserPurchaseActivityCreate"
+	PermUserPurchaseActivityRead       Perm = "UserPurchaseActivityRead"
+	PermUserPurchaseActivityUpdate     Perm = "UserPurchaseActivityUpdate"
 	PermUseAdvancedMode                Perm = "UseAdvancedMode"
 	PermUseAdminPortal                 Perm = "UseAdminPortal"
 )
@@ -757,13 +770,17 @@ var AllPerm = []Perm{
 	PermDistributorUnarchive,
 	PermActivityListBlockchainActivity,
 	PermActivityListUserActivity,
+	PermUserPurchaseActivityList,
+	PermUserPurchaseActivityCreate,
+	PermUserPurchaseActivityRead,
+	PermUserPurchaseActivityUpdate,
 	PermUseAdvancedMode,
 	PermUseAdminPortal,
 }
 
 func (e Perm) IsValid() bool {
 	switch e {
-	case PermUserList, PermUserCreate, PermUserRead, PermUserUpdate, PermUserArchive, PermUserUnarchive, PermReferralList, PermReferralRead, PermTaskList, PermTaskCreate, PermTaskRead, PermTaskUpdate, PermTaskArchive, PermTaskUnarchive, PermUserTaskList, PermUserTaskCreate, PermUserTaskRead, PermUserTaskUpdate, PermUserTaskArchive, PermUserTaskUnarchive, PermOrganisationList, PermOrganisationCreate, PermOrganisationRead, PermOrganisationUpdate, PermOrganisationArchive, PermOrganisationUnarchive, PermRoleList, PermRoleCreate, PermRoleRead, PermRoleUpdate, PermRoleArchive, PermRoleUnarchive, PermSKUList, PermSKUCreate, PermSKURead, PermSKUUpdate, PermSKUArchive, PermSKUUnarchive, PermCategoryList, PermCategoryCreate, PermCategoryRead, PermCategoryUpdate, PermCategoryArchive, PermCategoryUnarchive, PermProductCategoryList, PermProductCategoryCreate, PermProductCategoryRead, PermProductCategoryUpdate, PermProductCategoryArchive, PermProductCategoryUnarchive, PermContainerList, PermContainerRead, PermContainerCreate, PermContainerUpdate, PermContainerArchive, PermContainerUnarchive, PermPalletList, PermPalletRead, PermPalletCreate, PermPalletUpdate, PermPalletArchive, PermPalletUnarchive, PermCartonList, PermCartonRead, PermCartonCreate, PermCartonUpdate, PermCartonArchive, PermCartonUnarchive, PermProductList, PermProductRead, PermProductCreate, PermProductUpdate, PermProductArchive, PermProductUnarchive, PermOrderList, PermOrderRead, PermOrderCreate, PermOrderUpdate, PermOrderArchive, PermOrderUnarchive, PermTrackActionList, PermTrackActionRead, PermTrackActionCreate, PermTrackActionUpdate, PermTrackActionArchive, PermTrackActionUnarchive, PermContractList, PermContractRead, PermContractCreate, PermContractUpdate, PermContractArchive, PermContractUnarchive, PermDistributorList, PermDistributorRead, PermDistributorCreate, PermDistributorUpdate, PermDistributorArchive, PermDistributorUnarchive, PermActivityListBlockchainActivity, PermActivityListUserActivity, PermUseAdvancedMode, PermUseAdminPortal:
+	case PermUserList, PermUserCreate, PermUserRead, PermUserUpdate, PermUserArchive, PermUserUnarchive, PermReferralList, PermReferralRead, PermTaskList, PermTaskCreate, PermTaskRead, PermTaskUpdate, PermTaskArchive, PermTaskUnarchive, PermUserTaskList, PermUserTaskCreate, PermUserTaskRead, PermUserTaskUpdate, PermUserTaskArchive, PermUserTaskUnarchive, PermOrganisationList, PermOrganisationCreate, PermOrganisationRead, PermOrganisationUpdate, PermOrganisationArchive, PermOrganisationUnarchive, PermRoleList, PermRoleCreate, PermRoleRead, PermRoleUpdate, PermRoleArchive, PermRoleUnarchive, PermSKUList, PermSKUCreate, PermSKURead, PermSKUUpdate, PermSKUArchive, PermSKUUnarchive, PermCategoryList, PermCategoryCreate, PermCategoryRead, PermCategoryUpdate, PermCategoryArchive, PermCategoryUnarchive, PermProductCategoryList, PermProductCategoryCreate, PermProductCategoryRead, PermProductCategoryUpdate, PermProductCategoryArchive, PermProductCategoryUnarchive, PermContainerList, PermContainerRead, PermContainerCreate, PermContainerUpdate, PermContainerArchive, PermContainerUnarchive, PermPalletList, PermPalletRead, PermPalletCreate, PermPalletUpdate, PermPalletArchive, PermPalletUnarchive, PermCartonList, PermCartonRead, PermCartonCreate, PermCartonUpdate, PermCartonArchive, PermCartonUnarchive, PermProductList, PermProductRead, PermProductCreate, PermProductUpdate, PermProductArchive, PermProductUnarchive, PermOrderList, PermOrderRead, PermOrderCreate, PermOrderUpdate, PermOrderArchive, PermOrderUnarchive, PermTrackActionList, PermTrackActionRead, PermTrackActionCreate, PermTrackActionUpdate, PermTrackActionArchive, PermTrackActionUnarchive, PermContractList, PermContractRead, PermContractCreate, PermContractUpdate, PermContractArchive, PermContractUnarchive, PermDistributorList, PermDistributorRead, PermDistributorCreate, PermDistributorUpdate, PermDistributorArchive, PermDistributorUnarchive, PermActivityListBlockchainActivity, PermActivityListUserActivity, PermUserPurchaseActivityList, PermUserPurchaseActivityCreate, PermUserPurchaseActivityRead, PermUserPurchaseActivityUpdate, PermUseAdvancedMode, PermUseAdminPortal:
 		return true
 	}
 	return false

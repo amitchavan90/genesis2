@@ -290,6 +290,7 @@ func main() {
 				manifestStore := store.NewManifestStore(conn)
 				trackActionStore := store.NewTrackActionStore(conn)
 				userActivityStore := store.NewUserActivityStore(conn)
+				userPurchaseActivityStore := store.NewUserPurchaseActivityStore(conn)
 				tokenStore := store.NewTokenStore(conn)
 				blacklistRefreshHours := _config.UserAuth.BlacklistRefreshHours
 				blacklistProvider := genesis.NewBlacklister(l, tokenStore, blacklistRefreshHours)
@@ -412,6 +413,7 @@ func main() {
 					manifestStore,
 					trackActionStore,
 					userActivityStore,
+					userPurchaseActivityStore,
 					blacklistProvider,
 					tokenStore,
 					jwtSecret,

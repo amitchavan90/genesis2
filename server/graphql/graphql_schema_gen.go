@@ -57,6 +57,7 @@ type ResolverRoot interface {
 	User() UserResolver
 	UserActivity() UserActivityResolver
 	UserLoyaltyActivity() UserLoyaltyActivityResolver
+	UserPurchaseActivity() UserPurchaseActivityResolver
 	UserTask() UserTaskResolver
 }
 
@@ -185,73 +186,75 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CartonArchive            func(childComplexity int, id string) int
-		CartonBatchAction        func(childComplexity int, ids []string, action Action, value *BatchActionInput) int
-		CartonCreate             func(childComplexity int, input CreateCarton) int
-		CartonUnarchive          func(childComplexity int, id string) int
-		CartonUpdate             func(childComplexity int, id string, input UpdateCarton) int
-		ChangeDetails            func(childComplexity int, input UpdateUser) int
-		ChangePassword           func(childComplexity int, oldPassword string, password string) int
-		ContainerArchive         func(childComplexity int, id string) int
-		ContainerBatchAction     func(childComplexity int, ids []string, action Action, value *BatchActionInput) int
-		ContainerCreate          func(childComplexity int, input CreateContainer) int
-		ContainerUnarchive       func(childComplexity int, id string) int
-		ContainerUpdate          func(childComplexity int, id string, input UpdateContainer) int
-		ContractArchive          func(childComplexity int, id string) int
-		ContractCreate           func(childComplexity int, input UpdateContract) int
-		ContractUnarchive        func(childComplexity int, id string) int
-		ContractUpdate           func(childComplexity int, id string, input UpdateContract) int
-		DeploySmartContract      func(childComplexity int) int
-		DistributorArchive       func(childComplexity int, id string) int
-		DistributorCreate        func(childComplexity int, input UpdateDistributor) int
-		DistributorUnarchive     func(childComplexity int, id string) int
-		DistributorUpdate        func(childComplexity int, id string, input UpdateDistributor) int
-		FileUpload               func(childComplexity int, file graphql.Upload) int
-		FileUploadMultiple       func(childComplexity int, files []*graphql.Upload) int
-		FlushPendingTransactions func(childComplexity int) int
-		ForgotPassword           func(childComplexity int, email string, viaSms *bool) int
-		OrderArchive             func(childComplexity int, id string) int
-		OrderBatchAction         func(childComplexity int, ids []string, action Action, value *BatchActionInput) int
-		OrderCreate              func(childComplexity int, input CreateOrder) int
-		OrderUnarchive           func(childComplexity int, id string) int
-		OrderUpdate              func(childComplexity int, id string, input UpdateOrder) int
-		PalletArchive            func(childComplexity int, id string) int
-		PalletBatchAction        func(childComplexity int, ids []string, action Action, value *BatchActionInput) int
-		PalletCreate             func(childComplexity int, input CreatePallet) int
-		PalletUnarchive          func(childComplexity int, id string) int
-		PalletUpdate             func(childComplexity int, id string, input UpdatePallet) int
-		ProductArchive           func(childComplexity int, id string) int
-		ProductBatchAction       func(childComplexity int, ids []string, action Action, value *BatchActionInput) int
-		ProductCreate            func(childComplexity int, input UpdateProduct) int
-		ProductUnarchive         func(childComplexity int, id string) int
-		ProductUpdate            func(childComplexity int, id string, input UpdateProduct) int
-		RecordTransaction        func(childComplexity int, input RecordTransactionInput) int
-		RequestToken             func(childComplexity int, input *RequestToken) int
-		ResendEmailVerification  func(childComplexity int, email string) int
-		ResetPassword            func(childComplexity int, token string, password string, email *null.String) int
-		RoleArchive              func(childComplexity int, id string) int
-		RoleCreate               func(childComplexity int, input UpdateRole) int
-		RoleUnarchive            func(childComplexity int, id string) int
-		RoleUpdate               func(childComplexity int, id string, input UpdateRole) int
-		SkuArchive               func(childComplexity int, id string) int
-		SkuBatchAction           func(childComplexity int, ids []string, action Action, value *BatchActionInput) int
-		SkuCreate                func(childComplexity int, input UpdateSku) int
-		SkuUnarchive             func(childComplexity int, id string) int
-		SkuUpdate                func(childComplexity int, id string, input UpdateSku) int
-		TaskArchive              func(childComplexity int, id string) int
-		TaskCreate               func(childComplexity int, input UpdateTask) int
-		TaskUnarchive            func(childComplexity int, id string) int
-		TaskUpdate               func(childComplexity int, id string, input UpdateTask) int
-		TrackActionArchive       func(childComplexity int, id string) int
-		TrackActionCreate        func(childComplexity int, input UpdateTrackAction) int
-		TrackActionUnarchive     func(childComplexity int, id string) int
-		TrackActionUpdate        func(childComplexity int, id string, input UpdateTrackAction) int
-		UserArchive              func(childComplexity int, id string) int
-		UserCreate               func(childComplexity int, input UpdateUser) int
-		UserTaskCreate           func(childComplexity int, input UpdateUserTask) int
-		UserTaskUpdate           func(childComplexity int, id string, input UpdateUserTask) int
-		UserUnarchive            func(childComplexity int, id string) int
-		UserUpdate               func(childComplexity int, id string, input UpdateUser) int
+		CartonArchive              func(childComplexity int, id string) int
+		CartonBatchAction          func(childComplexity int, ids []string, action Action, value *BatchActionInput) int
+		CartonCreate               func(childComplexity int, input CreateCarton) int
+		CartonUnarchive            func(childComplexity int, id string) int
+		CartonUpdate               func(childComplexity int, id string, input UpdateCarton) int
+		ChangeDetails              func(childComplexity int, input UpdateUser) int
+		ChangePassword             func(childComplexity int, oldPassword string, password string) int
+		ContainerArchive           func(childComplexity int, id string) int
+		ContainerBatchAction       func(childComplexity int, ids []string, action Action, value *BatchActionInput) int
+		ContainerCreate            func(childComplexity int, input CreateContainer) int
+		ContainerUnarchive         func(childComplexity int, id string) int
+		ContainerUpdate            func(childComplexity int, id string, input UpdateContainer) int
+		ContractArchive            func(childComplexity int, id string) int
+		ContractCreate             func(childComplexity int, input UpdateContract) int
+		ContractUnarchive          func(childComplexity int, id string) int
+		ContractUpdate             func(childComplexity int, id string, input UpdateContract) int
+		DeploySmartContract        func(childComplexity int) int
+		DistributorArchive         func(childComplexity int, id string) int
+		DistributorCreate          func(childComplexity int, input UpdateDistributor) int
+		DistributorUnarchive       func(childComplexity int, id string) int
+		DistributorUpdate          func(childComplexity int, id string, input UpdateDistributor) int
+		FileUpload                 func(childComplexity int, file graphql.Upload) int
+		FileUploadMultiple         func(childComplexity int, files []*graphql.Upload) int
+		FlushPendingTransactions   func(childComplexity int) int
+		ForgotPassword             func(childComplexity int, email string, viaSms *bool) int
+		OrderArchive               func(childComplexity int, id string) int
+		OrderBatchAction           func(childComplexity int, ids []string, action Action, value *BatchActionInput) int
+		OrderCreate                func(childComplexity int, input CreateOrder) int
+		OrderUnarchive             func(childComplexity int, id string) int
+		OrderUpdate                func(childComplexity int, id string, input UpdateOrder) int
+		PalletArchive              func(childComplexity int, id string) int
+		PalletBatchAction          func(childComplexity int, ids []string, action Action, value *BatchActionInput) int
+		PalletCreate               func(childComplexity int, input CreatePallet) int
+		PalletUnarchive            func(childComplexity int, id string) int
+		PalletUpdate               func(childComplexity int, id string, input UpdatePallet) int
+		ProductArchive             func(childComplexity int, id string) int
+		ProductBatchAction         func(childComplexity int, ids []string, action Action, value *BatchActionInput) int
+		ProductCreate              func(childComplexity int, input UpdateProduct) int
+		ProductUnarchive           func(childComplexity int, id string) int
+		ProductUpdate              func(childComplexity int, id string, input UpdateProduct) int
+		RecordTransaction          func(childComplexity int, input RecordTransactionInput) int
+		RequestToken               func(childComplexity int, input *RequestToken) int
+		ResendEmailVerification    func(childComplexity int, email string) int
+		ResetPassword              func(childComplexity int, token string, password string, email *null.String) int
+		RoleArchive                func(childComplexity int, id string) int
+		RoleCreate                 func(childComplexity int, input UpdateRole) int
+		RoleUnarchive              func(childComplexity int, id string) int
+		RoleUpdate                 func(childComplexity int, id string, input UpdateRole) int
+		SkuArchive                 func(childComplexity int, id string) int
+		SkuBatchAction             func(childComplexity int, ids []string, action Action, value *BatchActionInput) int
+		SkuCreate                  func(childComplexity int, input UpdateSku) int
+		SkuUnarchive               func(childComplexity int, id string) int
+		SkuUpdate                  func(childComplexity int, id string, input UpdateSku) int
+		TaskArchive                func(childComplexity int, id string) int
+		TaskCreate                 func(childComplexity int, input UpdateTask) int
+		TaskUnarchive              func(childComplexity int, id string) int
+		TaskUpdate                 func(childComplexity int, id string, input UpdateTask) int
+		TrackActionArchive         func(childComplexity int, id string) int
+		TrackActionCreate          func(childComplexity int, input UpdateTrackAction) int
+		TrackActionUnarchive       func(childComplexity int, id string) int
+		TrackActionUpdate          func(childComplexity int, id string, input UpdateTrackAction) int
+		UserArchive                func(childComplexity int, id string) int
+		UserCreate                 func(childComplexity int, input UpdateUser) int
+		UserPurchaseActivityCreate func(childComplexity int, input UpdateUserPurchaseActivity) int
+		UserPurchaseActivityUpdate func(childComplexity int, id string, input UpdateUserPurchaseActivity) int
+		UserTaskCreate             func(childComplexity int, input UpdateUserTask) int
+		UserTaskUpdate             func(childComplexity int, id string, input UpdateUserTask) int
+		UserUnarchive              func(childComplexity int, id string) int
+		UserUpdate                 func(childComplexity int, id string, input UpdateUser) int
 	}
 
 	Order struct {
@@ -370,6 +373,8 @@ type ComplexityRoot struct {
 		Transactions             func(childComplexity int, search SearchFilter, limit int, offset int, productID *string, cartonID *string, trackActionID *string) int
 		User                     func(childComplexity int, email *string, wechatID *string) int
 		UserActivities           func(childComplexity int, search SearchFilter, limit int, offset int, userID *string) int
+		UserPurchaseActivities   func(childComplexity int, search SearchFilter, limit int, offset int, userID *string) int
+		UserPurchaseActivity     func(childComplexity int, id *string) int
 		UserTask                 func(childComplexity int, id *string) int
 		UserTasks                func(childComplexity int, search SearchFilter, limit int, offset int) int
 		Users                    func(childComplexity int, search SearchFilter, limit int, offset int) int
@@ -585,6 +590,21 @@ type ComplexityRoot struct {
 		User            func(childComplexity int) int
 	}
 
+	UserPurchaseActivity struct {
+		CreatedAt       func(childComplexity int) int
+		ID              func(childComplexity int) int
+		LoyaltyPoints   func(childComplexity int) int
+		Message         func(childComplexity int) int
+		Product         func(childComplexity int) int
+		TransactionHash func(childComplexity int) int
+		User            func(childComplexity int) int
+	}
+
+	UserPurchaseActivityResult struct {
+		Total                  func(childComplexity int) int
+		UserPurchaseActivities func(childComplexity int) int
+	}
+
 	UserSubtask struct {
 		CreatedAt  func(childComplexity int) int
 		ID         func(childComplexity int) int
@@ -696,6 +716,8 @@ type MutationResolver interface {
 	DistributorUpdate(ctx context.Context, id string, input UpdateDistributor) (*db.Distributor, error)
 	DistributorArchive(ctx context.Context, id string) (*db.Distributor, error)
 	DistributorUnarchive(ctx context.Context, id string) (*db.Distributor, error)
+	UserPurchaseActivityCreate(ctx context.Context, input UpdateUserPurchaseActivity) (*db.UserPurchaseActivity, error)
+	UserPurchaseActivityUpdate(ctx context.Context, id string, input UpdateUserPurchaseActivity) (*db.UserPurchaseActivity, error)
 }
 type OrderResolver interface {
 	Sku(ctx context.Context, obj *db.Order) (*db.StockKeepingUnit, error)
@@ -768,6 +790,8 @@ type QueryResolver interface {
 	Distributors(ctx context.Context, search SearchFilter, limit int, offset int) (*DistributorResult, error)
 	Distributor(ctx context.Context, code string) (*db.Distributor, error)
 	UserActivities(ctx context.Context, search SearchFilter, limit int, offset int, userID *string) (*UserActivityResult, error)
+	UserPurchaseActivities(ctx context.Context, search SearchFilter, limit int, offset int, userID *string) (*UserPurchaseActivityResult, error)
+	UserPurchaseActivity(ctx context.Context, id *string) (*db.UserPurchaseActivity, error)
 }
 type ReferralResolver interface {
 	User(ctx context.Context, obj *db.Referral) (*db.User, error)
@@ -834,6 +858,10 @@ type UserActivityResolver interface {
 type UserLoyaltyActivityResolver interface {
 	User(ctx context.Context, obj *db.UserLoyaltyActivity) (*db.User, error)
 	Product(ctx context.Context, obj *db.UserLoyaltyActivity) (*db.Product, error)
+}
+type UserPurchaseActivityResolver interface {
+	User(ctx context.Context, obj *db.UserPurchaseActivity) (*db.User, error)
+	Product(ctx context.Context, obj *db.UserPurchaseActivity) (*db.Product, error)
 }
 type UserTaskResolver interface {
 	Task(ctx context.Context, obj *db.UserTask) (*db.Task, error)
@@ -2093,6 +2121,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UserCreate(childComplexity, args["input"].(UpdateUser)), true
 
+	case "Mutation.userPurchaseActivityCreate":
+		if e.complexity.Mutation.UserPurchaseActivityCreate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_userPurchaseActivityCreate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UserPurchaseActivityCreate(childComplexity, args["input"].(UpdateUserPurchaseActivity)), true
+
+	case "Mutation.userPurchaseActivityUpdate":
+		if e.complexity.Mutation.UserPurchaseActivityUpdate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_userPurchaseActivityUpdate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UserPurchaseActivityUpdate(childComplexity, args["id"].(string), args["input"].(UpdateUserPurchaseActivity)), true
+
 	case "Mutation.userTaskCreate":
 		if e.complexity.Mutation.UserTaskCreate == nil {
 			break
@@ -2926,6 +2978,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.UserActivities(childComplexity, args["search"].(SearchFilter), args["limit"].(int), args["offset"].(int), args["userID"].(*string)), true
+
+	case "Query.userPurchaseActivities":
+		if e.complexity.Query.UserPurchaseActivities == nil {
+			break
+		}
+
+		args, err := ec.field_Query_userPurchaseActivities_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UserPurchaseActivities(childComplexity, args["search"].(SearchFilter), args["limit"].(int), args["offset"].(int), args["userID"].(*string)), true
+
+	case "Query.userPurchaseActivity":
+		if e.complexity.Query.UserPurchaseActivity == nil {
+			break
+		}
+
+		args, err := ec.field_Query_userPurchaseActivity_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UserPurchaseActivity(childComplexity, args["id"].(*string)), true
 
 	case "Query.userTask":
 		if e.complexity.Query.UserTask == nil {
@@ -3976,6 +4052,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserLoyaltyActivity.User(childComplexity), true
 
+	case "UserPurchaseActivity.createdAt":
+		if e.complexity.UserPurchaseActivity.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.UserPurchaseActivity.CreatedAt(childComplexity), true
+
+	case "UserPurchaseActivity.id":
+		if e.complexity.UserPurchaseActivity.ID == nil {
+			break
+		}
+
+		return e.complexity.UserPurchaseActivity.ID(childComplexity), true
+
+	case "UserPurchaseActivity.loyaltyPoints":
+		if e.complexity.UserPurchaseActivity.LoyaltyPoints == nil {
+			break
+		}
+
+		return e.complexity.UserPurchaseActivity.LoyaltyPoints(childComplexity), true
+
+	case "UserPurchaseActivity.message":
+		if e.complexity.UserPurchaseActivity.Message == nil {
+			break
+		}
+
+		return e.complexity.UserPurchaseActivity.Message(childComplexity), true
+
+	case "UserPurchaseActivity.product":
+		if e.complexity.UserPurchaseActivity.Product == nil {
+			break
+		}
+
+		return e.complexity.UserPurchaseActivity.Product(childComplexity), true
+
+	case "UserPurchaseActivity.transactionHash":
+		if e.complexity.UserPurchaseActivity.TransactionHash == nil {
+			break
+		}
+
+		return e.complexity.UserPurchaseActivity.TransactionHash(childComplexity), true
+
+	case "UserPurchaseActivity.user":
+		if e.complexity.UserPurchaseActivity.User == nil {
+			break
+		}
+
+		return e.complexity.UserPurchaseActivity.User(childComplexity), true
+
+	case "UserPurchaseActivityResult.total":
+		if e.complexity.UserPurchaseActivityResult.Total == nil {
+			break
+		}
+
+		return e.complexity.UserPurchaseActivityResult.Total(childComplexity), true
+
+	case "UserPurchaseActivityResult.userPurchaseActivities":
+		if e.complexity.UserPurchaseActivityResult.UserPurchaseActivities == nil {
+			break
+		}
+
+		return e.complexity.UserPurchaseActivityResult.UserPurchaseActivities(childComplexity), true
+
 	case "UserSubtask.createdAt":
 		if e.complexity.UserSubtask.CreatedAt == nil {
 			break
@@ -4268,6 +4407,11 @@ enum Perm {
 
 	ActivityListBlockchainActivity
 	ActivityListUserActivity
+
+	UserPurchaseActivityList
+	UserPurchaseActivityCreate
+	UserPurchaseActivityRead
+	UserPurchaseActivityUpdate
 
 	UseAdvancedMode
 	UseAdminPortal
@@ -5134,6 +5278,35 @@ type UserActivityResult {
 
 extend type Query {
 	userActivities(search: SearchFilter!, limit: Int!, offset: Int!, userID: String): UserActivityResult! @hasPerm(p: ActivityListUserActivity)
+}
+`},
+	&ast.Source{Name: "schema_user_purchase_activity.graphql", Input: `type UserPurchaseActivity {
+	id: ID!
+    user: User
+	product: Product
+    loyaltyPoints: Int!
+    message: String!
+	transactionHash: NullString
+	createdAt: Time!
+}
+
+type UserPurchaseActivityResult {
+	userPurchaseActivities: [UserPurchaseActivity!]!
+	total: Int!
+}
+
+input UpdateUserPurchaseActivity {
+    productID: NullString
+}
+
+extend type Query {
+	userPurchaseActivities(search: SearchFilter!, limit: Int!, offset: Int!, userID: String): UserPurchaseActivityResult! @hasPerm(p: UserPurchaseActivityList)
+	userPurchaseActivity(id: String): UserPurchaseActivity! @hasPerm(p: UserPurchaseActivityRead)
+}
+
+extend type Mutation {
+	userPurchaseActivityCreate(input: UpdateUserPurchaseActivity!): UserPurchaseActivity! @hasPerm(p: UserPurchaseActivityCreate)
+	userPurchaseActivityUpdate(id: ID!, input: UpdateUserPurchaseActivity!): UserPurchaseActivity! @hasPerm(p: UserPurchaseActivityUpdate)
 }
 `},
 	&ast.Source{Name: "schema_user_tasks.graphql", Input: `type UserSubtask {
@@ -6366,6 +6539,42 @@ func (ec *executionContext) field_Mutation_userCreate_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_userPurchaseActivityCreate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 UpdateUserPurchaseActivity
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNUpdateUserPurchaseActivity2genesisᚋgraphqlᚐUpdateUserPurchaseActivity(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_userPurchaseActivityUpdate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 UpdateUserPurchaseActivity
+	if tmp, ok := rawArgs["input"]; ok {
+		arg1, err = ec.unmarshalNUpdateUserPurchaseActivity2genesisᚋgraphqlᚐUpdateUserPurchaseActivity(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_userTaskCreate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -7271,6 +7480,58 @@ func (ec *executionContext) field_Query_userActivities_args(ctx context.Context,
 		}
 	}
 	args["userID"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_userPurchaseActivities_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 SearchFilter
+	if tmp, ok := rawArgs["search"]; ok {
+		arg0, err = ec.unmarshalNSearchFilter2genesisᚋgraphqlᚐSearchFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["search"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["limit"]; ok {
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg1
+	var arg2 int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
+	var arg3 *string
+	if tmp, ok := rawArgs["userID"]; ok {
+		arg3, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["userID"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_userPurchaseActivity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -14278,6 +14539,142 @@ func (ec *executionContext) _Mutation_distributorUnarchive(ctx context.Context, 
 	return ec.marshalNDistributor2ᚖgenesisᚋdbᚐDistributor(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_userPurchaseActivityCreate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_userPurchaseActivityCreate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UserPurchaseActivityCreate(rctx, args["input"].(UpdateUserPurchaseActivity))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "UserPurchaseActivityCreate")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasPerm == nil {
+				return nil, errors.New("directive hasPerm is not implemented")
+			}
+			return ec.directives.HasPerm(ctx, nil, directive0, p)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*db.UserPurchaseActivity); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *genesis/db.UserPurchaseActivity`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*db.UserPurchaseActivity)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUserPurchaseActivity2ᚖgenesisᚋdbᚐUserPurchaseActivity(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_userPurchaseActivityUpdate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_userPurchaseActivityUpdate_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UserPurchaseActivityUpdate(rctx, args["id"].(string), args["input"].(UpdateUserPurchaseActivity))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "UserPurchaseActivityUpdate")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasPerm == nil {
+				return nil, errors.New("directive hasPerm is not implemented")
+			}
+			return ec.directives.HasPerm(ctx, nil, directive0, p)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*db.UserPurchaseActivity); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *genesis/db.UserPurchaseActivity`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*db.UserPurchaseActivity)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUserPurchaseActivity2ᚖgenesisᚋdbᚐUserPurchaseActivity(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Order_id(ctx context.Context, field graphql.CollectedField, obj *db.Order) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -18753,6 +19150,142 @@ func (ec *executionContext) _Query_userActivities(ctx context.Context, field gra
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNUserActivityResult2ᚖgenesisᚋgraphqlᚐUserActivityResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_userPurchaseActivities(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_userPurchaseActivities_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().UserPurchaseActivities(rctx, args["search"].(SearchFilter), args["limit"].(int), args["offset"].(int), args["userID"].(*string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "UserPurchaseActivityList")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasPerm == nil {
+				return nil, errors.New("directive hasPerm is not implemented")
+			}
+			return ec.directives.HasPerm(ctx, nil, directive0, p)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*UserPurchaseActivityResult); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *genesis/graphql.UserPurchaseActivityResult`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*UserPurchaseActivityResult)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUserPurchaseActivityResult2ᚖgenesisᚋgraphqlᚐUserPurchaseActivityResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_userPurchaseActivity(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_userPurchaseActivity_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().UserPurchaseActivity(rctx, args["id"].(*string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "UserPurchaseActivityRead")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasPerm == nil {
+				return nil, errors.New("directive hasPerm is not implemented")
+			}
+			return ec.directives.HasPerm(ctx, nil, directive0, p)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*db.UserPurchaseActivity); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *genesis/db.UserPurchaseActivity`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*db.UserPurchaseActivity)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUserPurchaseActivity2ᚖgenesisᚋdbᚐUserPurchaseActivity(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -24031,6 +24564,330 @@ func (ec *executionContext) _UserLoyaltyActivity_createdAt(ctx context.Context, 
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _UserPurchaseActivity_id(ctx context.Context, field graphql.CollectedField, obj *db.UserPurchaseActivity) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserPurchaseActivity",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserPurchaseActivity_user(ctx context.Context, field graphql.CollectedField, obj *db.UserPurchaseActivity) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserPurchaseActivity",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.UserPurchaseActivity().User(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*db.User)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOUser2ᚖgenesisᚋdbᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserPurchaseActivity_product(ctx context.Context, field graphql.CollectedField, obj *db.UserPurchaseActivity) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserPurchaseActivity",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.UserPurchaseActivity().Product(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*db.Product)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOProduct2ᚖgenesisᚋdbᚐProduct(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserPurchaseActivity_loyaltyPoints(ctx context.Context, field graphql.CollectedField, obj *db.UserPurchaseActivity) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserPurchaseActivity",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LoyaltyPoints, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserPurchaseActivity_message(ctx context.Context, field graphql.CollectedField, obj *db.UserPurchaseActivity) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserPurchaseActivity",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserPurchaseActivity_transactionHash(ctx context.Context, field graphql.CollectedField, obj *db.UserPurchaseActivity) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserPurchaseActivity",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TransactionHash, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(null.String)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalONullString2githubᚗcomᚋvolatiletechᚋnullᚐString(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserPurchaseActivity_createdAt(ctx context.Context, field graphql.CollectedField, obj *db.UserPurchaseActivity) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserPurchaseActivity",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserPurchaseActivityResult_userPurchaseActivities(ctx context.Context, field graphql.CollectedField, obj *UserPurchaseActivityResult) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserPurchaseActivityResult",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserPurchaseActivities, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*db.UserPurchaseActivity)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUserPurchaseActivity2ᚕᚖgenesisᚋdbᚐUserPurchaseActivityᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserPurchaseActivityResult_total(ctx context.Context, field graphql.CollectedField, obj *UserPurchaseActivityResult) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserPurchaseActivityResult",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _UserSubtask_id(ctx context.Context, field graphql.CollectedField, obj *db.UserSubtask) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -26841,6 +27698,24 @@ func (ec *executionContext) unmarshalInputUpdateUser(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateUserPurchaseActivity(ctx context.Context, obj interface{}) (UpdateUserPurchaseActivity, error) {
+	var it UpdateUserPurchaseActivity
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "productID":
+			var err error
+			it.ProductID, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateUserTask(ctx context.Context, obj interface{}) (UpdateUserTask, error) {
 	var it UpdateUserTask
 	var asMap = obj.(map[string]interface{})
@@ -27933,6 +28808,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "distributorUnarchive":
 			out.Values[i] = ec._Mutation_distributorUnarchive(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "userPurchaseActivityCreate":
+			out.Values[i] = ec._Mutation_userPurchaseActivityCreate(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "userPurchaseActivityUpdate":
+			out.Values[i] = ec._Mutation_userPurchaseActivityUpdate(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -29122,6 +30007,34 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_userActivities(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "userPurchaseActivities":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_userPurchaseActivities(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "userPurchaseActivity":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_userPurchaseActivity(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -30539,6 +31452,104 @@ func (ec *executionContext) _UserLoyaltyActivity(ctx context.Context, sel ast.Se
 			out.Values[i] = ec._UserLoyaltyActivity_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var userPurchaseActivityImplementors = []string{"UserPurchaseActivity"}
+
+func (ec *executionContext) _UserPurchaseActivity(ctx context.Context, sel ast.SelectionSet, obj *db.UserPurchaseActivity) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, userPurchaseActivityImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserPurchaseActivity")
+		case "id":
+			out.Values[i] = ec._UserPurchaseActivity_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "user":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._UserPurchaseActivity_user(ctx, field, obj)
+				return res
+			})
+		case "product":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._UserPurchaseActivity_product(ctx, field, obj)
+				return res
+			})
+		case "loyaltyPoints":
+			out.Values[i] = ec._UserPurchaseActivity_loyaltyPoints(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "message":
+			out.Values[i] = ec._UserPurchaseActivity_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "transactionHash":
+			out.Values[i] = ec._UserPurchaseActivity_transactionHash(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._UserPurchaseActivity_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var userPurchaseActivityResultImplementors = []string{"UserPurchaseActivityResult"}
+
+func (ec *executionContext) _UserPurchaseActivityResult(ctx context.Context, sel ast.SelectionSet, obj *UserPurchaseActivityResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, userPurchaseActivityResultImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserPurchaseActivityResult")
+		case "userPurchaseActivities":
+			out.Values[i] = ec._UserPurchaseActivityResult_userPurchaseActivities(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "total":
+			out.Values[i] = ec._UserPurchaseActivityResult_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -32567,6 +33578,10 @@ func (ec *executionContext) unmarshalNUpdateUser2genesisᚋgraphqlᚐUpdateUser(
 	return ec.unmarshalInputUpdateUser(ctx, v)
 }
 
+func (ec *executionContext) unmarshalNUpdateUserPurchaseActivity2genesisᚋgraphqlᚐUpdateUserPurchaseActivity(ctx context.Context, v interface{}) (UpdateUserPurchaseActivity, error) {
+	return ec.unmarshalInputUpdateUserPurchaseActivity(ctx, v)
+}
+
 func (ec *executionContext) unmarshalNUpdateUserTask2genesisᚋgraphqlᚐUpdateUserTask(ctx context.Context, v interface{}) (UpdateUserTask, error) {
 	return ec.unmarshalInputUpdateUserTask(ctx, v)
 }
@@ -32797,6 +33812,71 @@ func (ec *executionContext) marshalNUserLoyaltyActivity2ᚖgenesisᚋdbᚐUserLo
 		return graphql.Null
 	}
 	return ec._UserLoyaltyActivity(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUserPurchaseActivity2genesisᚋdbᚐUserPurchaseActivity(ctx context.Context, sel ast.SelectionSet, v db.UserPurchaseActivity) graphql.Marshaler {
+	return ec._UserPurchaseActivity(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserPurchaseActivity2ᚕᚖgenesisᚋdbᚐUserPurchaseActivityᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.UserPurchaseActivity) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUserPurchaseActivity2ᚖgenesisᚋdbᚐUserPurchaseActivity(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNUserPurchaseActivity2ᚖgenesisᚋdbᚐUserPurchaseActivity(ctx context.Context, sel ast.SelectionSet, v *db.UserPurchaseActivity) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._UserPurchaseActivity(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUserPurchaseActivityResult2genesisᚋgraphqlᚐUserPurchaseActivityResult(ctx context.Context, sel ast.SelectionSet, v UserPurchaseActivityResult) graphql.Marshaler {
+	return ec._UserPurchaseActivityResult(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserPurchaseActivityResult2ᚖgenesisᚋgraphqlᚐUserPurchaseActivityResult(ctx context.Context, sel ast.SelectionSet, v *UserPurchaseActivityResult) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._UserPurchaseActivityResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNUserSubtask2genesisᚋdbᚐUserSubtask(ctx context.Context, sel ast.SelectionSet, v db.UserSubtask) graphql.Marshaler {

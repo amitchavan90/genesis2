@@ -33,6 +33,8 @@ type Task struct {
 	FinishDate        null.Time   `db:"finish_date" boil:"finish_date" json:"finish_date,omitempty" toml:"finish_date" yaml:"finish_date,omitempty"`
 	MaximumPeople     int         `db:"maximum_people" boil:"maximum_people" json:"maximum_people" toml:"maximum_people" yaml:"maximum_people"`
 	SkuID             null.String `db:"sku_id" boil:"sku_id" json:"sku_id,omitempty" toml:"sku_id" yaml:"sku_id,omitempty"`
+	BannerPhotoBlobID null.String `db:"banner_photo_blob_id" boil:"banner_photo_blob_id" json:"banner_photo_blob_id,omitempty" toml:"banner_photo_blob_id" yaml:"banner_photo_blob_id,omitempty"`
+	BrandLogoBlobID   null.String `db:"brand_logo_blob_id" boil:"brand_logo_blob_id" json:"brand_logo_blob_id,omitempty" toml:"brand_logo_blob_id" yaml:"brand_logo_blob_id,omitempty"`
 	IsFinal           bool        `db:"is_final" boil:"is_final" json:"is_final" toml:"is_final" yaml:"is_final"`
 	Archived          bool        `db:"archived" boil:"archived" json:"archived" toml:"archived" yaml:"archived"`
 	ArchivedAt        null.Time   `db:"archived_at" boil:"archived_at" json:"archived_at,omitempty" toml:"archived_at" yaml:"archived_at,omitempty"`
@@ -54,6 +56,8 @@ var TaskColumns = struct {
 	FinishDate        string
 	MaximumPeople     string
 	SkuID             string
+	BannerPhotoBlobID string
+	BrandLogoBlobID   string
 	IsFinal           string
 	Archived          string
 	ArchivedAt        string
@@ -70,6 +74,8 @@ var TaskColumns = struct {
 	FinishDate:        "finish_date",
 	MaximumPeople:     "maximum_people",
 	SkuID:             "sku_id",
+	BannerPhotoBlobID: "banner_photo_blob_id",
+	BrandLogoBlobID:   "brand_logo_blob_id",
 	IsFinal:           "is_final",
 	Archived:          "archived",
 	ArchivedAt:        "archived_at",
@@ -90,6 +96,8 @@ var TaskWhere = struct {
 	FinishDate        whereHelpernull_Time
 	MaximumPeople     whereHelperint
 	SkuID             whereHelpernull_String
+	BannerPhotoBlobID whereHelpernull_String
+	BrandLogoBlobID   whereHelpernull_String
 	IsFinal           whereHelperbool
 	Archived          whereHelperbool
 	ArchivedAt        whereHelpernull_Time
@@ -106,6 +114,8 @@ var TaskWhere = struct {
 	FinishDate:        whereHelpernull_Time{field: "\"tasks\".\"finish_date\""},
 	MaximumPeople:     whereHelperint{field: "\"tasks\".\"maximum_people\""},
 	SkuID:             whereHelpernull_String{field: "\"tasks\".\"sku_id\""},
+	BannerPhotoBlobID: whereHelpernull_String{field: "\"tasks\".\"banner_photo_blob_id\""},
+	BrandLogoBlobID:   whereHelpernull_String{field: "\"tasks\".\"brand_logo_blob_id\""},
 	IsFinal:           whereHelperbool{field: "\"tasks\".\"is_final\""},
 	Archived:          whereHelperbool{field: "\"tasks\".\"archived\""},
 	ArchivedAt:        whereHelpernull_Time{field: "\"tasks\".\"archived_at\""},
@@ -115,20 +125,26 @@ var TaskWhere = struct {
 
 // TaskRels is where relationship names are stored.
 var TaskRels = struct {
-	Sku       string
-	Subtasks  string
-	UserTasks string
+	BannerPhotoBlob string
+	BrandLogoBlob   string
+	Sku             string
+	Subtasks        string
+	UserTasks       string
 }{
-	Sku:       "Sku",
-	Subtasks:  "Subtasks",
-	UserTasks: "UserTasks",
+	BannerPhotoBlob: "BannerPhotoBlob",
+	BrandLogoBlob:   "BrandLogoBlob",
+	Sku:             "Sku",
+	Subtasks:        "Subtasks",
+	UserTasks:       "UserTasks",
 }
 
 // taskR is where relationships are stored.
 type taskR struct {
-	Sku       *StockKeepingUnit
-	Subtasks  SubtaskSlice
-	UserTasks UserTaskSlice
+	BannerPhotoBlob *Blob
+	BrandLogoBlob   *Blob
+	Sku             *StockKeepingUnit
+	Subtasks        SubtaskSlice
+	UserTasks       UserTaskSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -140,8 +156,8 @@ func (*taskR) NewStruct() *taskR {
 type taskL struct{}
 
 var (
-	taskAllColumns            = []string{"id", "title", "description", "loyalty_points", "is_time_bound", "is_people_bound", "is_product_relevant", "finish_date", "maximum_people", "sku_id", "is_final", "archived", "archived_at", "updated_at", "created_at"}
-	taskColumnsWithoutDefault = []string{"title", "description", "finish_date", "sku_id", "archived_at"}
+	taskAllColumns            = []string{"id", "title", "description", "loyalty_points", "is_time_bound", "is_people_bound", "is_product_relevant", "finish_date", "maximum_people", "sku_id", "banner_photo_blob_id", "brand_logo_blob_id", "is_final", "archived", "archived_at", "updated_at", "created_at"}
+	taskColumnsWithoutDefault = []string{"title", "description", "finish_date", "sku_id", "banner_photo_blob_id", "brand_logo_blob_id", "archived_at"}
 	taskColumnsWithDefault    = []string{"id", "loyalty_points", "is_time_bound", "is_people_bound", "is_product_relevant", "maximum_people", "is_final", "archived", "updated_at", "created_at"}
 	taskPrimaryKeyColumns     = []string{"id"}
 )
@@ -385,6 +401,34 @@ func (q taskQuery) Exists(exec boil.Executor) (bool, error) {
 	return count > 0, nil
 }
 
+// BannerPhotoBlob pointed to by the foreign key.
+func (o *Task) BannerPhotoBlob(mods ...qm.QueryMod) blobQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.BannerPhotoBlobID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	query := Blobs(queryMods...)
+	queries.SetFrom(query.Query, "\"blobs\"")
+
+	return query
+}
+
+// BrandLogoBlob pointed to by the foreign key.
+func (o *Task) BrandLogoBlob(mods ...qm.QueryMod) blobQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.BrandLogoBlobID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	query := Blobs(queryMods...)
+	queries.SetFrom(query.Query, "\"blobs\"")
+
+	return query
+}
+
 // Sku pointed to by the foreign key.
 func (o *Task) Sku(mods ...qm.QueryMod) stockKeepingUnitQuery {
 	queryMods := []qm.QueryMod{
@@ -439,6 +483,216 @@ func (o *Task) UserTasks(mods ...qm.QueryMod) userTaskQuery {
 	}
 
 	return query
+}
+
+// LoadBannerPhotoBlob allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (taskL) LoadBannerPhotoBlob(e boil.Executor, singular bool, maybeTask interface{}, mods queries.Applicator) error {
+	var slice []*Task
+	var object *Task
+
+	if singular {
+		object = maybeTask.(*Task)
+	} else {
+		slice = *maybeTask.(*[]*Task)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &taskR{}
+		}
+		if !queries.IsNil(object.BannerPhotoBlobID) {
+			args = append(args, object.BannerPhotoBlobID)
+		}
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &taskR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.BannerPhotoBlobID) {
+					continue Outer
+				}
+			}
+
+			if !queries.IsNil(obj.BannerPhotoBlobID) {
+				args = append(args, obj.BannerPhotoBlobID)
+			}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`blobs`), qm.WhereIn(`blobs.id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Blob")
+	}
+
+	var resultSlice []*Blob
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Blob")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for blobs")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for blobs")
+	}
+
+	if len(taskAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.BannerPhotoBlob = foreign
+		if foreign.R == nil {
+			foreign.R = &blobR{}
+		}
+		foreign.R.BannerPhotoBlobTasks = append(foreign.R.BannerPhotoBlobTasks, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if queries.Equal(local.BannerPhotoBlobID, foreign.ID) {
+				local.R.BannerPhotoBlob = foreign
+				if foreign.R == nil {
+					foreign.R = &blobR{}
+				}
+				foreign.R.BannerPhotoBlobTasks = append(foreign.R.BannerPhotoBlobTasks, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadBrandLogoBlob allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (taskL) LoadBrandLogoBlob(e boil.Executor, singular bool, maybeTask interface{}, mods queries.Applicator) error {
+	var slice []*Task
+	var object *Task
+
+	if singular {
+		object = maybeTask.(*Task)
+	} else {
+		slice = *maybeTask.(*[]*Task)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &taskR{}
+		}
+		if !queries.IsNil(object.BrandLogoBlobID) {
+			args = append(args, object.BrandLogoBlobID)
+		}
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &taskR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.BrandLogoBlobID) {
+					continue Outer
+				}
+			}
+
+			if !queries.IsNil(obj.BrandLogoBlobID) {
+				args = append(args, obj.BrandLogoBlobID)
+			}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`blobs`), qm.WhereIn(`blobs.id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Blob")
+	}
+
+	var resultSlice []*Blob
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Blob")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for blobs")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for blobs")
+	}
+
+	if len(taskAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.BrandLogoBlob = foreign
+		if foreign.R == nil {
+			foreign.R = &blobR{}
+		}
+		foreign.R.BrandLogoBlobTasks = append(foreign.R.BrandLogoBlobTasks, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if queries.Equal(local.BrandLogoBlobID, foreign.ID) {
+				local.R.BrandLogoBlob = foreign
+				if foreign.R == nil {
+					foreign.R = &blobR{}
+				}
+				foreign.R.BrandLogoBlobTasks = append(foreign.R.BrandLogoBlobTasks, local)
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // LoadSku allows an eager lookup of values, cached into the
@@ -733,6 +987,164 @@ func (taskL) LoadUserTasks(e boil.Executor, singular bool, maybeTask interface{}
 		}
 	}
 
+	return nil
+}
+
+// SetBannerPhotoBlob of the task to the related item.
+// Sets o.R.BannerPhotoBlob to related.
+// Adds o to related.R.BannerPhotoBlobTasks.
+func (o *Task) SetBannerPhotoBlob(exec boil.Executor, insert bool, related *Blob) error {
+	var err error
+	if insert {
+		if err = related.Insert(exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"tasks\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"banner_photo_blob_id"}),
+		strmangle.WhereClause("\"", "\"", 2, taskPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, updateQuery)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+	if _, err = exec.Exec(updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	queries.Assign(&o.BannerPhotoBlobID, related.ID)
+	if o.R == nil {
+		o.R = &taskR{
+			BannerPhotoBlob: related,
+		}
+	} else {
+		o.R.BannerPhotoBlob = related
+	}
+
+	if related.R == nil {
+		related.R = &blobR{
+			BannerPhotoBlobTasks: TaskSlice{o},
+		}
+	} else {
+		related.R.BannerPhotoBlobTasks = append(related.R.BannerPhotoBlobTasks, o)
+	}
+
+	return nil
+}
+
+// RemoveBannerPhotoBlob relationship.
+// Sets o.R.BannerPhotoBlob to nil.
+// Removes o from all passed in related items' relationships struct (Optional).
+func (o *Task) RemoveBannerPhotoBlob(exec boil.Executor, related *Blob) error {
+	var err error
+
+	queries.SetScanner(&o.BannerPhotoBlobID, nil)
+	if _, err = o.Update(exec, boil.Whitelist("banner_photo_blob_id")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.BannerPhotoBlob = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.BannerPhotoBlobTasks {
+		if queries.Equal(o.BannerPhotoBlobID, ri.BannerPhotoBlobID) {
+			continue
+		}
+
+		ln := len(related.R.BannerPhotoBlobTasks)
+		if ln > 1 && i < ln-1 {
+			related.R.BannerPhotoBlobTasks[i] = related.R.BannerPhotoBlobTasks[ln-1]
+		}
+		related.R.BannerPhotoBlobTasks = related.R.BannerPhotoBlobTasks[:ln-1]
+		break
+	}
+	return nil
+}
+
+// SetBrandLogoBlob of the task to the related item.
+// Sets o.R.BrandLogoBlob to related.
+// Adds o to related.R.BrandLogoBlobTasks.
+func (o *Task) SetBrandLogoBlob(exec boil.Executor, insert bool, related *Blob) error {
+	var err error
+	if insert {
+		if err = related.Insert(exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"tasks\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"brand_logo_blob_id"}),
+		strmangle.WhereClause("\"", "\"", 2, taskPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, updateQuery)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+	if _, err = exec.Exec(updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	queries.Assign(&o.BrandLogoBlobID, related.ID)
+	if o.R == nil {
+		o.R = &taskR{
+			BrandLogoBlob: related,
+		}
+	} else {
+		o.R.BrandLogoBlob = related
+	}
+
+	if related.R == nil {
+		related.R = &blobR{
+			BrandLogoBlobTasks: TaskSlice{o},
+		}
+	} else {
+		related.R.BrandLogoBlobTasks = append(related.R.BrandLogoBlobTasks, o)
+	}
+
+	return nil
+}
+
+// RemoveBrandLogoBlob relationship.
+// Sets o.R.BrandLogoBlob to nil.
+// Removes o from all passed in related items' relationships struct (Optional).
+func (o *Task) RemoveBrandLogoBlob(exec boil.Executor, related *Blob) error {
+	var err error
+
+	queries.SetScanner(&o.BrandLogoBlobID, nil)
+	if _, err = o.Update(exec, boil.Whitelist("brand_logo_blob_id")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.BrandLogoBlob = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.BrandLogoBlobTasks {
+		if queries.Equal(o.BrandLogoBlobID, ri.BrandLogoBlobID) {
+			continue
+		}
+
+		ln := len(related.R.BrandLogoBlobTasks)
+		if ln > 1 && i < ln-1 {
+			related.R.BrandLogoBlobTasks[i] = related.R.BrandLogoBlobTasks[ln-1]
+		}
+		related.R.BrandLogoBlobTasks = related.R.BrandLogoBlobTasks[:ln-1]
+		break
+	}
 	return nil
 }
 

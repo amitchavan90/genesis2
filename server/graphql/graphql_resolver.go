@@ -73,6 +73,9 @@ func (r *Resolver) UserActivity() UserActivityResolver {
 func (r *Resolver) UserLoyaltyActivity() UserLoyaltyActivityResolver {
 	return &userLoyaltyActivityResolver{r}
 }
+func (r *Resolver) UserPurchaseActivity() UserPurchaseActivityResolver {
+	return &userPurchaseActivityResolver{r}
+}
 
 type blobResolver struct{ *Resolver }
 
@@ -313,6 +316,12 @@ func (r *mutationResolver) DistributorArchive(ctx context.Context, id string) (*
 func (r *mutationResolver) DistributorUnarchive(ctx context.Context, id string) (*db.Distributor, error) {
 	panic("not implemented")
 }
+func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input UpdateUserPurchaseActivity) (*db.UserPurchaseActivity, error) {
+	panic("not implemented")
+}
+func (r *mutationResolver) UserPurchaseActivityUpdate(ctx context.Context, id string, input UpdateUserPurchaseActivity) (*db.UserPurchaseActivity, error) {
+	panic("not implemented")
+}
 
 type orderResolver struct{ *Resolver }
 
@@ -508,6 +517,12 @@ func (r *queryResolver) Distributor(ctx context.Context, code string) (*db.Distr
 func (r *queryResolver) UserActivities(ctx context.Context, search SearchFilter, limit int, offset int, userID *string) (*UserActivityResult, error) {
 	panic("not implemented")
 }
+func (r *queryResolver) UserPurchaseActivities(ctx context.Context, search SearchFilter, limit int, offset int, userID *string) (*UserPurchaseActivityResult, error) {
+	panic("not implemented")
+}
+func (r *queryResolver) UserPurchaseActivity(ctx context.Context, id *string) (*db.UserPurchaseActivity, error) {
+	panic("not implemented")
+}
 
 type referralResolver struct{ *Resolver }
 
@@ -656,5 +671,14 @@ func (r *userLoyaltyActivityResolver) User(ctx context.Context, obj *db.UserLoya
 	panic("not implemented")
 }
 func (r *userLoyaltyActivityResolver) Product(ctx context.Context, obj *db.UserLoyaltyActivity) (*db.Product, error) {
+	panic("not implemented")
+}
+
+type userPurchaseActivityResolver struct{ *Resolver }
+
+func (r *userPurchaseActivityResolver) User(ctx context.Context, obj *db.UserPurchaseActivity) (*db.User, error) {
+	panic("not implemented")
+}
+func (r *userPurchaseActivityResolver) Product(ctx context.Context, obj *db.UserPurchaseActivity) (*db.Product, error) {
 	panic("not implemented")
 }

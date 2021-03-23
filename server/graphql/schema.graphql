@@ -124,6 +124,11 @@ enum Perm {
 	ActivityListBlockchainActivity
 	ActivityListUserActivity
 
+	UserPurchaseActivityList
+	UserPurchaseActivityCreate
+	UserPurchaseActivityRead
+	UserPurchaseActivityUpdate
+
 	UseAdvancedMode
 	UseAdminPortal
 }
