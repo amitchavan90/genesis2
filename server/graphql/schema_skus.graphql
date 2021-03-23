@@ -39,6 +39,7 @@ type SKU {
 
 	masterPlan: Blob
 	video: Blob
+	brandLogo: Blob
 	urls: [SKUContent!]!
 	productInfo: [SKUContent!]!
 	photos: [Blob!]!
@@ -82,6 +83,7 @@ input UpdateSKU {
 
 	masterPlanBlobID: NullString
 	videoBlobID: NullString
+	brandLogoBlobID: NullString
 	urls: [SKUContentInput!]
 	productInfo: [SKUContentInput!]
 	photoBlobIDs: [String!]

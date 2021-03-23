@@ -44,6 +44,16 @@ func (r *skuResolver) Video(ctx context.Context, sku *db.StockKeepingUnit) (*db.
 	}
 	return r.BlobStore.Get(blobUUID)
 }
+func (r *skuResolver) BrandLogo(ctx context.Context, sku *db.StockKeepingUnit) (*db.Blob, error) {
+	if !sku.BrandLogoBlobID.Valid {
+		return nil, nil
+	}
+	blobUUID, err := uuid.FromString(sku.BrandLogoBlobID.String)
+	if err != nil {
+		return nil, terror.New(terror.ErrParse, "")
+	}
+	return r.BlobStore.Get(blobUUID)
+}
 func (r *skuResolver) Urls(ctx context.Context, sku *db.StockKeepingUnit) ([]*db.StockKeepingUnitContent, error) {
 	content, err := r.SKUStore.GetContent(sku, db.ContentTypeURL)
 	if err != nil {
@@ -285,6 +295,13 @@ func (r *mutationResolver) SkuCreate(ctx context.Context, input graphql.UpdateSk
 			u.VideoBlobID = *input.VideoBlobID
 		}
 	}
+	if input.BrandLogoBlobID != nil {
+		if input.BrandLogoBlobID.String == "-" {
+			u.BrandLogoBlobID = null.StringFromPtr(nil)
+		} else {
+			u.BrandLogoBlobID = *input.BrandLogoBlobID
+		}
+	}
 	if input.CloneParentID != nil {
 		u.CloneParentID = *input.CloneParentID
 	}
@@ -406,6 +423,7 @@ func (r *mutationResolver) SkuUpdate(ctx context.Context, id string, input graph
 	}
 
 	// Update SKU
+
 	if input.Name != nil {
 		u.Name = input.Name.String
 	}
@@ -433,6 +451,13 @@ func (r *mutationResolver) SkuUpdate(ctx context.Context, id string, input graph
 			u.VideoBlobID = null.StringFromPtr(nil)
 		} else {
 			u.VideoBlobID = *input.VideoBlobID
+		}
+	}
+	if input.BrandLogoBlobID != nil {
+		if input.BrandLogoBlobID.String == "-" {
+			u.BrandLogoBlobID = null.StringFromPtr(nil)
+		} else {
+			u.BrandLogoBlobID = *input.BrandLogoBlobID
 		}
 	}
 	if input.CloneParentID != nil {
@@ -483,6 +508,29 @@ func (r *mutationResolver) SkuUpdate(ctx context.Context, id string, input graph
 	if err != nil {
 		return nil, terror.New(err, "update sku")
 	}
+
+	// Update categories
+	// if len(input.Categories) >= 0 {
+	// 	for i := range input.Categories {
+	// 		cat := &db.Category{}
+	// 		cat.Name = input.Categories[i].Name
+	// 		_, err = r.SKUStore.InsertCategory(cat)
+	// 		if err != nil {
+	// 			return nil, terror.New(err, "create sku")
+	// 		}
+	// 	}
+	// }
+
+	// if len(input.ProductCategories) >= 0 {
+	// 	for i := range input.ProductCategories {
+	// 		pcat := &db.ProductCategory{}
+	// 		pcat.Name = input.ProductCategories[i].Name
+	// 		_, err = r.SKUStore.InsertProductCategory(pcat)
+	// 		if err != nil {
+	// 			return nil, terror.New(err, "create sku")
+	// 		}
+	// 	}
+	// }
 
 	// Add Content
 	if input.Urls != nil && len(input.Urls) > 0 {

@@ -412,6 +412,7 @@ type ComplexityRoot struct {
 	Sku struct {
 		Archived          func(childComplexity int) int
 		Brand             func(childComplexity int) int
+		BrandLogo         func(childComplexity int) int
 		Categories        func(childComplexity int) int
 		CloneParentID     func(childComplexity int) int
 		Code              func(childComplexity int) int
@@ -808,6 +809,7 @@ type SKUResolver interface {
 
 	MasterPlan(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error)
 	Video(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error)
+	BrandLogo(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error)
 	Urls(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.StockKeepingUnitContent, error)
 	ProductInfo(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.StockKeepingUnitContent, error)
 	Photos(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.Blob, error)
@@ -3179,6 +3181,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Sku.Brand(childComplexity), true
 
+	case "SKU.brandLogo":
+		if e.complexity.Sku.BrandLogo == nil {
+			break
+		}
+
+		return e.complexity.Sku.BrandLogo(childComplexity), true
+
 	case "SKU.categories":
 		if e.complexity.Sku.Categories == nil {
 			break
@@ -5007,6 +5016,7 @@ type SKU {
 
 	masterPlan: Blob
 	video: Blob
+	brandLogo: Blob
 	urls: [SKUContent!]!
 	productInfo: [SKUContent!]!
 	photos: [Blob!]!
@@ -5050,6 +5060,7 @@ input UpdateSKU {
 
 	masterPlanBlobID: NullString
 	videoBlobID: NullString
+	brandLogoBlobID: NullString
 	urls: [SKUContentInput!]
 	productInfo: [SKUContentInput!]
 	photoBlobIDs: [String!]
@@ -20729,6 +20740,40 @@ func (ec *executionContext) _SKU_video(ctx context.Context, field graphql.Collec
 	return ec.marshalOBlob2ᚖgenesisᚋdbᚐBlob(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _SKU_brandLogo(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SKU",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.SKU().BrandLogo(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*db.Blob)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOBlob2ᚖgenesisᚋdbᚐBlob(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _SKU_urls(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -27544,6 +27589,12 @@ func (ec *executionContext) unmarshalInputUpdateSKU(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "brandLogoBlobID":
+			var err error
+			it.BrandLogoBlobID, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "urls":
 			var err error
 			it.Urls, err = ec.unmarshalOSKUContentInput2ᚕᚖgenesisᚋgraphqlᚐSKUContentInputᚄ(ctx, v)
@@ -30471,6 +30522,17 @@ func (ec *executionContext) _SKU(ctx context.Context, sel ast.SelectionSet, obj 
 					}
 				}()
 				res = ec._SKU_video(ctx, field, obj)
+				return res
+			})
+		case "brandLogo":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SKU_brandLogo(ctx, field, obj)
 				return res
 			})
 		case "urls":

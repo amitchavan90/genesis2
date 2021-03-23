@@ -287,6 +287,7 @@ type UpdateSku struct {
 	IsMiniappSku      *null.Bool               `json:"isMiniappSku"`
 	MasterPlanBlobID  *null.String             `json:"masterPlanBlobID"`
 	VideoBlobID       *null.String             `json:"videoBlobID"`
+	BrandLogoBlobID   *null.String             `json:"brandLogoBlobID"`
 	Urls              []*SKUContentInput       `json:"urls"`
 	ProductInfo       []*SKUContentInput       `json:"productInfo"`
 	PhotoBlobIDs      []string                 `json:"photoBlobIDs"`
