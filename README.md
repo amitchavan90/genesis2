@@ -75,6 +75,10 @@ Genesis requires the following pieces:
    - Set the output to GENESIS_BLOCKCHAIN_PRIVATEKEYBYTES
    ```See below```
 
+### Install solc v0.6.4
+Please follow the following link for setting up the specific version of solc
+https://github.com/crytic/solc-select
+
 ### Database
 
 ```bash
