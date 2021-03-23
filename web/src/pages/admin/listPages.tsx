@@ -526,6 +526,54 @@ const ReferralList = () => (
 		//readPermission={Perm.TaskRead}
 	/>
 )
+
+const UserPurchaseActivityList = () => (
+	<ItemListPage
+		itemName="userPurchaseActivity"
+		header="UserPurchaseActivity"
+		query={graphql.query.REFERRALS}
+		batchActionMutation={graphql.mutation.BATCH_ACTION_SKU}
+		firstColumnValue="isRedemmed"
+		firstColumnSubValue="createdAt"
+		columns={[
+			{ label: "UserFristName", value: "user" ,subValues: ["firstName"]},
+			{ label: "UserLastName", value: "user" ,subValues: ["lastName"]},
+			{ label: "RefralCode", value: "referee" ,subValues: ["referralCode"]},
+			{ label: "RefereeFristName", value: "referee" ,subValues: ["firstName"]},
+			{ label: "RefereeLastName", value: "referee" ,subValues: ["lastName"]},
+			{
+				label: "Date Created",
+				value: "createdAt",
+				dateTime: true,
+			},
+		]}
+		actions={ActionItemSet.Archive}
+	/>
+)
+
+const UserTaskList = () => (
+	<ItemListPage
+		itemName="userTask"
+		header="UserTask"
+		query={graphql.query.REFERRALS}
+		batchActionMutation={graphql.mutation.BATCH_ACTION_SKU}
+		firstColumnValue="isRedemmed"
+		firstColumnSubValue="createdAt"
+		columns={[
+			{ label: "UserFristName", value: "user" ,subValues: ["firstName"]},
+			{ label: "UserLastName", value: "user" ,subValues: ["lastName"]},
+			{ label: "RefralCode", value: "referee" ,subValues: ["referralCode"]},
+			{ label: "RefereeFristName", value: "referee" ,subValues: ["firstName"]},
+			{ label: "RefereeLastName", value: "referee" ,subValues: ["lastName"]},
+			{
+				label: "Date Created",
+				value: "createdAt",
+				dateTime: true,
+			},
+		]}
+		actions={ActionItemSet.Archive}
+	/>
+)
 export const ListPage = {
 	Products,
 	SKUs,
@@ -544,5 +592,7 @@ export const ListPage = {
 	Transactions,
 	UserActivity,
 	TasksList,
-	ReferralList
+	ReferralList,
+	UserPurchaseActivityList,
+	UserTaskList
 }

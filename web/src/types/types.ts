@@ -75,7 +75,8 @@ export interface SKU {
 	purchasePoints: number
 	weight: number
 	ingredients: string
-	category: []
+	categories: SKUCategory[]
+	productCategories: SKUCategory[]
 	code: string
 	description: string
 	isBeef: boolean
@@ -251,6 +252,8 @@ export interface Contract {
 	code: string
 	name: string
 	description: string
+	latitude:number
+	longitude: number
 	supplierName: string
 	dateSigned: string
 	archived: boolean

@@ -95,6 +95,12 @@ const SKU = gql`
 			title
 			content
 		}
+		categories {
+            name
+        }
+        productCategories {
+            name
+        }
 	}
 `
 const SKU_LIST = gql`
@@ -352,6 +358,8 @@ const CONTRACT = gql`
 		code
 		name
 		description
+		latitude
+		longitude
 		supplierName
 		dateSigned
 		archived

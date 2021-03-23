@@ -206,6 +206,8 @@ export const SideBar = () => {
 				)}
 			    {hasPermission(Perm.TaskList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="Tasks" url="/portal/tasks" altURL="/portal/tasks" />}
 				{hasPermission(Perm.ReferralList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="Referrals" url="/portal/referrals" altURL="/portal/referrals" />}
+				{hasPermission(Perm.UserPurchaseActivityList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="Purchase Activity" url="/portal/purchesActivity" altURL="/portal/purchesActivity" />}
+				{hasPermission(Perm.UserTaskList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="User Task" url="/portal/userTask" altURL="/portal/userTask" />}
 			</div>
 		</div>
 	)

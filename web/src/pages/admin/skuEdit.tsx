@@ -3,7 +3,7 @@ import { RouteComponentProps, useHistory } from "react-router-dom"
 import { useStyletron } from "baseui"
 import { useQuery, useMutation } from "@apollo/react-hooks"
 import { graphql } from "../../graphql"
-import { SKU, Blob, SKUContent, Settings } from "../../types/types"
+import { SKU, Blob, SKUContent, Settings, SKUCategory } from "../../types/types"
 import { useForm } from "react-hook-form"
 import { FormControl, FormControlOverrides } from "baseui/form-control"
 import { Input } from "baseui/input"
@@ -31,7 +31,8 @@ import { invalidateListQueries } from "../../apollo"
 import { SKUCloneTree } from "../../components/skuCloneTree"
 import { Checkbox } from "baseui/checkbox"
 import { promiseTimeout, TIMED_OUT } from "../../helpers/timeout"
-import { Select } from "baseui/select";
+import { Select,Value} from "baseui/select";
+import {Categories, ProductCategories } from "../../types/enums";
 
 type FormData = {
 	name: string
@@ -91,11 +92,12 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	const [timedOut, setTimedOut] = React.useState(false)
 	const [showSuccessModal, setShowSuccessModal] = React.useState(false)
 	const [description, setDescription] = React.useState("")
-	const [isBeef, setIsBeef] = React.useState<boolean>()
-	const [isAppSku, setIsAppSku] = React.useState<boolean>()
-	const [isPointSku, setIsPointSku] = React.useState<boolean>()
+	const [isBeef, setIsBeef] = React.useState<boolean>(false)
+	const [isAppSku, setIsAppSku] = React.useState<boolean>(false)
+	const [isPointSku, setIsPointSku] = React.useState<boolean>(false)
 
-	const [purchasePoints, setPurchasePoints] = React.useState<number>()
+	const [categories, setCategories] = React.useState<Value>()
+	const [productCategories, setProductCategories] = React.useState<Value>()
 
 	const [masterPlanFile, setMasterPlanFile] = React.useState<File>()
 	const [masterPlanURL, setMasterPlanURL] = React.useState<string>()
@@ -113,7 +115,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 	const { register, setValue, handleSubmit, errors, getValues } = useForm<FormData>()
 
-	const onSubmit = handleSubmit(async ({ name,brand, price, purchasePoints, weight, ingredients, code, urls, productInfo, loyaltyPoints }) => {
+	const onSubmit = handleSubmit(async ({ name,brand, price, purchasePoints, weight, ingredients, code, urls, productInfo, loyaltyPoints}) => {
 		setTimedOut(false)
 		console.log("purchasePoints----------->",purchasePoints);
 		// Upload Master Plan
@@ -179,7 +181,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 		} else if (cloneFrom && sku) {
 			photoBlobIDs = sku.photos.map(p => p.id)
 		}
-
+		console.log("categories--------------->",categories);
 		const input = {
 			name,
 			brand,
@@ -199,6 +201,8 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 			productInfo,
 			loyaltyPoints: loyaltyPoints || 0,
 			cloneParentID: isNewSKU && cloneFrom ? sku?.id : undefined,
+			categories,
+			productCategories,
 		}
 
 		if (isNewSKU) {
@@ -224,11 +228,11 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	React.useEffect(() => {
 		if (activeKey != "#details") return
 		if (!sku) return
-	
+		console.log("sku---------------------->",sku);
 		setValue("name", sku.name)
 		setValue("brand", sku.brand)
 		setValue("price", sku.price)
-		setPurchasePoints(sku.purchasePoints)
+		setValue("purchasePoints",sku.purchasePoints)
 		setValue("weight", sku.weight)
 		setValue("ingredients", sku.ingredients)
 		setValue("code", sku.code)
@@ -237,6 +241,14 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 		setIsBeef(sku.isBeef)
 		setIsAppSku(sku.isAppSku)
 		setIsPointSku(sku.isPointSku)
+
+		if (sku.categories.length) {
+			setCategories(sku.categories)
+		}
+		if (sku.productCategories.length) {
+			setProductCategories(sku.productCategories)
+		}
+
 		if (sku.masterPlan) setMasterPlanURL(sku.masterPlan.file_url)
 		if (sku.video) setVideoURL(sku.video.file_url)
 		setPhotos(sku.photos)
@@ -326,6 +338,8 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 	const breakLine = <div className={breakLineStyle} />
 
+	const canEdit = isNewSKU;
+
 	const editForm = (
 		<form onSubmit={onSubmit}>
 			{isNewSKU && cloneFrom && <div>Cloned from {cloneFrom}</div>}
@@ -402,8 +416,33 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	   		</FormControl>
 			}
 			{breakLine}
+			<FormControl label="Categories" error="" positive="" caption="">
+				<Select
+					creatable
+					options={Categories}
+					labelKey="name"
+					valueKey="name"
+					value={categories}
+					multi
+					onChange={({ value }) => setCategories(value)}
+					//disabled={!canEdit}
+				/>
+			</FormControl>
+			<FormControl label="Product Categories" error="" positive="" caption="">
+				<Select
+					creatable
+					options={ProductCategories}
+					labelKey="name"
+					valueKey="name"
+					value={productCategories}
+					multi
+					onChange={({ value }) => setProductCategories(value)}
+					//disabled={!canEdit}
+				/>
+			</FormControl>
+			{breakLine}
 			<FormControl label="Brand" error={errors.brand ? errors.brand.message : ""} positive="">
-				<Input name="brnad"  inputRef={register({ required: "Required" })} />
+				<Input name="brand" inputRef={register({ required: "Required" })} />
 			</FormControl>
 			<ImageUpload.Single
 				// client requested to rename it to Hero Image

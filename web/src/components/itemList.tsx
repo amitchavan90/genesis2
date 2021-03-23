@@ -227,6 +227,10 @@ export const ItemList = (props: ItemListProps) => {
 				return graphql.query.TASKS	
 			case "referral":
 				return graphql.query.REFERRALS	
+			case "userPurchaseActivity":
+				return graphql.query.REFERRALS
+			case "userTask":
+				return graphql.query.REFERRALS		
 		}
 		return graphql.query.CONTRACTS
 	}
@@ -286,7 +290,14 @@ export const ItemList = (props: ItemListProps) => {
 				break	
 			case "referral":
 				setReferralID(id)	
+				break
+			case "userPurchaseActivity":
+				setReferralID(id)	
+				break
+			case "userTask":
+				setReferralID(id)	
 				break	
+
 		}
 	}
 
