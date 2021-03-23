@@ -145,35 +145,38 @@ var ProductWhere = struct {
 
 // ProductRels is where relationship names are stored.
 var ProductRels = struct {
-	Carton                string
-	Contract              string
-	CreatedBy             string
-	Distributor           string
-	Order                 string
-	Sku                   string
-	Transactions          string
-	UserLoyaltyActivities string
+	Carton                 string
+	Contract               string
+	CreatedBy              string
+	Distributor            string
+	Order                  string
+	Sku                    string
+	Transactions           string
+	UserLoyaltyActivities  string
+	UserPurchaseActivities string
 }{
-	Carton:                "Carton",
-	Contract:              "Contract",
-	CreatedBy:             "CreatedBy",
-	Distributor:           "Distributor",
-	Order:                 "Order",
-	Sku:                   "Sku",
-	Transactions:          "Transactions",
-	UserLoyaltyActivities: "UserLoyaltyActivities",
+	Carton:                 "Carton",
+	Contract:               "Contract",
+	CreatedBy:              "CreatedBy",
+	Distributor:            "Distributor",
+	Order:                  "Order",
+	Sku:                    "Sku",
+	Transactions:           "Transactions",
+	UserLoyaltyActivities:  "UserLoyaltyActivities",
+	UserPurchaseActivities: "UserPurchaseActivities",
 }
 
 // productR is where relationships are stored.
 type productR struct {
-	Carton                *Carton
-	Contract              *Contract
-	CreatedBy             *User
-	Distributor           *Distributor
-	Order                 *Order
-	Sku                   *StockKeepingUnit
-	Transactions          TransactionSlice
-	UserLoyaltyActivities UserLoyaltyActivitySlice
+	Carton                 *Carton
+	Contract               *Contract
+	CreatedBy              *User
+	Distributor            *Distributor
+	Order                  *Order
+	Sku                    *StockKeepingUnit
+	Transactions           TransactionSlice
+	UserLoyaltyActivities  UserLoyaltyActivitySlice
+	UserPurchaseActivities UserPurchaseActivitySlice
 }
 
 // NewStruct creates a new relationship struct
@@ -551,6 +554,27 @@ func (o *Product) UserLoyaltyActivities(mods ...qm.QueryMod) userLoyaltyActivity
 
 	if len(queries.GetSelect(query.Query)) == 0 {
 		queries.SetSelect(query.Query, []string{"\"user_loyalty_activities\".*"})
+	}
+
+	return query
+}
+
+// UserPurchaseActivities retrieves all the user_purchase_activity's UserPurchaseActivities with an executor.
+func (o *Product) UserPurchaseActivities(mods ...qm.QueryMod) userPurchaseActivityQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"user_purchase_activities\".\"product_id\"=?", o.ID),
+	)
+
+	query := UserPurchaseActivities(queryMods...)
+	queries.SetFrom(query.Query, "\"user_purchase_activities\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"user_purchase_activities\".*"})
 	}
 
 	return query
@@ -1372,6 +1396,101 @@ func (productL) LoadUserLoyaltyActivities(e boil.Executor, singular bool, maybeP
 	return nil
 }
 
+// LoadUserPurchaseActivities allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (productL) LoadUserPurchaseActivities(e boil.Executor, singular bool, maybeProduct interface{}, mods queries.Applicator) error {
+	var slice []*Product
+	var object *Product
+
+	if singular {
+		object = maybeProduct.(*Product)
+	} else {
+		slice = *maybeProduct.(*[]*Product)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &productR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &productR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.ID) {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`user_purchase_activities`), qm.WhereIn(`user_purchase_activities.product_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load user_purchase_activities")
+	}
+
+	var resultSlice []*UserPurchaseActivity
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice user_purchase_activities")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on user_purchase_activities")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for user_purchase_activities")
+	}
+
+	if len(userPurchaseActivityAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.UserPurchaseActivities = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &userPurchaseActivityR{}
+			}
+			foreign.R.Product = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if queries.Equal(local.ID, foreign.ProductID) {
+				local.R.UserPurchaseActivities = append(local.R.UserPurchaseActivities, foreign)
+				if foreign.R == nil {
+					foreign.R = &userPurchaseActivityR{}
+				}
+				foreign.R.Product = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // SetCarton of the product to the related item.
 // Sets o.R.Carton to related.
 // Adds o to related.R.Products.
@@ -2048,6 +2167,127 @@ func (o *Product) RemoveUserLoyaltyActivities(exec boil.Executor, related ...*Us
 				o.R.UserLoyaltyActivities[i] = o.R.UserLoyaltyActivities[ln-1]
 			}
 			o.R.UserLoyaltyActivities = o.R.UserLoyaltyActivities[:ln-1]
+			break
+		}
+	}
+
+	return nil
+}
+
+// AddUserPurchaseActivities adds the given related objects to the existing relationships
+// of the product, optionally inserting them as new records.
+// Appends related to o.R.UserPurchaseActivities.
+// Sets related.R.Product appropriately.
+func (o *Product) AddUserPurchaseActivities(exec boil.Executor, insert bool, related ...*UserPurchaseActivity) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			queries.Assign(&rel.ProductID, o.ID)
+			if err = rel.Insert(exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"user_purchase_activities\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"product_id"}),
+				strmangle.WhereClause("\"", "\"", 2, userPurchaseActivityPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+			if _, err = exec.Exec(updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			queries.Assign(&rel.ProductID, o.ID)
+		}
+	}
+
+	if o.R == nil {
+		o.R = &productR{
+			UserPurchaseActivities: related,
+		}
+	} else {
+		o.R.UserPurchaseActivities = append(o.R.UserPurchaseActivities, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &userPurchaseActivityR{
+				Product: o,
+			}
+		} else {
+			rel.R.Product = o
+		}
+	}
+	return nil
+}
+
+// SetUserPurchaseActivities removes all previously related items of the
+// product replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.Product's UserPurchaseActivities accordingly.
+// Replaces o.R.UserPurchaseActivities with related.
+// Sets related.R.Product's UserPurchaseActivities accordingly.
+func (o *Product) SetUserPurchaseActivities(exec boil.Executor, insert bool, related ...*UserPurchaseActivity) error {
+	query := "update \"user_purchase_activities\" set \"product_id\" = null where \"product_id\" = $1"
+	values := []interface{}{o.ID}
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, query)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+	_, err := exec.Exec(query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.UserPurchaseActivities {
+			queries.SetScanner(&rel.ProductID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.Product = nil
+		}
+
+		o.R.UserPurchaseActivities = nil
+	}
+	return o.AddUserPurchaseActivities(exec, insert, related...)
+}
+
+// RemoveUserPurchaseActivities relationships from objects passed in.
+// Removes related items from R.UserPurchaseActivities (uses pointer comparison, removal does not keep order)
+// Sets related.R.Product.
+func (o *Product) RemoveUserPurchaseActivities(exec boil.Executor, related ...*UserPurchaseActivity) error {
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.ProductID, nil)
+		if rel.R != nil {
+			rel.R.Product = nil
+		}
+		if _, err = rel.Update(exec, boil.Whitelist("product_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.UserPurchaseActivities {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.UserPurchaseActivities)
+			if ln > 1 && i < ln-1 {
+				o.R.UserPurchaseActivities[i] = o.R.UserPurchaseActivities[ln-1]
+			}
+			o.R.UserPurchaseActivities = o.R.UserPurchaseActivities[:ln-1]
 			break
 		}
 	}

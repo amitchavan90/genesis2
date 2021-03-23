@@ -367,6 +367,18 @@ type DistributorStorer interface {
 	Count() (int64, error)
 }
 
+// UserPurchaseActivityStorer collects all role methods
+type UserPurchaseActivityStorer interface {
+	Get(id uuid.UUID, txes ...*sql.Tx) (*db.UserPurchaseActivity, error)
+	GetMany(keys []string, txes ...*sql.Tx) (db.UserPurchaseActivitySlice, []error)
+	GetProduct(productID string, txes ...*sql.Tx) (*db.Product, error)
+	All(txes ...*sql.Tx) (db.UserPurchaseActivitySlice, error)
+	Count() (int64, error)
+	SearchSelect(search graphql.SearchFilter, limit int, offset int) (int64, []*db.UserPurchaseActivity, error)
+	Insert(record *db.UserPurchaseActivity, tx ...*sql.Tx) (*db.UserPurchaseActivity, error)
+	Update(record *db.UserPurchaseActivity, tx ...*sql.Tx) (*db.UserPurchaseActivity, error)
+}
+
 // TransactionStorer collects all Transaction methods
 type TransactionStorer interface {
 	Get(id uuid.UUID) (*db.Transaction, error)

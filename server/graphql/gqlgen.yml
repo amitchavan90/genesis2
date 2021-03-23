@@ -16,6 +16,7 @@ schema:
   - schema_contracts.graphql
   - schema_distributors.graphql
   - schema_user_activity.graphql
+  - schema_user_purchase_activity.graphql
 exec:
   filename: ./graphql_schema_gen.go
 model:
@@ -77,6 +78,8 @@ models:
     model: genesis/db.Distributor
   UserLoyaltyActivity:
     model: genesis/db.UserLoyaltyActivity
+  UserPurchaseActivity:
+    model: genesis/db.UserPurchaseActivity
   TrackAction:
     model: genesis/db.TrackAction
   Transaction:

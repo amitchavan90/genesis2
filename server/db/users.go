@@ -162,6 +162,7 @@ var UserRels = struct {
 	CreatedByTransactions      string
 	UserActivities             string
 	UserLoyaltyActivities      string
+	UserPurchaseActivities     string
 	UserTasks                  string
 }{
 	Organisation:               "Organisation",
@@ -181,6 +182,7 @@ var UserRels = struct {
 	CreatedByTransactions:      "CreatedByTransactions",
 	UserActivities:             "UserActivities",
 	UserLoyaltyActivities:      "UserLoyaltyActivities",
+	UserPurchaseActivities:     "UserPurchaseActivities",
 	UserTasks:                  "UserTasks",
 }
 
@@ -203,6 +205,7 @@ type userR struct {
 	CreatedByTransactions      TransactionSlice
 	UserActivities             UserActivitySlice
 	UserLoyaltyActivities      UserLoyaltyActivitySlice
+	UserPurchaseActivities     UserPurchaseActivitySlice
 	UserTasks                  UserTaskSlice
 }
 
@@ -798,6 +801,27 @@ func (o *User) UserLoyaltyActivities(mods ...qm.QueryMod) userLoyaltyActivityQue
 
 	if len(queries.GetSelect(query.Query)) == 0 {
 		queries.SetSelect(query.Query, []string{"\"user_loyalty_activities\".*"})
+	}
+
+	return query
+}
+
+// UserPurchaseActivities retrieves all the user_purchase_activity's UserPurchaseActivities with an executor.
+func (o *User) UserPurchaseActivities(mods ...qm.QueryMod) userPurchaseActivityQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"user_purchase_activities\".\"user_id\"=?", o.ID),
+	)
+
+	query := UserPurchaseActivities(queryMods...)
+	queries.SetFrom(query.Query, "\"user_purchase_activities\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"user_purchase_activities\".*"})
 	}
 
 	return query
@@ -2455,6 +2479,101 @@ func (userL) LoadUserLoyaltyActivities(e boil.Executor, singular bool, maybeUser
 	return nil
 }
 
+// LoadUserPurchaseActivities allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (userL) LoadUserPurchaseActivities(e boil.Executor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+	var slice []*User
+	var object *User
+
+	if singular {
+		object = maybeUser.(*User)
+	} else {
+		slice = *maybeUser.(*[]*User)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &userR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`user_purchase_activities`), qm.WhereIn(`user_purchase_activities.user_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load user_purchase_activities")
+	}
+
+	var resultSlice []*UserPurchaseActivity
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice user_purchase_activities")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on user_purchase_activities")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for user_purchase_activities")
+	}
+
+	if len(userPurchaseActivityAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.UserPurchaseActivities = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &userPurchaseActivityR{}
+			}
+			foreign.R.User = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.UserID {
+				local.R.UserPurchaseActivities = append(local.R.UserPurchaseActivities, foreign)
+				if foreign.R == nil {
+					foreign.R = &userPurchaseActivityR{}
+				}
+				foreign.R.User = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // LoadUserTasks allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
 func (userL) LoadUserTasks(e boil.Executor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
@@ -3653,6 +3772,58 @@ func (o *User) AddUserLoyaltyActivities(exec boil.Executor, insert bool, related
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &userLoyaltyActivityR{
+				User: o,
+			}
+		} else {
+			rel.R.User = o
+		}
+	}
+	return nil
+}
+
+// AddUserPurchaseActivities adds the given related objects to the existing relationships
+// of the user, optionally inserting them as new records.
+// Appends related to o.R.UserPurchaseActivities.
+// Sets related.R.User appropriately.
+func (o *User) AddUserPurchaseActivities(exec boil.Executor, insert bool, related ...*UserPurchaseActivity) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.UserID = o.ID
+			if err = rel.Insert(exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"user_purchase_activities\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
+				strmangle.WhereClause("\"", "\"", 2, userPurchaseActivityPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+			if _, err = exec.Exec(updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.UserID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &userR{
+			UserPurchaseActivities: related,
+		}
+	} else {
+		o.R.UserPurchaseActivities = append(o.R.UserPurchaseActivities, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &userPurchaseActivityR{
 				User: o,
 			}
 		} else {

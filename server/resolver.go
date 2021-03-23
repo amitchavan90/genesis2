@@ -16,34 +16,35 @@ import (
 
 // Resolver for graphql
 type Resolver struct {
-	Auther            AuthProvider
-	Config            *config.PlatformConfig
-	Mailer            *mailgun.MailgunImpl
-	SKUStore          SKUStorer
-	OrderStore        OrderStorer
-	ContainerStore    ContainerStorer
-	PalletStore       PalletStorer
-	CartonStore       CartonStorer
-	ProductStore      ProductStorer
-	OrganisationStore OrganisationStorer
-	UserStore         UserStorer
-	ReferralStore     ReferralStorer
-	TaskStore         TaskStorer
-	UserTaskStore     UserTaskStorer
-	UserSubtaskStore  UserSubtaskStorer
-	RoleStore         RoleStorer
-	BlobStore         BlobStorer
-	ContractStore     ContractStorer
-	DistributorStore  DistributorStorer
-	TransactionStore  TransactionStorer
-	ManifestStore     ManifestStorer
-	TrackActionStore  TrackActionStorer
-	UserActivityStore UserActivityStorer
-	LoyaltyStore      LoyaltyStorer
-	Blacklister       BlacklistProvider
-	SmsMessenger      Messenger
-	Blk               *blockchain.Service
-	SystemTicker      *SystemTicker
+	Auther                    AuthProvider
+	Config                    *config.PlatformConfig
+	Mailer                    *mailgun.MailgunImpl
+	SKUStore                  SKUStorer
+	OrderStore                OrderStorer
+	ContainerStore            ContainerStorer
+	PalletStore               PalletStorer
+	CartonStore               CartonStorer
+	ProductStore              ProductStorer
+	OrganisationStore         OrganisationStorer
+	UserStore                 UserStorer
+	ReferralStore             ReferralStorer
+	TaskStore                 TaskStorer
+	UserTaskStore             UserTaskStorer
+	UserSubtaskStore          UserSubtaskStorer
+	RoleStore                 RoleStorer
+	BlobStore                 BlobStorer
+	ContractStore             ContractStorer
+	DistributorStore          DistributorStorer
+	TransactionStore          TransactionStorer
+	ManifestStore             ManifestStorer
+	TrackActionStore          TrackActionStorer
+	UserActivityStore         UserActivityStorer
+	UserPurchaseActivityStore UserPurchaseActivityStorer
+	LoyaltyStore              LoyaltyStorer
+	Blacklister               BlacklistProvider
+	SmsMessenger              Messenger
+	Blk                       *blockchain.Service
+	SystemTicker              *SystemTicker
 }
 
 /////////////////

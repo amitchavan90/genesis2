@@ -357,6 +357,11 @@ func Roles(conn *sqlx.DB) error {
 			string(graphql.PermDistributorArchive),
 			string(graphql.PermDistributorUnarchive),
 
+			string(graphql.PermUserPurchaseActivityList),
+			string(graphql.PermUserPurchaseActivityRead),
+			string(graphql.PermUserPurchaseActivityCreate),
+			string(graphql.PermUserPurchaseActivityUpdate),
+
 			string(graphql.PermActivityListBlockchainActivity),
 			string(graphql.PermActivityListUserActivity),
 			string(graphql.PermUseAdvancedMode),
@@ -443,6 +448,11 @@ func Roles(conn *sqlx.DB) error {
 			string(graphql.PermProductUpdate),
 			string(graphql.PermProductArchive),
 			string(graphql.PermProductUnarchive),
+
+			string(graphql.PermUserPurchaseActivityList),
+			string(graphql.PermUserPurchaseActivityRead),
+			string(graphql.PermUserPurchaseActivityCreate),
+			string(graphql.PermUserPurchaseActivityUpdate),
 		},
 	}
 	err = r3.Insert(conn, boil.Infer())

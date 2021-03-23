@@ -74,6 +74,9 @@ const CartonLoaderKey ContextKey = "carton_loader"
 // ProductLoaderKey declares a statically typed key for context reference in other packages
 const ProductLoaderKey ContextKey = "product_loader"
 
+// UserPurchaseActivityLoaderKey declares a statically typed key for context reference in other packages
+const UserPurchaseActivityLoaderKey ContextKey = "user_purchase_activity_loader"
+
 // ContractLoaderKey declares a statically typed key for context reference in other packages
 const ContractLoaderKey ContextKey = "contract_loader"
 
@@ -176,6 +179,11 @@ func ProductLoaderFromContext(ctx context.Context, id uuid.UUID) (*db.Product, e
 	return ctx.Value(ProductLoaderKey).(*dataloaders.ProductLoader).Load(id.String())
 }
 
+// UserPurchaseActivityLoaderFromContext runs the dataloader inside the context
+func UserPurchaseActivityLoaderFromContext(ctx context.Context, id uuid.UUID) (*db.UserPurchaseActivity, error) {
+	return ctx.Value(UserPurchaseActivityLoaderKey).(*dataloaders.UserPurchaseActivityLoader).Load(id.String())
+}
+
 // ContractLoaderFromContext runs the dataloader inside the context
 func ContractLoaderFromContext(ctx context.Context, id uuid.UUID) (*db.Contract, error) {
 	return ctx.Value(ContractLoaderKey).(*dataloaders.ContractLoader).Load(id.String())
@@ -207,6 +215,7 @@ func WithDataloaders(
 	TaskStore TaskStorer,
 	UserTaskStore UserTaskStorer,
 	RoleStorer RoleStorer,
+	UserPurchaseActivityStorer UserPurchaseActivityStorer,
 	ContractStorer ContractStorer,
 	TransactionStorer TransactionStorer,
 	ManifestStorer ManifestStorer,
@@ -406,6 +415,7 @@ func DataloaderMiddleware(
 	taskStore TaskStorer,
 	userTaskStore UserTaskStorer,
 	roleStore RoleStorer,
+	userPurchaseActivityStore UserPurchaseActivityStorer,
 	contractStore ContractStorer,
 	transactionStorer TransactionStorer,
 	manifestStorer ManifestStorer,
@@ -428,6 +438,7 @@ func DataloaderMiddleware(
 				taskStore,
 				userTaskStore,
 				roleStore,
+				userPurchaseActivityStore,
 				contractStore,
 				transactionStorer,
 				manifestStorer,

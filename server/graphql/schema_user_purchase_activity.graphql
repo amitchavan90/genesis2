@@ -1,0 +1,28 @@
+type UserPurchaseActivity {
+	id: ID!
+    user: User
+	product: Product
+    loyaltyPoints: Int!
+    message: String!
+	transactionHash: NullString
+	createdAt: Time!
+}
+
+type UserPurchaseActivityResult {
+	userPurchaseActivities: [UserPurchaseActivity!]!
+	total: Int!
+}
+
+input UpdateUserPurchaseActivity {
+    productID: NullString
+}
+
+extend type Query {
+	userPurchaseActivities(search: SearchFilter!, limit: Int!, offset: Int!, userID: String): UserPurchaseActivityResult! @hasPerm(p: UserPurchaseActivityList)
+	userPurchaseActivity(id: String): UserPurchaseActivity! @hasPerm(p: UserPurchaseActivityRead)
+}
+
+extend type Mutation {
+	userPurchaseActivityCreate(input: UpdateUserPurchaseActivity!): UserPurchaseActivity! @hasPerm(p: UserPurchaseActivityCreate)
+	userPurchaseActivityUpdate(id: ID!, input: UpdateUserPurchaseActivity!): UserPurchaseActivity! @hasPerm(p: UserPurchaseActivityUpdate)
+}
