@@ -32,6 +32,43 @@ Project use on some libraries which does not work on go v1.15
 
 ## Development
 
+Genesis requires the following pieces:
+
+- Database
+- Server
+- Front-end
+- Mobile
+
+## Prerequisites
+
+### Setup docker and docker compose
+- Docker installation guide - https://docs.docker.com/engine/install/ubuntu/
+- Docker Compose installation guide - https://docs.docker.com/compose/install/
+
+
+### Setup Golang: go version go1.14.2 linux/amd64
+- Golang setup guide - https://golang.org/doc/install
+- Setup go path: in root directory, go to filr .profile and paste the following line `export PATH=$PATH:/usr/local/go/bin`
+
+
+### Install ethereum
+   - `sudo add-apt-repository -y ppa:ethereum/ethereum`
+   - `sudo apt-get update`
+   - `sudo apt-get install ethereum`
+   - `geth account new`
+   
+   - Set a password
+   `in file server/cmd/platform/main.go, line 79, for variable blockchainPrivatekeypassword, replace "tiger" with the password you just set`
+   `after setting the password, you will get some output, which specifies the "Public address of the key", and "Path of the secret key file", which will look something like this "/home/tiger/.ethereum/keystore/UTC--2021-01-23T07-11-12.748956556Z--68ed5c4fe3c98389cfc1312e58155c6fd8d24e44"`
+   
+   - cat the path of the secret key file from the above step
+   
+   - `cat $PATH_OF_SECRET_KEY_FILE | base64 -w 0`
+   `this will give you a base64 output`
+  
+   - Set the output to GENESIS_BLOCKCHAIN_PRIVATEKEYBYTES
+   `See below`
+
 ### Database
 
 ```bash
@@ -82,10 +119,10 @@ npm start
 Make sure these environment variables are set:
 
 ```bash
-GENESIS_BLOCKCHAIN_PRIVATEKEYBYTES
-GENESIS_EMAIL_APIKEY
-GENESIS_SENTRY_DSN
-FONTAWESOME_TOKEN
+GENESIS_BLOCKCHAIN_PRIVATEKEYBYTES  // Check ethereum setup guide
+GENESIS_EMAIL_APIKEY  // Not required
+GENESIS_SENTRY_DSN  // Not required
+FONTAWESOME_TOKEN // Already setup inside web/.npmrc
 ```
 
 (Find in Bitwarden, Mailgun and [Sentry](https://sentry.theninja.life/settings/sentry/projects/genesis-backend/keys/))
