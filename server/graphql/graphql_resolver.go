@@ -602,6 +602,12 @@ func (r *taskResolver) Sku(ctx context.Context, obj *db.Task) (*db.StockKeepingU
 func (r *taskResolver) Subtasks(ctx context.Context, obj *db.Task) ([]*db.Subtask, error) {
 	panic("not implemented")
 }
+func (r *taskResolver) BrandLogo(ctx context.Context, obj *db.Task) (*db.Blob, error) {
+	panic("not implemented")
+}
+func (r *taskResolver) BannerPhoto(ctx context.Context, obj *db.Task) (*db.Blob, error) {
+	panic("not implemented")
+}
 
 type userTaskResolver struct{ *Resolver }
 

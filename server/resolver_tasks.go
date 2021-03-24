@@ -48,6 +48,28 @@ func (r *taskResolver) Subtasks(ctx context.Context, obj *db.Task) ([]*db.Subtas
 	return result, nil
 }
 
+func (r *taskResolver) BrandLogo(ctx context.Context, obj *db.Task) (*db.Blob, error) {
+	if !obj.BrandLogoBlobID.Valid {
+		return nil, nil
+	}
+	blobUUID, err := uuid.FromString(obj.BrandLogoBlobID.String)
+	if err != nil {
+		return nil, terror.New(terror.ErrParse, "")
+	}
+	return r.BlobStore.Get(blobUUID)
+}
+
+func (r *taskResolver) BannerPhoto(ctx context.Context, obj *db.Task) (*db.Blob, error) {
+	if !obj.BannerPhotoBlobID.Valid {
+		return nil, nil
+	}
+	blobUUID, err := uuid.FromString(obj.BannerPhotoBlobID.String)
+	if err != nil {
+		return nil, terror.New(terror.ErrParse, "")
+	}
+	return r.BlobStore.Get(blobUUID)
+}
+
 ///////////////
 //   Query   //
 ///////////////
@@ -100,6 +122,20 @@ func (r *mutationResolver) TaskCreate(ctx context.Context, input graphql.UpdateT
 	}
 	if input.Description != "" {
 		t.Description = input.Description
+	}
+	if input.BrandLogoBlobID != nil {
+		if input.BrandLogoBlobID.String == "-" {
+			t.BrandLogoBlobID = null.StringFromPtr(nil)
+		} else {
+			t.BrandLogoBlobID = *input.BrandLogoBlobID
+		}
+	}
+	if input.BannerPhotoBlobID != nil {
+		if input.BannerPhotoBlobID.String == "-" {
+			t.BannerPhotoBlobID = null.StringFromPtr(nil)
+		} else {
+			t.BannerPhotoBlobID = *input.BannerPhotoBlobID
+		}
 	}
 
 	t.LoyaltyPoints = input.LoyaltyPoints

@@ -471,6 +471,8 @@ type ComplexityRoot struct {
 
 	Task struct {
 		Archived          func(childComplexity int) int
+		BannerPhoto       func(childComplexity int) int
+		BrandLogo         func(childComplexity int) int
 		Code              func(childComplexity int) int
 		CreatedAt         func(childComplexity int) int
 		Description       func(childComplexity int) int
@@ -827,6 +829,8 @@ type TaskResolver interface {
 	FinishDate(ctx context.Context, obj *db.Task) (*time.Time, error)
 
 	Sku(ctx context.Context, obj *db.Task) (*db.StockKeepingUnit, error)
+	BrandLogo(ctx context.Context, obj *db.Task) (*db.Blob, error)
+	BannerPhoto(ctx context.Context, obj *db.Task) (*db.Blob, error)
 
 	Subtasks(ctx context.Context, obj *db.Task) ([]*db.Subtask, error)
 }
@@ -3468,6 +3472,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.Archived(childComplexity), true
 
+	case "Task.bannerPhoto":
+		if e.complexity.Task.BannerPhoto == nil {
+			break
+		}
+
+		return e.complexity.Task.BannerPhoto(childComplexity), true
+
+	case "Task.brandLogo":
+		if e.complexity.Task.BrandLogo == nil {
+			break
+		}
+
+		return e.complexity.Task.BrandLogo(childComplexity), true
+
 	case "Task.code":
 		if e.complexity.Task.Code == nil {
 			break
@@ -5110,6 +5128,8 @@ type Task {
 	maximumPeople: Int!
     skuID: NullString
 	sku: SKU
+	brandLogo: Blob
+	bannerPhoto: Blob
 	archived: Boolean!
 	createdAt: Time!
 	subtasks: [Subtask!]!
@@ -5138,6 +5158,8 @@ input UpdateTask {
 	finishDate: Time
 	maximumPeople: Int!
     skuID: NullString
+	bannerPhotoBlobID: NullString
+	brandLogoBlobID: NullString
 	subtasks: [UpdateSubtask]
 }
 
@@ -21986,6 +22008,74 @@ func (ec *executionContext) _Task_sku(ctx context.Context, field graphql.Collect
 	return ec.marshalOSKU2ᚖgenesisᚋdbᚐStockKeepingUnit(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Task_brandLogo(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Task",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().BrandLogo(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*db.Blob)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOBlob2ᚖgenesisᚋdbᚐBlob(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Task_bannerPhoto(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Task",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().BannerPhoto(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*db.Blob)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOBlob2ᚖgenesisᚋdbᚐBlob(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Task_archived(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -27727,6 +27817,18 @@ func (ec *executionContext) unmarshalInputUpdateTask(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "bannerPhotoBlobID":
+			var err error
+			it.BannerPhotoBlobID, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "brandLogoBlobID":
+			var err error
+			it.BrandLogoBlobID, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "subtasks":
 			var err error
 			it.Subtasks, err = ec.unmarshalOUpdateSubtask2ᚕᚖgenesisᚋgraphqlᚐUpdateSubtask(ctx, v)
@@ -30929,6 +31031,28 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._Task_sku(ctx, field, obj)
+				return res
+			})
+		case "brandLogo":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Task_brandLogo(ctx, field, obj)
+				return res
+			})
+		case "bannerPhoto":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Task_bannerPhoto(ctx, field, obj)
 				return res
 			})
 		case "archived":

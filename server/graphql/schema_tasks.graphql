@@ -17,6 +17,8 @@ type Task {
 	maximumPeople: Int!
     skuID: NullString
 	sku: SKU
+	brandLogo: Blob
+	bannerPhoto: Blob
 	archived: Boolean!
 	createdAt: Time!
 	subtasks: [Subtask!]!
@@ -45,6 +47,8 @@ input UpdateTask {
 	finishDate: Time
 	maximumPeople: Int!
     skuID: NullString
+	bannerPhotoBlobID: NullString
+	brandLogoBlobID: NullString
 	subtasks: [UpdateSubtask]
 }
 
