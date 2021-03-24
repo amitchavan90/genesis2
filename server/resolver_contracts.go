@@ -120,6 +120,9 @@ func (r *mutationResolver) ContractUpdate(ctx context.Context, id string, input 
 		u.DateSigned = *input.DateSigned
 	}
 
+	u.Latitude = input.Latitude
+	u.Longitude = input.Longitude
+
 	updated, err := r.ContractStore.Update(u)
 	if err != nil {
 		return nil, terror.New(err, "update contract")

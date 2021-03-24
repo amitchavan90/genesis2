@@ -24,6 +24,7 @@ import (
 // UserPurchaseActivity is an object representing the database table.
 type UserPurchaseActivity struct {
 	ID              string      `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
+	Code            string      `db:"code" boil:"code" json:"code" toml:"code" yaml:"code"`
 	UserID          string      `db:"user_id" boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 	ProductID       null.String `db:"product_id" boil:"product_id" json:"product_id,omitempty" toml:"product_id" yaml:"product_id,omitempty"`
 	LoyaltyPoints   int         `db:"loyalty_points" boil:"loyalty_points" json:"loyalty_points" toml:"loyalty_points" yaml:"loyalty_points"`
@@ -37,6 +38,7 @@ type UserPurchaseActivity struct {
 
 var UserPurchaseActivityColumns = struct {
 	ID              string
+	Code            string
 	UserID          string
 	ProductID       string
 	LoyaltyPoints   string
@@ -45,6 +47,7 @@ var UserPurchaseActivityColumns = struct {
 	CreatedAt       string
 }{
 	ID:              "id",
+	Code:            "code",
 	UserID:          "user_id",
 	ProductID:       "product_id",
 	LoyaltyPoints:   "loyalty_points",
@@ -57,6 +60,7 @@ var UserPurchaseActivityColumns = struct {
 
 var UserPurchaseActivityWhere = struct {
 	ID              whereHelperstring
+	Code            whereHelperstring
 	UserID          whereHelperstring
 	ProductID       whereHelpernull_String
 	LoyaltyPoints   whereHelperint
@@ -65,6 +69,7 @@ var UserPurchaseActivityWhere = struct {
 	CreatedAt       whereHelpertime_Time
 }{
 	ID:              whereHelperstring{field: "\"user_purchase_activities\".\"id\""},
+	Code:            whereHelperstring{field: "\"user_purchase_activities\".\"code\""},
 	UserID:          whereHelperstring{field: "\"user_purchase_activities\".\"user_id\""},
 	ProductID:       whereHelpernull_String{field: "\"user_purchase_activities\".\"product_id\""},
 	LoyaltyPoints:   whereHelperint{field: "\"user_purchase_activities\".\"loyalty_points\""},
@@ -97,8 +102,8 @@ func (*userPurchaseActivityR) NewStruct() *userPurchaseActivityR {
 type userPurchaseActivityL struct{}
 
 var (
-	userPurchaseActivityAllColumns            = []string{"id", "user_id", "product_id", "loyalty_points", "message", "transaction_hash", "created_at"}
-	userPurchaseActivityColumnsWithoutDefault = []string{"user_id", "product_id", "loyalty_points", "transaction_hash"}
+	userPurchaseActivityAllColumns            = []string{"id", "code", "user_id", "product_id", "loyalty_points", "message", "transaction_hash", "created_at"}
+	userPurchaseActivityColumnsWithoutDefault = []string{"code", "user_id", "product_id", "loyalty_points", "transaction_hash"}
 	userPurchaseActivityColumnsWithDefault    = []string{"id", "message", "created_at"}
 	userPurchaseActivityPrimaryKeyColumns     = []string{"id"}
 )

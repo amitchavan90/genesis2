@@ -372,6 +372,7 @@ type UserPurchaseActivityStorer interface {
 	Get(id uuid.UUID, txes ...*sql.Tx) (*db.UserPurchaseActivity, error)
 	GetMany(keys []string, txes ...*sql.Tx) (db.UserPurchaseActivitySlice, []error)
 	GetProduct(productID string, txes ...*sql.Tx) (*db.Product, error)
+	GetUser(userID string, txes ...*sql.Tx) (*db.User, error)
 	All(txes ...*sql.Tx) (db.UserPurchaseActivitySlice, error)
 	Count() (int64, error)
 	SearchSelect(search graphql.SearchFilter, limit int, offset int) (int64, []*db.UserPurchaseActivity, error)

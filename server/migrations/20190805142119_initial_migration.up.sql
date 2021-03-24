@@ -147,6 +147,7 @@ CREATE TABLE product_categories (
 -- Tasks Specifications
 CREATE TABLE tasks (
     id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid (),
+    code text UNIQUE NOT NULL,
     title text NOT NULL,
     description text NOT NULL,
     loyalty_points int NOT NULL DEFAULT 0,
@@ -425,6 +426,7 @@ CREATE TABLE user_loyalty_activities (
 -- Purchase
 CREATE TABLE user_purchase_activities (
     id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid (),
+    code text UNIQUE NOT NULL,
     user_id uuid NOT NULL REFERENCES users (id),
     product_id uuid REFERENCES products (id),
     loyalty_points int NOT NULL, -- sku points + bonus points

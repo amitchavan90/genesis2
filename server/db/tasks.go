@@ -24,6 +24,7 @@ import (
 // Task is an object representing the database table.
 type Task struct {
 	ID                string      `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
+	Code              string      `db:"code" boil:"code" json:"code" toml:"code" yaml:"code"`
 	Title             string      `db:"title" boil:"title" json:"title" toml:"title" yaml:"title"`
 	Description       string      `db:"description" boil:"description" json:"description" toml:"description" yaml:"description"`
 	LoyaltyPoints     int         `db:"loyalty_points" boil:"loyalty_points" json:"loyalty_points" toml:"loyalty_points" yaml:"loyalty_points"`
@@ -47,6 +48,7 @@ type Task struct {
 
 var TaskColumns = struct {
 	ID                string
+	Code              string
 	Title             string
 	Description       string
 	LoyaltyPoints     string
@@ -65,6 +67,7 @@ var TaskColumns = struct {
 	CreatedAt         string
 }{
 	ID:                "id",
+	Code:              "code",
 	Title:             "title",
 	Description:       "description",
 	LoyaltyPoints:     "loyalty_points",
@@ -87,6 +90,7 @@ var TaskColumns = struct {
 
 var TaskWhere = struct {
 	ID                whereHelperstring
+	Code              whereHelperstring
 	Title             whereHelperstring
 	Description       whereHelperstring
 	LoyaltyPoints     whereHelperint
@@ -105,6 +109,7 @@ var TaskWhere = struct {
 	CreatedAt         whereHelpertime_Time
 }{
 	ID:                whereHelperstring{field: "\"tasks\".\"id\""},
+	Code:              whereHelperstring{field: "\"tasks\".\"code\""},
 	Title:             whereHelperstring{field: "\"tasks\".\"title\""},
 	Description:       whereHelperstring{field: "\"tasks\".\"description\""},
 	LoyaltyPoints:     whereHelperint{field: "\"tasks\".\"loyalty_points\""},
@@ -156,8 +161,8 @@ func (*taskR) NewStruct() *taskR {
 type taskL struct{}
 
 var (
-	taskAllColumns            = []string{"id", "title", "description", "loyalty_points", "is_time_bound", "is_people_bound", "is_product_relevant", "finish_date", "maximum_people", "sku_id", "banner_photo_blob_id", "brand_logo_blob_id", "is_final", "archived", "archived_at", "updated_at", "created_at"}
-	taskColumnsWithoutDefault = []string{"title", "description", "finish_date", "sku_id", "banner_photo_blob_id", "brand_logo_blob_id", "archived_at"}
+	taskAllColumns            = []string{"id", "code", "title", "description", "loyalty_points", "is_time_bound", "is_people_bound", "is_product_relevant", "finish_date", "maximum_people", "sku_id", "banner_photo_blob_id", "brand_logo_blob_id", "is_final", "archived", "archived_at", "updated_at", "created_at"}
+	taskColumnsWithoutDefault = []string{"code", "title", "description", "finish_date", "sku_id", "banner_photo_blob_id", "brand_logo_blob_id", "archived_at"}
 	taskColumnsWithDefault    = []string{"id", "loyalty_points", "is_time_bound", "is_people_bound", "is_product_relevant", "maximum_people", "is_final", "archived", "updated_at", "created_at"}
 	taskPrimaryKeyColumns     = []string{"id"}
 )

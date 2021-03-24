@@ -110,6 +110,15 @@ func (s *UserPurchaseActivities) GetProduct(productID string, txes ...*sql.Tx) (
 	return dat, nil
 }
 
+// GetUser by userID
+func (s *UserPurchaseActivities) GetUser(userID string, txes ...*sql.Tx) (*db.User, error) {
+	dat, err := db.Users(db.UserWhere.ID.EQ(userID)).One(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
 // GetMany userPurchaseActivities given a list of IDs
 func (s *UserPurchaseActivities) GetMany(keys []string, txes ...*sql.Tx) (db.UserPurchaseActivitySlice, []error) {
 	if len(keys) == 0 {

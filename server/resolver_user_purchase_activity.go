@@ -2,6 +2,7 @@ package genesis
 
 import (
 	"context"
+	"fmt"
 	"genesis/db"
 	"genesis/graphql"
 
@@ -23,16 +24,15 @@ type userPurchaseActivityResolver struct{ *Resolver }
 func (r *userPurchaseActivityResolver) Product(ctx context.Context, obj *db.UserPurchaseActivity) (*db.Product, error) {
 	result, err := r.UserPurchaseActivityStore.GetProduct(obj.ProductID.String)
 	if err != nil {
-		return nil, terror.New(err, "get sku")
+		return nil, terror.New(err, "get product")
 	}
 	return result, nil
 }
 
 func (r *userPurchaseActivityResolver) User(ctx context.Context, obj *db.UserPurchaseActivity) (*db.User, error) {
-	userUUID, _ := uuid.FromString(obj.ID)
-	result, err := r.UserStore.Get(userUUID)
+	result, err := r.UserPurchaseActivityStore.GetUser(obj.UserID)
 	if err != nil {
-		return nil, terror.New(err, "get subtasks")
+		return nil, terror.New(err, "get user")
 	}
 	return result, nil
 }
@@ -42,22 +42,22 @@ func (r *userPurchaseActivityResolver) User(ctx context.Context, obj *db.UserPur
 ///////////////
 
 func (r *queryResolver) UserPurchaseActivity(ctx context.Context, id *string) (*db.UserPurchaseActivity, error) {
-	taskUUID, err := uuid.FromString(*id)
-	task, err := r.UserPurchaseActivityStore.Get(taskUUID)
+	purchaseUUID, err := uuid.FromString(*id)
+	purchase, err := r.UserPurchaseActivityStore.Get(purchaseUUID)
 	if err != nil {
-		return nil, terror.New(err, "get task")
+		return nil, terror.New(err, "get purchase")
 	}
-	return task, nil
+	return purchase, nil
 }
 
 func (r *queryResolver) UserPurchaseActivities(ctx context.Context, search graphql.SearchFilter, limit int, offset int, userID *string) (*graphql.UserPurchaseActivityResult, error) {
-	total, tasks, err := r.UserPurchaseActivityStore.SearchSelect(search, limit, offset)
+	total, purchases, err := r.UserPurchaseActivityStore.SearchSelect(search, limit, offset)
 	if err != nil {
-		return nil, terror.New(err, "list task")
+		return nil, terror.New(err, "list purchase")
 	}
 
 	result := &graphql.UserPurchaseActivityResult{
-		UserPurchaseActivities: tasks,
+		UserPurchaseActivities: purchases,
 		Total:                  int(total),
 	}
 
@@ -68,10 +68,18 @@ func (r *queryResolver) UserPurchaseActivities(ctx context.Context, search graph
 // Mutations //
 ///////////////
 
-// UserPurchaseActivityCreate creates an task
+// UserPurchaseActivityCreate creates an purchase
 func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input graphql.UpdateUserPurchaseActivity) (*db.UserPurchaseActivity, error) {
+	// Get UserPurchaseActivity count (for UserPurchaseActivity Code)
+	count, err := r.UserPurchaseActivityStore.Count()
+	if err != nil {
+		return nil, terror.New(err, "create purchase: Error while fetching purchase count from db")
+	}
+
 	// Create UserPurchaseActivity
-	t := &db.UserPurchaseActivity{}
+	t := &db.UserPurchaseActivity{
+		Code: fmt.Sprintf("P%05d", count),
+	}
 
 	purchaseID, _ := uuid.NewV4()
 	t.ID = purchaseID.String()
@@ -85,7 +93,7 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 	// Get product
 	product, err := r.ProductStore.Get(productUUID)
 	if err != nil {
-		return nil, terror.New(terror.ErrParse, "create task: no product found with given id")
+		return nil, terror.New(terror.ErrParse, "create purchase: no product found with given id")
 	}
 
 	// get user
@@ -108,7 +116,7 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 	return created, nil
 }
 
-// UserPurchaseActivityUpdate updates a task
+// UserPurchaseActivityUpdate updates a purchase
 func (r *mutationResolver) UserPurchaseActivityUpdate(ctx context.Context, id string, input graphql.UpdateUserPurchaseActivity) (*db.UserPurchaseActivity, error) {
 	// Get UserPurchaseActivity
 	purchaseUUID, err := uuid.FromString(id)

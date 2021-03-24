@@ -412,6 +412,7 @@ type ComplexityRoot struct {
 	Sku struct {
 		Archived          func(childComplexity int) int
 		Brand             func(childComplexity int) int
+		BrandLogo         func(childComplexity int) int
 		Categories        func(childComplexity int) int
 		CloneParentID     func(childComplexity int) int
 		Code              func(childComplexity int) int
@@ -470,6 +471,7 @@ type ComplexityRoot struct {
 
 	Task struct {
 		Archived          func(childComplexity int) int
+		Code              func(childComplexity int) int
 		CreatedAt         func(childComplexity int) int
 		Description       func(childComplexity int) int
 		FinishDate        func(childComplexity int) int
@@ -591,6 +593,7 @@ type ComplexityRoot struct {
 	}
 
 	UserPurchaseActivity struct {
+		Code            func(childComplexity int) int
 		CreatedAt       func(childComplexity int) int
 		ID              func(childComplexity int) int
 		LoyaltyPoints   func(childComplexity int) int
@@ -806,6 +809,7 @@ type SKUResolver interface {
 
 	MasterPlan(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error)
 	Video(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error)
+	BrandLogo(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error)
 	Urls(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.StockKeepingUnitContent, error)
 	ProductInfo(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.StockKeepingUnitContent, error)
 	Photos(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.Blob, error)
@@ -3177,6 +3181,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Sku.Brand(childComplexity), true
 
+	case "SKU.brandLogo":
+		if e.complexity.Sku.BrandLogo == nil {
+			break
+		}
+
+		return e.complexity.Sku.BrandLogo(childComplexity), true
+
 	case "SKU.categories":
 		if e.complexity.Sku.Categories == nil {
 			break
@@ -3456,6 +3467,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Task.Archived(childComplexity), true
+
+	case "Task.code":
+		if e.complexity.Task.Code == nil {
+			break
+		}
+
+		return e.complexity.Task.Code(childComplexity), true
 
 	case "Task.createdAt":
 		if e.complexity.Task.CreatedAt == nil {
@@ -4051,6 +4069,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserLoyaltyActivity.User(childComplexity), true
+
+	case "UserPurchaseActivity.code":
+		if e.complexity.UserPurchaseActivity.Code == nil {
+			break
+		}
+
+		return e.complexity.UserPurchaseActivity.Code(childComplexity), true
 
 	case "UserPurchaseActivity.createdAt":
 		if e.complexity.UserPurchaseActivity.CreatedAt == nil {
@@ -4991,6 +5016,7 @@ type SKU {
 
 	masterPlan: Blob
 	video: Blob
+	brandLogo: Blob
 	urls: [SKUContent!]!
 	productInfo: [SKUContent!]!
 	photos: [Blob!]!
@@ -5034,6 +5060,7 @@ input UpdateSKU {
 
 	masterPlanBlobID: NullString
 	videoBlobID: NullString
+	brandLogoBlobID: NullString
 	urls: [SKUContentInput!]
 	productInfo: [SKUContentInput!]
 	photoBlobIDs: [String!]
@@ -5071,6 +5098,7 @@ extend type Mutation {
 }
 type Task {
 	id: ID!
+	code: String!
 	title: String!
 	description: String!
 	loyaltyPoints: Int!
@@ -5282,6 +5310,7 @@ extend type Query {
 `},
 	&ast.Source{Name: "schema_user_purchase_activity.graphql", Input: `type UserPurchaseActivity {
 	id: ID!
+	code: String!
     user: User
 	product: Product
     loyaltyPoints: Int!
@@ -20711,6 +20740,40 @@ func (ec *executionContext) _SKU_video(ctx context.Context, field graphql.Collec
 	return ec.marshalOBlob2ᚖgenesisᚋdbᚐBlob(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _SKU_brandLogo(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SKU",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.SKU().BrandLogo(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*db.Blob)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOBlob2ᚖgenesisᚋdbᚐBlob(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _SKU_urls(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -21486,6 +21549,43 @@ func (ec *executionContext) _Task_id(ctx context.Context, field graphql.Collecte
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Task_code(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Task",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Task_title(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
@@ -24601,6 +24701,43 @@ func (ec *executionContext) _UserPurchaseActivity_id(ctx context.Context, field 
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _UserPurchaseActivity_code(ctx context.Context, field graphql.CollectedField, obj *db.UserPurchaseActivity) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserPurchaseActivity",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _UserPurchaseActivity_user(ctx context.Context, field graphql.CollectedField, obj *db.UserPurchaseActivity) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -27449,6 +27586,12 @@ func (ec *executionContext) unmarshalInputUpdateSKU(ctx context.Context, obj int
 		case "videoBlobID":
 			var err error
 			it.VideoBlobID, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "brandLogoBlobID":
+			var err error
+			it.BrandLogoBlobID, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -30381,6 +30524,17 @@ func (ec *executionContext) _SKU(ctx context.Context, sel ast.SelectionSet, obj 
 				res = ec._SKU_video(ctx, field, obj)
 				return res
 			})
+		case "brandLogo":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SKU_brandLogo(ctx, field, obj)
+				return res
+			})
 		case "urls":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -30705,6 +30859,11 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = graphql.MarshalString("Task")
 		case "id":
 			out.Values[i] = ec._Task_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "code":
+			out.Values[i] = ec._Task_code(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -31477,6 +31636,11 @@ func (ec *executionContext) _UserPurchaseActivity(ctx context.Context, sel ast.S
 			out.Values[i] = graphql.MarshalString("UserPurchaseActivity")
 		case "id":
 			out.Values[i] = ec._UserPurchaseActivity_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "code":
+			out.Values[i] = ec._UserPurchaseActivity_code(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}

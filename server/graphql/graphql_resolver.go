@@ -553,6 +553,10 @@ func (r *skuResolver) MasterPlan(ctx context.Context, obj *db.StockKeepingUnit) 
 func (r *skuResolver) Video(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error) {
 	panic("not implemented")
 }
+func (r *skuResolver) BrandLogo(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error) {
+	panic("not implemented")
+}
+
 func (r *skuResolver) Urls(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.StockKeepingUnitContent, error) {
 	panic("not implemented")
 }
