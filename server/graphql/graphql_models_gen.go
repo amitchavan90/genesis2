@@ -312,6 +312,8 @@ type UpdateTask struct {
 	FinishDate        *time.Time       `json:"finishDate"`
 	MaximumPeople     int              `json:"maximumPeople"`
 	SkuID             *null.String     `json:"skuID"`
+	BannerPhotoBlobID *null.String     `json:"bannerPhotoBlobID"`
+	BrandLogoBlobID   *null.String     `json:"brandLogoBlobID"`
 	Subtasks          []*UpdateSubtask `json:"subtasks"`
 }
 

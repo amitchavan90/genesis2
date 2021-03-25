@@ -26,7 +26,7 @@ input UpdateUserTask {
 
 extend type Query {
 	userTasks(search: SearchFilter!, limit: Int!, offset: Int!): UserTasksResult! @hasPerm(p: UserTaskList)
-	userTask(id: String): UserTask! @hasPerm(p: UserTaskRead)
+	userTask(code: String): UserTask! @hasPerm(p: UserTaskRead)
 }
 
 extend type Mutation {

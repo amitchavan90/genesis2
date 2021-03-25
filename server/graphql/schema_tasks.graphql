@@ -17,6 +17,8 @@ type Task {
 	maximumPeople: Int!
     skuID: NullString
 	sku: SKU
+	brandLogo: Blob
+	bannerPhoto: Blob
 	archived: Boolean!
 	createdAt: Time!
 	subtasks: [Subtask!]!
@@ -45,12 +47,14 @@ input UpdateTask {
 	finishDate: Time
 	maximumPeople: Int!
     skuID: NullString
+	bannerPhotoBlobID: NullString
+	brandLogoBlobID: NullString
 	subtasks: [UpdateSubtask]
 }
 
 extend type Query {
 	tasks(search: SearchFilter!, limit: Int!, offset: Int!): TasksResult! @hasPerm(p: TaskList)
-	task(id: String): Task! @hasPerm(p: TaskRead)
+	task(code: String): Task! @hasPerm(p: TaskRead)
 }
 
 extend type Mutation {

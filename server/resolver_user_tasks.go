@@ -2,6 +2,7 @@ package genesis
 
 import (
 	"context"
+	"fmt"
 	"genesis/db"
 	"genesis/graphql"
 
@@ -49,9 +50,8 @@ func (r *userTaskResolver) UserSubtasks(ctx context.Context, obj *db.UserTask) (
 //   Query   //
 ///////////////
 
-func (r *queryResolver) UserTask(ctx context.Context, id *string) (*db.UserTask, error) {
-	userTaskUUID, err := uuid.FromString(*id)
-	userTask, err := r.UserTaskStore.Get(userTaskUUID)
+func (r *queryResolver) UserTask(ctx context.Context, code *string) (*db.UserTask, error) {
+	userTask, err := r.UserTaskStore.GetByCode(*code)
 	if err != nil {
 		return nil, terror.New(err, "get userTask")
 	}
@@ -78,8 +78,16 @@ func (r *queryResolver) UserTasks(ctx context.Context, search graphql.SearchFilt
 
 // UserTaskCreate creates an userTask
 func (r *mutationResolver) UserTaskCreate(ctx context.Context, input graphql.UpdateUserTask) (*db.UserTask, error) {
+	// Get Task count (for Task Code)
+	count, err := r.UserTaskStore.Count()
+	if err != nil {
+		return nil, terror.New(err, "create user task: Error while fetching user task count from db")
+	}
+
 	// Create UserTask
-	ut := &db.UserTask{}
+	ut := &db.UserTask{
+		Code: fmt.Sprintf("UT%05d", count+1),
+	}
 
 	userTaskID, _ := uuid.NewV4()
 	ut.ID = userTaskID.String()

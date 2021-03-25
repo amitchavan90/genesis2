@@ -256,11 +256,9 @@ func (r *mutationResolver) ProductCreate(ctx context.Context, input graphql.Upda
 		createdByName = user.LastName.String
 	}
 
-	productCode := fmt.Sprintf("P%05d", count)
-
 	// Create Product
 	p := &db.Product{
-		Code:        productCode,
+		Code:        fmt.Sprintf("P%05d", count+1),
 		CreatedByID: user.ID,
 		// Description: input.Description.String,
 	}
@@ -305,6 +303,17 @@ func (r *mutationResolver) ProductCreate(ctx context.Context, input graphql.Upda
 
 	if input.LoyaltyPoints != nil {
 		p.LoyaltyPoints = input.LoyaltyPoints.Int
+	} else {
+		// Get sku
+		if input.SkuID != nil {
+			skuUUID, _ := uuid.FromString(input.SkuID.String)
+			sku, err := r.SKUStore.Get(skuUUID)
+			if err != nil {
+				return nil, terror.New(err, "product create: no sku found with give ID")
+			}
+			p.SkuID = null.StringFrom(sku.ID)
+			p.LoyaltyPoints = sku.LoyaltyPoints
+		}
 	}
 	if input.LoyaltyPointsExpire != nil {
 		p.LoyaltyPointsExpire = input.LoyaltyPointsExpire.Time

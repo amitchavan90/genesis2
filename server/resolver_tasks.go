@@ -48,13 +48,34 @@ func (r *taskResolver) Subtasks(ctx context.Context, obj *db.Task) ([]*db.Subtas
 	return result, nil
 }
 
+func (r *taskResolver) BrandLogo(ctx context.Context, obj *db.Task) (*db.Blob, error) {
+	if !obj.BrandLogoBlobID.Valid {
+		return nil, nil
+	}
+	blobUUID, err := uuid.FromString(obj.BrandLogoBlobID.String)
+	if err != nil {
+		return nil, terror.New(terror.ErrParse, "")
+	}
+	return r.BlobStore.Get(blobUUID)
+}
+
+func (r *taskResolver) BannerPhoto(ctx context.Context, obj *db.Task) (*db.Blob, error) {
+	if !obj.BannerPhotoBlobID.Valid {
+		return nil, nil
+	}
+	blobUUID, err := uuid.FromString(obj.BannerPhotoBlobID.String)
+	if err != nil {
+		return nil, terror.New(terror.ErrParse, "")
+	}
+	return r.BlobStore.Get(blobUUID)
+}
+
 ///////////////
 //   Query   //
 ///////////////
 
-func (r *queryResolver) Task(ctx context.Context, id *string) (*db.Task, error) {
-	taskUUID, err := uuid.FromString(*id)
-	task, err := r.TaskStore.Get(taskUUID)
+func (r *queryResolver) Task(ctx context.Context, code *string) (*db.Task, error) {
+	task, err := r.TaskStore.GetByCode(*code)
 	if err != nil {
 		return nil, terror.New(err, "get task")
 	}
@@ -89,7 +110,7 @@ func (r *mutationResolver) TaskCreate(ctx context.Context, input graphql.UpdateT
 
 	// Create Task
 	t := &db.Task{
-		Code: fmt.Sprintf("T%05d", count),
+		Code: fmt.Sprintf("T%05d", count+1),
 	}
 
 	taskUUID, _ := uuid.NewV4()
@@ -100,6 +121,20 @@ func (r *mutationResolver) TaskCreate(ctx context.Context, input graphql.UpdateT
 	}
 	if input.Description != "" {
 		t.Description = input.Description
+	}
+	if input.BrandLogoBlobID != nil {
+		if input.BrandLogoBlobID.String == "-" {
+			t.BrandLogoBlobID = null.StringFromPtr(nil)
+		} else {
+			t.BrandLogoBlobID = *input.BrandLogoBlobID
+		}
+	}
+	if input.BannerPhotoBlobID != nil {
+		if input.BannerPhotoBlobID.String == "-" {
+			t.BannerPhotoBlobID = null.StringFromPtr(nil)
+		} else {
+			t.BannerPhotoBlobID = *input.BannerPhotoBlobID
+		}
 	}
 
 	t.LoyaltyPoints = input.LoyaltyPoints

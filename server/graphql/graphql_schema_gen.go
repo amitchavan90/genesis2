@@ -307,9 +307,9 @@ type ComplexityRoot struct {
 		Description         func(childComplexity int) int
 		Distributor         func(childComplexity int) int
 		ID                  func(childComplexity int) int
-		IsAppProduct        func(childComplexity int) int
+		IsAppBound          func(childComplexity int) int
 		IsBeef              func(childComplexity int) int
-		IsPointProduct      func(childComplexity int) int
+		IsPointBound        func(childComplexity int) int
 		LatestTrackAction   func(childComplexity int) int
 		LoyaltyPoints       func(childComplexity int) int
 		LoyaltyPointsExpire func(childComplexity int) int
@@ -366,7 +366,7 @@ type ComplexityRoot struct {
 		SkuByID                  func(childComplexity int, id string) int
 		SkuCloneTree             func(childComplexity int, id string) int
 		Skus                     func(childComplexity int, search SearchFilter, limit int, offset int) int
-		Task                     func(childComplexity int, id *string) int
+		Task                     func(childComplexity int, code *string) int
 		Tasks                    func(childComplexity int, search SearchFilter, limit int, offset int) int
 		TrackAction              func(childComplexity int, code string) int
 		TrackActions             func(childComplexity int, search SearchFilter, limit int, offset int) int
@@ -375,13 +375,14 @@ type ComplexityRoot struct {
 		UserActivities           func(childComplexity int, search SearchFilter, limit int, offset int, userID *string) int
 		UserPurchaseActivities   func(childComplexity int, search SearchFilter, limit int, offset int, userID *string) int
 		UserPurchaseActivity     func(childComplexity int, id *string) int
-		UserTask                 func(childComplexity int, id *string) int
+		UserTask                 func(childComplexity int, code *string) int
 		UserTasks                func(childComplexity int, search SearchFilter, limit int, offset int) int
 		Users                    func(childComplexity int, search SearchFilter, limit int, offset int) int
 		VerifyResetToken         func(childComplexity int, token string, email *null.String) int
 	}
 
 	Referral struct {
+		Code       func(childComplexity int) int
 		CreatedAt  func(childComplexity int) int
 		ID         func(childComplexity int) int
 		IsRedemmed func(childComplexity int) int
@@ -471,6 +472,8 @@ type ComplexityRoot struct {
 
 	Task struct {
 		Archived          func(childComplexity int) int
+		BannerPhoto       func(childComplexity int) int
+		BrandLogo         func(childComplexity int) int
 		Code              func(childComplexity int) int
 		CreatedAt         func(childComplexity int) int
 		Description       func(childComplexity int) int
@@ -563,6 +566,7 @@ type ComplexityRoot struct {
 		Referrals      func(childComplexity int) int
 		Role           func(childComplexity int) int
 		Verified       func(childComplexity int) int
+		WalletPoints   func(childComplexity int) int
 		WechatID       func(childComplexity int) int
 	}
 
@@ -763,9 +767,9 @@ type QueryResolver interface {
 	Referrals(ctx context.Context, search SearchFilter, limit int, offset int) (*ReferralsResult, error)
 	Referral(ctx context.Context, userID *string) (*db.Referral, error)
 	Tasks(ctx context.Context, search SearchFilter, limit int, offset int) (*TasksResult, error)
-	Task(ctx context.Context, id *string) (*db.Task, error)
+	Task(ctx context.Context, code *string) (*db.Task, error)
 	UserTasks(ctx context.Context, search SearchFilter, limit int, offset int) (*UserTasksResult, error)
-	UserTask(ctx context.Context, id *string) (*db.UserTask, error)
+	UserTask(ctx context.Context, code *string) (*db.UserTask, error)
 	Skus(ctx context.Context, search SearchFilter, limit int, offset int) (*SKUResult, error)
 	Sku(ctx context.Context, code string) (*db.StockKeepingUnit, error)
 	SkuByID(ctx context.Context, id string) (*db.StockKeepingUnit, error)
@@ -827,6 +831,8 @@ type TaskResolver interface {
 	FinishDate(ctx context.Context, obj *db.Task) (*time.Time, error)
 
 	Sku(ctx context.Context, obj *db.Task) (*db.StockKeepingUnit, error)
+	BrandLogo(ctx context.Context, obj *db.Task) (*db.Blob, error)
+	BannerPhoto(ctx context.Context, obj *db.Task) (*db.Blob, error)
 
 	Subtasks(ctx context.Context, obj *db.Task) ([]*db.Subtask, error)
 }
@@ -2414,12 +2420,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Product.ID(childComplexity), true
 
-	case "Product.isAppProduct":
-		if e.complexity.Product.IsAppProduct == nil {
+	case "Product.isAppBound":
+		if e.complexity.Product.IsAppBound == nil {
 			break
 		}
 
-		return e.complexity.Product.IsAppProduct(childComplexity), true
+		return e.complexity.Product.IsAppBound(childComplexity), true
 
 	case "Product.isBeef":
 		if e.complexity.Product.IsBeef == nil {
@@ -2428,12 +2434,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Product.IsBeef(childComplexity), true
 
-	case "Product.isPointProduct":
-		if e.complexity.Product.IsPointProduct == nil {
+	case "Product.isPointBound":
+		if e.complexity.Product.IsPointBound == nil {
 			break
 		}
 
-		return e.complexity.Product.IsPointProduct(childComplexity), true
+		return e.complexity.Product.IsPointBound(childComplexity), true
 
 	case "Product.latestTrackAction":
 		if e.complexity.Product.LatestTrackAction == nil {
@@ -2909,7 +2915,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Task(childComplexity, args["id"].(*string)), true
+		return e.complexity.Query.Task(childComplexity, args["code"].(*string)), true
 
 	case "Query.tasks":
 		if e.complexity.Query.Tasks == nil {
@@ -3017,7 +3023,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.UserTask(childComplexity, args["id"].(*string)), true
+		return e.complexity.Query.UserTask(childComplexity, args["code"].(*string)), true
 
 	case "Query.userTasks":
 		if e.complexity.Query.UserTasks == nil {
@@ -3054,6 +3060,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.VerifyResetToken(childComplexity, args["token"].(string), args["email"].(*null.String)), true
+
+	case "Referral.code":
+		if e.complexity.Referral.Code == nil {
+			break
+		}
+
+		return e.complexity.Referral.Code(childComplexity), true
 
 	case "Referral.createdAt":
 		if e.complexity.Referral.CreatedAt == nil {
@@ -3467,6 +3480,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Task.Archived(childComplexity), true
+
+	case "Task.bannerPhoto":
+		if e.complexity.Task.BannerPhoto == nil {
+			break
+		}
+
+		return e.complexity.Task.BannerPhoto(childComplexity), true
+
+	case "Task.brandLogo":
+		if e.complexity.Task.BrandLogo == nil {
+			break
+		}
+
+		return e.complexity.Task.BrandLogo(childComplexity), true
 
 	case "Task.code":
 		if e.complexity.Task.Code == nil {
@@ -3943,6 +3970,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Verified(childComplexity), true
+
+	case "User.walletPoints":
+		if e.complexity.User.WalletPoints == nil {
+			break
+		}
+
+		return e.complexity.User.WalletPoints(childComplexity), true
 
 	case "User.wechatID":
 		if e.complexity.User.WechatID == nil {
@@ -4867,13 +4901,10 @@ extend type Mutation {
 	order: Order
 	contract: Contract
 	distributor: Distributor
-	# price: Int!
-	# currency: String!
-	# weight: Int!
 	
 	isBeef: Boolean!
-	isPointProduct: Boolean!
-	isAppProduct: Boolean!
+	isPointBound: Boolean!
+	isAppBound: Boolean!
 
 	registered: Boolean!
 	registeredBy: User
@@ -4926,6 +4957,7 @@ extend type Mutation {
 `},
 	&ast.Source{Name: "schema_referrals.graphql", Input: `type Referral {
 	id: ID!
+	code: String!
 	user: User
 	referee: User
 	isRedemmed: Boolean!
@@ -5110,6 +5142,8 @@ type Task {
 	maximumPeople: Int!
     skuID: NullString
 	sku: SKU
+	brandLogo: Blob
+	bannerPhoto: Blob
 	archived: Boolean!
 	createdAt: Time!
 	subtasks: [Subtask!]!
@@ -5138,12 +5172,14 @@ input UpdateTask {
 	finishDate: Time
 	maximumPeople: Int!
     skuID: NullString
+	bannerPhotoBlobID: NullString
+	brandLogoBlobID: NullString
 	subtasks: [UpdateSubtask]
 }
 
 extend type Query {
 	tasks(search: SearchFilter!, limit: Int!, offset: Int!): TasksResult! @hasPerm(p: TaskList)
-	task(id: String): Task! @hasPerm(p: TaskRead)
+	task(code: String): Task! @hasPerm(p: TaskRead)
 }
 
 extend type Mutation {
@@ -5366,7 +5402,7 @@ input UpdateUserTask {
 
 extend type Query {
 	userTasks(search: SearchFilter!, limit: Int!, offset: Int!): UserTasksResult! @hasPerm(p: UserTaskList)
-	userTask(id: String): UserTask! @hasPerm(p: UserTaskRead)
+	userTask(code: String): UserTask! @hasPerm(p: UserTaskRead)
 }
 
 extend type Mutation {
@@ -5385,6 +5421,7 @@ type User {
 	lastName: NullString
 	email: NullString
 	organisation: Organisation
+	walletPoints: Int!
 	referralCode: NullString
 	verified: Boolean!
 	role: Role!
@@ -7336,13 +7373,13 @@ func (ec *executionContext) field_Query_task_args(ctx context.Context, rawArgs m
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *string
-	if tmp, ok := rawArgs["id"]; ok {
+	if tmp, ok := rawArgs["code"]; ok {
 		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["id"] = arg0
+	args["code"] = arg0
 	return args, nil
 }
 
@@ -7568,13 +7605,13 @@ func (ec *executionContext) field_Query_userTask_args(ctx context.Context, rawAr
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *string
-	if tmp, ok := rawArgs["id"]; ok {
+	if tmp, ok := rawArgs["code"]; ok {
 		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["id"] = arg0
+	args["code"] = arg0
 	return args, nil
 }
 
@@ -16073,7 +16110,7 @@ func (ec *executionContext) _Product_isBeef(ctx context.Context, field graphql.C
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Product_isPointProduct(ctx context.Context, field graphql.CollectedField, obj *db.Product) (ret graphql.Marshaler) {
+func (ec *executionContext) _Product_isPointBound(ctx context.Context, field graphql.CollectedField, obj *db.Product) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -16092,7 +16129,7 @@ func (ec *executionContext) _Product_isPointProduct(ctx context.Context, field g
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.IsPointProduct, nil
+		return obj.IsPointBound, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -16110,7 +16147,7 @@ func (ec *executionContext) _Product_isPointProduct(ctx context.Context, field g
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Product_isAppProduct(ctx context.Context, field graphql.CollectedField, obj *db.Product) (ret graphql.Marshaler) {
+func (ec *executionContext) _Product_isAppBound(ctx context.Context, field graphql.CollectedField, obj *db.Product) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -16129,7 +16166,7 @@ func (ec *executionContext) _Product_isAppProduct(ctx context.Context, field gra
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.IsAppProduct, nil
+		return obj.IsAppBound, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17312,7 +17349,7 @@ func (ec *executionContext) _Query_task(ctx context.Context, field graphql.Colle
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Task(rctx, args["id"].(*string))
+			return ec.resolvers.Query().Task(rctx, args["code"].(*string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "TaskRead")
@@ -17448,7 +17485,7 @@ func (ec *executionContext) _Query_userTask(ctx context.Context, field graphql.C
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().UserTask(rctx, args["id"].(*string))
+			return ec.resolvers.Query().UserTask(rctx, args["code"].(*string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "UserTaskRead")
@@ -19427,6 +19464,43 @@ func (ec *executionContext) _Referral_id(ctx context.Context, field graphql.Coll
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Referral_code(ctx context.Context, field graphql.CollectedField, obj *db.Referral) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Referral",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Referral_user(ctx context.Context, field graphql.CollectedField, obj *db.Referral) (ret graphql.Marshaler) {
@@ -21986,6 +22060,74 @@ func (ec *executionContext) _Task_sku(ctx context.Context, field graphql.Collect
 	return ec.marshalOSKU2ᚖgenesisᚋdbᚐStockKeepingUnit(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Task_brandLogo(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Task",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().BrandLogo(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*db.Blob)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOBlob2ᚖgenesisᚋdbᚐBlob(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Task_bannerPhoto(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Task",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Task().BannerPhoto(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*db.Blob)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOBlob2ᚖgenesisᚋdbᚐBlob(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Task_archived(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -23626,6 +23768,43 @@ func (ec *executionContext) _User_organisation(ctx context.Context, field graphq
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOOrganisation2ᚖgenesisᚋdbᚐOrganisation(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_walletPoints(ctx context.Context, field graphql.CollectedField, obj *db.User) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "User",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WalletPoints, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_referralCode(ctx context.Context, field graphql.CollectedField, obj *db.User) (ret graphql.Marshaler) {
@@ -27727,6 +27906,18 @@ func (ec *executionContext) unmarshalInputUpdateTask(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "bannerPhotoBlobID":
+			var err error
+			it.BannerPhotoBlobID, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "brandLogoBlobID":
+			var err error
+			it.BrandLogoBlobID, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "subtasks":
 			var err error
 			it.Subtasks, err = ec.unmarshalOUpdateSubtask2ᚕᚖgenesisᚋgraphqlᚐUpdateSubtask(ctx, v)
@@ -29378,13 +29569,13 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "isPointProduct":
-			out.Values[i] = ec._Product_isPointProduct(ctx, field, obj)
+		case "isPointBound":
+			out.Values[i] = ec._Product_isPointBound(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "isAppProduct":
-			out.Values[i] = ec._Product_isAppProduct(ctx, field, obj)
+		case "isAppBound":
+			out.Values[i] = ec._Product_isAppBound(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -30214,6 +30405,11 @@ func (ec *executionContext) _Referral(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "code":
+			out.Values[i] = ec._Referral_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "user":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -30931,6 +31127,28 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 				res = ec._Task_sku(ctx, field, obj)
 				return res
 			})
+		case "brandLogo":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Task_brandLogo(ctx, field, obj)
+				return res
+			})
+		case "bannerPhoto":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Task_bannerPhoto(ctx, field, obj)
+				return res
+			})
 		case "archived":
 			out.Values[i] = ec._Task_archived(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -31367,6 +31585,11 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 				res = ec._User_organisation(ctx, field, obj)
 				return res
 			})
+		case "walletPoints":
+			out.Values[i] = ec._User_walletPoints(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "referralCode":
 			out.Values[i] = ec._User_referralCode(ctx, field, obj)
 		case "verified":

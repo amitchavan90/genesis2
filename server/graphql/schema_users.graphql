@@ -9,6 +9,7 @@ type User {
 	lastName: NullString
 	email: NullString
 	organisation: Organisation
+	walletPoints: Int!
 	referralCode: NullString
 	verified: Boolean!
 	role: Role!

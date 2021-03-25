@@ -24,6 +24,7 @@ import (
 // Referral is an object representing the database table.
 type Referral struct {
 	ID           string      `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
+	Code         string      `db:"code" boil:"code" json:"code" toml:"code" yaml:"code"`
 	UserID       string      `db:"user_id" boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 	ReferredByID null.String `db:"referred_by_id" boil:"referred_by_id" json:"referred_by_id,omitempty" toml:"referred_by_id" yaml:"referred_by_id,omitempty"`
 	IsRedemmed   bool        `db:"is_redemmed" boil:"is_redemmed" json:"is_redemmed" toml:"is_redemmed" yaml:"is_redemmed"`
@@ -36,6 +37,7 @@ type Referral struct {
 
 var ReferralColumns = struct {
 	ID           string
+	Code         string
 	UserID       string
 	ReferredByID string
 	IsRedemmed   string
@@ -43,6 +45,7 @@ var ReferralColumns = struct {
 	CreatedAt    string
 }{
 	ID:           "id",
+	Code:         "code",
 	UserID:       "user_id",
 	ReferredByID: "referred_by_id",
 	IsRedemmed:   "is_redemmed",
@@ -54,6 +57,7 @@ var ReferralColumns = struct {
 
 var ReferralWhere = struct {
 	ID           whereHelperstring
+	Code         whereHelperstring
 	UserID       whereHelperstring
 	ReferredByID whereHelpernull_String
 	IsRedemmed   whereHelperbool
@@ -61,6 +65,7 @@ var ReferralWhere = struct {
 	CreatedAt    whereHelpertime_Time
 }{
 	ID:           whereHelperstring{field: "\"referrals\".\"id\""},
+	Code:         whereHelperstring{field: "\"referrals\".\"code\""},
 	UserID:       whereHelperstring{field: "\"referrals\".\"user_id\""},
 	ReferredByID: whereHelpernull_String{field: "\"referrals\".\"referred_by_id\""},
 	IsRedemmed:   whereHelperbool{field: "\"referrals\".\"is_redemmed\""},
@@ -92,8 +97,8 @@ func (*referralR) NewStruct() *referralR {
 type referralL struct{}
 
 var (
-	referralAllColumns            = []string{"id", "user_id", "referred_by_id", "is_redemmed", "updated_at", "created_at"}
-	referralColumnsWithoutDefault = []string{"user_id", "referred_by_id"}
+	referralAllColumns            = []string{"id", "code", "user_id", "referred_by_id", "is_redemmed", "updated_at", "created_at"}
+	referralColumnsWithoutDefault = []string{"code", "user_id", "referred_by_id"}
 	referralColumnsWithDefault    = []string{"id", "is_redemmed", "updated_at", "created_at"}
 	referralPrimaryKeyColumns     = []string{"id"}
 )

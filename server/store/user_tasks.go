@@ -48,7 +48,7 @@ func (s *UserTasks) All(txes ...*sql.Tx) (db.UserTaskSlice, error) {
 
 // Count gives the amount of tasks
 func (s *UserTasks) Count() (int64, error) {
-	return db.StockKeepingUnits().Count(s.Conn)
+	return db.UserTasks().Count(s.Conn)
 }
 
 // SearchSelect searchs/selects tasks
@@ -103,6 +103,15 @@ func (s *UserTasks) SearchSelect(search graphql.SearchFilter, limit int, offset 
 	}
 
 	return count, records, nil
+}
+
+// GetByCode by code
+func (s *UserTasks) GetByCode(code string, txes ...*sql.Tx) (*db.UserTask, error) {
+	dat, err := db.UserTasks(db.UserTaskWhere.Code.EQ(code)).One(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
 }
 
 // GetTask by taskID

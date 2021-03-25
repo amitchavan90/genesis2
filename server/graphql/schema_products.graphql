@@ -14,13 +14,10 @@ type Product {
 	order: Order
 	contract: Contract
 	distributor: Distributor
-	# price: Int!
-	# currency: String!
-	# weight: Int!
 	
 	isBeef: Boolean!
-	isPointProduct: Boolean!
-	isAppProduct: Boolean!
+	isPointBound: Boolean!
+	isAppBound: Boolean!
 
 	registered: Boolean!
 	registeredBy: User
