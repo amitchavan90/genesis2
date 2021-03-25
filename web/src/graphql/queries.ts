@@ -571,6 +571,30 @@ const REFERRALS = gql`
 	}
 	${fragment.REFERRAL_LIST}
 `
+
+const USER_TASKS = gql`
+	query userTasks($search: SearchFilter!, $limit: Int!, $offset: Int!) {
+		userTasks(search: $search, limit: $limit, offset: $offset) {
+			userTasks {
+				...UserTaskListFragment         
+			}
+			total
+		}
+	}
+	${fragment.USER_TASK_LIST}
+`
+
+const USER_PURCHASE_ACTIVITIES = gql`
+	query userPurchaseActivities($search: SearchFilter!, $limit: Int!, $offset: Int!) {
+		userPurchaseActivities(search: $search, limit: $limit, offset: $offset) {
+			userPurchaseActivities{
+				...UserPurchaseActivityFragment         
+			}
+			total
+		}
+	}
+	${fragment.USER_PURCHASE_ACTIVITIES}
+`
 export const query = {
 	ME,
 
@@ -638,5 +662,7 @@ export const query = {
 	TASKS,
 	TASK,
 
-	REFERRALS
+	REFERRALS,
+	USER_TASKS,
+	USER_PURCHASE_ACTIVITIES
 }

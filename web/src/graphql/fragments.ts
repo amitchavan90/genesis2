@@ -506,6 +506,7 @@ const TASK_LIST = gql`
 	fragment TaskListFragment on Task {
 			id,
 			title,
+			code,
 			description,
 			isTimeBound,
 			isPeopleBound,
@@ -532,6 +533,47 @@ fragment ReferralListFragment on Referral{
         lastName,
         email
     }
+}`
+
+const  USER_TASK_LIST = gql`
+fragment UserTaskListFragment on UserTask {
+	id,
+	isComplete,
+	status,
+	task {
+		id,
+		title,
+		description,
+	},
+	user {
+		id,
+		firstName,
+		lastName,
+		email
+	}
+	userSubtasks {
+		id,
+		isComplete,
+		status
+	},
+	createdAt
+}`
+
+const  USER_PURCHASE_ACTIVITIES = gql`
+fragment UserPurchaseActivityFragment on  UserPurchaseActivity{
+	id,
+	loyaltyPoints,
+	user {
+		id,
+		firstName,
+		lastName,
+		email
+	},
+	product {
+		id
+		code
+	}
+	createdAt
 }`
 
 export const fragment = {
@@ -568,5 +610,7 @@ export const fragment = {
 	TASK,
 	TASK_LIST,
 
-	REFERRAL_LIST
+	REFERRAL_LIST,
+	USER_TASK_LIST,
+	USER_PURCHASE_ACTIVITIES
 }

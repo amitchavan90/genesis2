@@ -23,10 +23,14 @@ export const SideBar = () => {
 		history.location.pathname.startsWith("/portal/consumer") ||
 		history.location.pathname.startsWith("/portal/role") ||
 		history.location.pathname.startsWith("/portal/trackAction")
-
+	const onAppPage = 
+		history.location.pathname.startsWith("/portal/tasks") || 
+		history.location.pathname.startsWith("/portal/referrals")||
+		history.location.pathname.startsWith("/portal/purchesActivity")
 	const [expandInventoryPanel, setExpandInventoryPanel] = React.useState(onInventoryPage)
 	const [expandActivityPanel, setExpandActivityPanel] = React.useState(onActivityPage)
 	const [expandSystemPanel, setExpandSystemPanel] = React.useState(onSystemPage)
+	const [expandAppPanel, setExpandAppPanel] = React.useState(onAppPage)
 
 	const [css, theme] = useStyletron()
 
@@ -75,11 +79,17 @@ export const SideBar = () => {
 		maxHeight: expandSystemPanel ? "150px" : "0px",
 		transition: "0.25s",
 	})
+	const accordionPanelApp: string = css({
+		transformOrigin: "top",
+		transform: expandAppPanel ? "scaleY(1)" : "scaleY(0)",
+		maxHeight: expandAppPanel ? "150px" : "0px",
+		transition: "0.25s",
+	})
 
 	const showInventoryPanel = hasPermission(Perm.ContainerList) || hasPermission(Perm.CartonList) || hasPermission(Perm.ProductList)
 	const showActivityPanel = hasPermission(Perm.ActivityListBlockchainActivity) || hasPermission(Perm.ActivityListUserActivity)
 	const showSystemPanel = hasPermission(Perm.UserList) || hasPermission(Perm.RoleList) || hasPermission(Perm.TrackActionList)
-
+	const showAppPanel = hasPermission(Perm.TaskList) || hasPermission(Perm.ReferralList) || hasPermission(Perm.UserPurchaseActivityList)
 	React.useEffect(() => {
 		if (expandSystemPanel != onSystemPage) setExpandSystemPanel(onSystemPage)
 		if (expandActivityPanel != onActivityPage) setExpandActivityPanel(onActivityPage)
@@ -176,7 +186,29 @@ export const SideBar = () => {
 						</div>
 					</>
 				)}
-
+				{showAppPanel && (
+					<>
+						<SideMenuButton
+							index={index++}
+							icon="chart-line"
+							label="App"
+							selected={onAppPage}
+							onClick={() => {
+								if (onAppPage) return
+								setExpandAppPanel(!expandAppPanel)
+								if (!onAppPage) history.push("/portal/tasks")
+							}}
+						/>
+						<div className={accordionPanelApp}>
+							{hasPermission(Perm.TaskList) && (
+								<SideMenuButton index={index++} subMenu icon="file-contract" label="Tasks" url="/portal/tasks" />
+							)}
+							{hasPermission(Perm.ReferralList) && (
+								<SideMenuButton index={index++} subMenu icon="user-chart" label="Referrals" url="/portal/referrals" />
+							)}
+						</div>
+					</>
+				)}
 				{showSystemPanel && (
 					<>
 						<SideMenuButton
@@ -204,10 +236,10 @@ export const SideBar = () => {
 						</div>
 					</>
 				)}
-			    {hasPermission(Perm.TaskList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="Tasks" url="/portal/tasks" altURL="/portal/tasks" />}
-				{hasPermission(Perm.ReferralList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="Referrals" url="/portal/referrals" altURL="/portal/referrals" />}
+			    {/* {hasPermission(Perm.TaskList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="Tasks" url="/portal/tasks" altURL="/portal/task" />} */}
+				{/* {hasPermission(Perm.ReferralList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="Referrals" url="/portal/referrals" altURL="/portal/referral" />} */}
 				{hasPermission(Perm.UserPurchaseActivityList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="Purchase Activity" url="/portal/purchesActivity" altURL="/portal/purchesActivity" />}
-				{hasPermission(Perm.UserTaskList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="User Task" url="/portal/userTask" altURL="/portal/userTask" />}
+				{hasPermission(Perm.UserTaskList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="User Task" url="/portal/userTasks" altURL="/portal/userTask" />}
 			</div>
 		</div>
 	)

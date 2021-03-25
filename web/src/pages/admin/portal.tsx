@@ -120,8 +120,8 @@ const PortalInner = () => {
 							{hasPermission(Perm.TaskList) && <Route path={"/portal/tasks"} component={ListPage.TasksList} />}
 
 							{hasPermission(Perm.ReferralList) && <Route path={"/portal/referrals"} component={ListPage.ReferralList} />}
-							{hasPermission(Perm.UserPurchaseActivityList) && <Route path={"/portal/purchesActivity"} component={ListPage.ReferralList} />}
-							{hasPermission(Perm.UserTaskList) && <Route path={"/portal/userTask"} component={ListPage.ReferralList} />}
+							{hasPermission(Perm.UserPurchaseActivityList) && <Route path={"/portal/purchesActivity"} component={ListPage.UserPurchaseActivityList} />}
+							{hasPermission(Perm.UserTaskList) && <Route path={"/portal/userTasks"} component={ListPage.UserTaskList} />}
 							<Route path={"/portal/"} component={Dashboard} />
 						</Switch>
 					</div>

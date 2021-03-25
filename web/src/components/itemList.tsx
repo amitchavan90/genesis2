@@ -92,6 +92,7 @@ interface ItemListProps {
 	trackActionID?: string
 	taskID?: string
 	referralID?: string
+	userPurchaseActivityID?:string
 
 	/** Additional columns to show in the table
 	 *
@@ -198,6 +199,7 @@ export const ItemList = (props: ItemListProps) => {
 	const [trackActionID, setTrackActionID] = React.useState(props.trackActionID)
 	const [taskID, setTaskID] = React.useState(props.taskID)
 	const [referralID, setReferralID] = React.useState(props.referralID)
+	const [userPurchaseActivityID, setUserPurchaseActivityID] = React.useState(props.userPurchaseActivityID)
 
 	const [showModal, setShowModal] = React.useState<boolean>()
 	const [modalColumn, setModalColumn] = React.useState<number>()
@@ -228,7 +230,7 @@ export const ItemList = (props: ItemListProps) => {
 			case "referral":
 				return graphql.query.REFERRALS	
 			case "userPurchaseActivity":
-				return graphql.query.REFERRALS
+				return graphql.query.USER_PURCHASE_ACTIVITIES
 			case "userTask":
 				return graphql.query.REFERRALS		
 		}
@@ -253,6 +255,7 @@ export const ItemList = (props: ItemListProps) => {
 		setTrackActionID(undefined)
 		setTaskID(undefined)
 		setReferralID(undefined)
+		setUserPurchaseActivityID(undefined)
 
 		switch (column) {
 			case "container":
@@ -292,7 +295,7 @@ export const ItemList = (props: ItemListProps) => {
 				setReferralID(id)	
 				break
 			case "userPurchaseActivity":
-				setReferralID(id)	
+				setUserPurchaseActivityID(id)	
 				break
 			case "userTask":
 				setReferralID(id)	
@@ -343,6 +346,7 @@ export const ItemList = (props: ItemListProps) => {
 			trackActionID,
 			taskID,
 			referralID,
+			userPurchaseActivityID,
 		},
 	})
 

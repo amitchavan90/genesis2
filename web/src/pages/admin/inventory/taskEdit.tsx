@@ -21,8 +21,13 @@ import { Task, SubTask} from "../../../types/types"
 import { SKUSelectList } from "../../../components/itemSelectList"
 import { Select, Value } from "baseui/select"
 import { IconName } from "@fortawesome/fontawesome-svg-core"
+import { Tabs, Tab } from "baseui/tabs"
 import { Modal, ModalButton, ModalFooter, ModalHeader } from "baseui/modal"
 import { promiseTimeout, TIMED_OUT } from "../../../helpers/timeout"
+import { paddingZero} from "../../../themeOverrides"
+import { ItemList } from "../../../components/itemList"
+import { FilterOption } from "../../../types/enums"
+import { ActionItemSet } from "../../../types/actions"
 
 
 type FormData = {
@@ -30,14 +35,16 @@ type FormData = {
 	loyaltyPoints: number
     maximumPeople: number
     skuID: string
+	code: string
 	subtasks : SubTask[]
 }
 
 const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 	console.log("i am in task update")
 	const code = props.match.params.code
-	const isNewTask = "new"
+	const isNewTask = code ==="new"
 	const history = useHistory()
+	const [activeKey, setActiveKey] = React.useState(props.location.hash || "#details")
 	const [showPreviewModal, setShowPreviewModal] = React.useState<boolean>()
 
 	//style
@@ -59,6 +66,10 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 	
 	// Get TASK
 	const [task, setTask] = React.useState<Task>()
+	const { data, loading, error, refetch } = useQuery<{ task: Task}>(graphql.query.TASK, {
+		variables: { code },
+		fetchPolicy: isNewTask ? "cache-only" : undefined, // prevent query if new
+	})
 	// Mutations
 	const [updateTask, mutUpdateTask] = useMutation(isNewTask ? graphql.mutation.CREATE_TASK : graphql.mutation.UPDATE_TASK)
 	// Form submission
@@ -76,11 +87,12 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 	const { register, setValue, handleSubmit, errors, getValues } = useForm<FormData>()
 
-	const onSubmit = handleSubmit(async ({ title, loyaltyPoints, maximumPeople, skuID, subtasks}) => {
+	const onSubmit = handleSubmit(async ({ title, loyaltyPoints, maximumPeople, code, subtasks}) => {
 		setTimedOut(false)
 		
 		const input = {
 			title,
+			code,
 			description,
 			isTimeBound,
 			isPeopleBound,
@@ -107,10 +119,16 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 	})
 
 	React.useEffect(() => {
+		if (!data || !data.task) return
+		setTask(data.task)
+	}, [data, loading, error])
+
+	React.useEffect(() => {
 		if (!task) return
 		setValue("title",task.title)
 		setValue("loyaltyPoints", task.loyaltyPoints)
 		setValue("maximumPeople", task.maximumPeople)
+		setValue("code", task.code)
 		setfinishDate(new Date(task.finishDate))
 		if (task.sku) setSKU([{ id: task.sku.id, label: task.sku.code }])
 		setSubTasksCount(task.subtasks.length)
@@ -127,7 +145,7 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 		if (isNewTask) {
 			if (!mutUpdateTask.data.taskCreate) return
 			setShowSuccessModal(true)
-			history.replace(`/portal/task/${mutUpdateTask.data.taskCreate.id}`)
+			history.replace(`/portal/task/${mutUpdateTask.data.taskCreate.code}`)
 			return
 		}
 
@@ -144,11 +162,11 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 			{mutUpdateTask.error && <ErrorNotification message={mutUpdateTask.error.message} />}
 
-			{/* {!isNewTask && (
+			{!isNewTask && (
 				<FormControl label="Code" error={errors.code ? errors.code.message : ""} positive="" disabled>
 					<Input name="code" inputRef={register} disabled />
 				</FormControl>
-			)} */}
+			)}
 
 			<FormControl label="Name" error={errors.title ? errors.title.message : ""} positive="">
 				<Input name="title" inputRef={register({ required: "Required" })} />
@@ -266,7 +284,60 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 				</Spaced>
 				{isNewTask ? (
 				editForm
-			) : (<div>view task</div>)}
+			) : (
+				<Tabs
+					onChange={({ activeKey }) => {
+						setActiveKey(activeKey.toString())
+						history.push(`/portal/sku/${code}${activeKey}`)
+					}}
+					activeKey={activeKey}
+					overrides={{
+						TabContent: {
+							style: { ...paddingZero },
+						},
+						TabBar: {
+							style: { ...paddingZero },
+						},
+					}}
+				>
+					<Tab
+						key="#details"
+						title={
+							<Spaced>
+								<FontAwesomeIcon icon={["fal", "pencil"]} />
+								<div>Details</div>
+							</Spaced>
+						}
+					>
+						{editForm}
+					</Tab>
+					{!isNewTask && task && (
+						<Tab
+							key="#products"
+							title={
+								<Spaced>
+									<FontAwesomeIcon icon={["fal", "steak"]} />
+									<div>Products</div>
+								</Spaced>
+							}
+						>
+							<ItemList
+								taskID={task.id}
+								itemName="product"
+								query={graphql.query.PRODUCTS}
+								batchActionMutation={graphql.mutation.BATCH_ACTION_PRODUCT}
+								extraFilterOptions={[
+									{ label: "Not in Carton", id: FilterOption.ProductWithoutCarton },
+									{ label: "Not in Order", id: FilterOption.ProductWithoutOrder },
+								]}
+								itemLinks={["order", "contract", "distributor", "carton"]}
+								actions={ActionItemSet.Products}
+								showQRCodesToggle
+							/>
+						</Tab>
+					)}
+				</Tabs>
+			)}
 			
 			<Modal isOpen={showPreviewModal} onClose={() => setShowPreviewModal(false)}>
 				

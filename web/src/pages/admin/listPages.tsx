@@ -486,7 +486,7 @@ const TasksList = () => (
 		query={graphql.query.TASKS}
 		batchActionMutation={graphql.mutation.BATCH_ACTION_TASK}
 		firstColumnValue="title"
-		firstColumnSubValue="finishDate"
+		firstColumnSubValue="code"
 		columns={[
 			{ label: "Products Amount", value: "loyaltyPoints" },
 			{
@@ -510,11 +510,11 @@ const ReferralList = () => (
 		firstColumnValue="isRedemmed"
 		firstColumnSubValue="createdAt"
 		columns={[
-			{ label: "UserFristName", value: "user" ,subValues: ["firstName"]},
-			{ label: "UserLastName", value: "user" ,subValues: ["lastName"]},
+			{ label: "UFName", value: "user" ,subValues: ["firstName"]},
+			{ label: "ULName", value: "user" ,subValues: ["lastName"]},
 			{ label: "RefralCode", value: "referee" ,subValues: ["referralCode"]},
-			{ label: "RefereeFristName", value: "referee" ,subValues: ["firstName"]},
-			{ label: "RefereeLastName", value: "referee" ,subValues: ["lastName"]},
+			{ label: "RFName", value: "referee" ,subValues: ["firstName"]},
+			{ label: "RLName", value: "referee" ,subValues: ["lastName"]},
 			{
 				label: "Date Created",
 				value: "createdAt",
@@ -531,16 +531,15 @@ const UserPurchaseActivityList = () => (
 	<ItemListPage
 		itemName="userPurchaseActivity"
 		header="UserPurchaseActivity"
-		query={graphql.query.REFERRALS}
+		query={graphql.query.USER_PURCHASE_ACTIVITIES}
 		batchActionMutation={graphql.mutation.BATCH_ACTION_SKU}
-		firstColumnValue="isRedemmed"
+		firstColumnValue="loyaltyPoints"
 		firstColumnSubValue="createdAt"
 		columns={[
-			{ label: "UserFristName", value: "user" ,subValues: ["firstName"]},
-			{ label: "UserLastName", value: "user" ,subValues: ["lastName"]},
-			{ label: "RefralCode", value: "referee" ,subValues: ["referralCode"]},
-			{ label: "RefereeFristName", value: "referee" ,subValues: ["firstName"]},
-			{ label: "RefereeLastName", value: "referee" ,subValues: ["lastName"]},
+			{ label: "UFName", value: "user" ,subValues: ["firstName"]},
+			{ label: "ULName", value: "user" ,subValues: ["lastName"]},
+			{ label: "UEmail", value: "user" ,subValues: ["email"]},
+			{ label: "ProductCode", value: "product" ,subValues: ["code"]},
 			{
 				label: "Date Created",
 				value: "createdAt",
@@ -555,16 +554,14 @@ const UserTaskList = () => (
 	<ItemListPage
 		itemName="userTask"
 		header="UserTask"
-		query={graphql.query.REFERRALS}
+		query={graphql.query.USER_TASKS}
 		batchActionMutation={graphql.mutation.BATCH_ACTION_SKU}
-		firstColumnValue="isRedemmed"
+		firstColumnValue="status"
 		firstColumnSubValue="createdAt"
 		columns={[
-			{ label: "UserFristName", value: "user" ,subValues: ["firstName"]},
+			{ label: "task", value: "task" ,subValues: ["title"]},
 			{ label: "UserLastName", value: "user" ,subValues: ["lastName"]},
-			{ label: "RefralCode", value: "referee" ,subValues: ["referralCode"]},
-			{ label: "RefereeFristName", value: "referee" ,subValues: ["firstName"]},
-			{ label: "RefereeLastName", value: "referee" ,subValues: ["lastName"]},
+			{ label: "USerEmail", value: "user" ,subValues: ["email"]},
 			{
 				label: "Date Created",
 				value: "createdAt",

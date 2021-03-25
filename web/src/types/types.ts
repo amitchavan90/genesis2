@@ -107,6 +107,7 @@ export interface SubTask {
 export interface Task{
 	id:string
     title:string
+	code: string
     description:String
     loyaltyPoints:number
     isTimeBound:boolean
