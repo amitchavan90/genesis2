@@ -32,6 +32,7 @@ type User struct {
 	AffiliateOrg       null.String `db:"affiliate_org" boil:"affiliate_org" json:"affiliate_org,omitempty" toml:"affiliate_org" yaml:"affiliate_org,omitempty"`
 	ReferralCode       null.String `db:"referral_code" boil:"referral_code" json:"referral_code,omitempty" toml:"referral_code" yaml:"referral_code,omitempty"`
 	MobilePhone        null.String `db:"mobile_phone" boil:"mobile_phone" json:"mobile_phone,omitempty" toml:"mobile_phone" yaml:"mobile_phone,omitempty"`
+	WalletPoints       int         `db:"wallet_points" boil:"wallet_points" json:"wallet_points" toml:"wallet_points" yaml:"wallet_points"`
 	MobileVerified     bool        `db:"mobile_verified" boil:"mobile_verified" json:"mobile_verified" toml:"mobile_verified" yaml:"mobile_verified"`
 	WechatID           null.String `db:"wechat_id" boil:"wechat_id" json:"wechat_id,omitempty" toml:"wechat_id" yaml:"wechat_id,omitempty"`
 	Verified           bool        `db:"verified" boil:"verified" json:"verified" toml:"verified" yaml:"verified"`
@@ -59,6 +60,7 @@ var UserColumns = struct {
 	AffiliateOrg       string
 	ReferralCode       string
 	MobilePhone        string
+	WalletPoints       string
 	MobileVerified     string
 	WechatID           string
 	Verified           string
@@ -81,6 +83,7 @@ var UserColumns = struct {
 	AffiliateOrg:       "affiliate_org",
 	ReferralCode:       "referral_code",
 	MobilePhone:        "mobile_phone",
+	WalletPoints:       "wallet_points",
 	MobileVerified:     "mobile_verified",
 	WechatID:           "wechat_id",
 	Verified:           "verified",
@@ -107,6 +110,7 @@ var UserWhere = struct {
 	AffiliateOrg       whereHelpernull_String
 	ReferralCode       whereHelpernull_String
 	MobilePhone        whereHelpernull_String
+	WalletPoints       whereHelperint
 	MobileVerified     whereHelperbool
 	WechatID           whereHelpernull_String
 	Verified           whereHelperbool
@@ -129,6 +133,7 @@ var UserWhere = struct {
 	AffiliateOrg:       whereHelpernull_String{field: "\"users\".\"affiliate_org\""},
 	ReferralCode:       whereHelpernull_String{field: "\"users\".\"referral_code\""},
 	MobilePhone:        whereHelpernull_String{field: "\"users\".\"mobile_phone\""},
+	WalletPoints:       whereHelperint{field: "\"users\".\"wallet_points\""},
 	MobileVerified:     whereHelperbool{field: "\"users\".\"mobile_verified\""},
 	WechatID:           whereHelpernull_String{field: "\"users\".\"wechat_id\""},
 	Verified:           whereHelperbool{field: "\"users\".\"verified\""},
@@ -218,9 +223,9 @@ func (*userR) NewStruct() *userR {
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "organisation_id", "role_id", "email", "first_name", "last_name", "affiliate_org", "referral_code", "mobile_phone", "mobile_verified", "wechat_id", "verified", "verify_token", "verify_token_expires", "reset_token", "reset_token_expires", "password_hash", "archived", "archived_at", "updated_at", "created_at"}
+	userAllColumns            = []string{"id", "organisation_id", "role_id", "email", "first_name", "last_name", "affiliate_org", "referral_code", "mobile_phone", "wallet_points", "mobile_verified", "wechat_id", "verified", "verify_token", "verify_token_expires", "reset_token", "reset_token_expires", "password_hash", "archived", "archived_at", "updated_at", "created_at"}
 	userColumnsWithoutDefault = []string{"organisation_id", "role_id", "email", "first_name", "last_name", "affiliate_org", "referral_code", "mobile_phone", "wechat_id", "password_hash", "archived_at"}
-	userColumnsWithDefault    = []string{"id", "mobile_verified", "verified", "verify_token", "verify_token_expires", "reset_token", "reset_token_expires", "archived", "updated_at", "created_at"}
+	userColumnsWithDefault    = []string{"id", "wallet_points", "mobile_verified", "verified", "verify_token", "verify_token_expires", "reset_token", "reset_token_expires", "archived", "updated_at", "created_at"}
 	userPrimaryKeyColumns     = []string{"id"}
 )
 

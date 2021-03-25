@@ -23,54 +23,64 @@ import (
 
 // Order is an object representing the database table.
 type Order struct {
-	ID          string    `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
-	Code        string    `db:"code" boil:"code" json:"code" toml:"code" yaml:"code"`
-	Archived    bool      `db:"archived" boil:"archived" json:"archived" toml:"archived" yaml:"archived"`
-	ArchivedAt  null.Time `db:"archived_at" boil:"archived_at" json:"archived_at,omitempty" toml:"archived_at" yaml:"archived_at,omitempty"`
-	UpdatedAt   time.Time `db:"updated_at" boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	CreatedAt   time.Time `db:"created_at" boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	CreatedByID string    `db:"created_by_id" boil:"created_by_id" json:"created_by_id" toml:"created_by_id" yaml:"created_by_id"`
+	ID           string    `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
+	Code         string    `db:"code" boil:"code" json:"code" toml:"code" yaml:"code"`
+	IsPointBound bool      `db:"is_point_bound" boil:"is_point_bound" json:"is_point_bound" toml:"is_point_bound" yaml:"is_point_bound"`
+	IsAppBound   bool      `db:"is_app_bound" boil:"is_app_bound" json:"is_app_bound" toml:"is_app_bound" yaml:"is_app_bound"`
+	Archived     bool      `db:"archived" boil:"archived" json:"archived" toml:"archived" yaml:"archived"`
+	ArchivedAt   null.Time `db:"archived_at" boil:"archived_at" json:"archived_at,omitempty" toml:"archived_at" yaml:"archived_at,omitempty"`
+	UpdatedAt    time.Time `db:"updated_at" boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	CreatedAt    time.Time `db:"created_at" boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	CreatedByID  string    `db:"created_by_id" boil:"created_by_id" json:"created_by_id" toml:"created_by_id" yaml:"created_by_id"`
 
 	R *orderR `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
 	L orderL  `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var OrderColumns = struct {
-	ID          string
-	Code        string
-	Archived    string
-	ArchivedAt  string
-	UpdatedAt   string
-	CreatedAt   string
-	CreatedByID string
+	ID           string
+	Code         string
+	IsPointBound string
+	IsAppBound   string
+	Archived     string
+	ArchivedAt   string
+	UpdatedAt    string
+	CreatedAt    string
+	CreatedByID  string
 }{
-	ID:          "id",
-	Code:        "code",
-	Archived:    "archived",
-	ArchivedAt:  "archived_at",
-	UpdatedAt:   "updated_at",
-	CreatedAt:   "created_at",
-	CreatedByID: "created_by_id",
+	ID:           "id",
+	Code:         "code",
+	IsPointBound: "is_point_bound",
+	IsAppBound:   "is_app_bound",
+	Archived:     "archived",
+	ArchivedAt:   "archived_at",
+	UpdatedAt:    "updated_at",
+	CreatedAt:    "created_at",
+	CreatedByID:  "created_by_id",
 }
 
 // Generated where
 
 var OrderWhere = struct {
-	ID          whereHelperstring
-	Code        whereHelperstring
-	Archived    whereHelperbool
-	ArchivedAt  whereHelpernull_Time
-	UpdatedAt   whereHelpertime_Time
-	CreatedAt   whereHelpertime_Time
-	CreatedByID whereHelperstring
+	ID           whereHelperstring
+	Code         whereHelperstring
+	IsPointBound whereHelperbool
+	IsAppBound   whereHelperbool
+	Archived     whereHelperbool
+	ArchivedAt   whereHelpernull_Time
+	UpdatedAt    whereHelpertime_Time
+	CreatedAt    whereHelpertime_Time
+	CreatedByID  whereHelperstring
 }{
-	ID:          whereHelperstring{field: "\"orders\".\"id\""},
-	Code:        whereHelperstring{field: "\"orders\".\"code\""},
-	Archived:    whereHelperbool{field: "\"orders\".\"archived\""},
-	ArchivedAt:  whereHelpernull_Time{field: "\"orders\".\"archived_at\""},
-	UpdatedAt:   whereHelpertime_Time{field: "\"orders\".\"updated_at\""},
-	CreatedAt:   whereHelpertime_Time{field: "\"orders\".\"created_at\""},
-	CreatedByID: whereHelperstring{field: "\"orders\".\"created_by_id\""},
+	ID:           whereHelperstring{field: "\"orders\".\"id\""},
+	Code:         whereHelperstring{field: "\"orders\".\"code\""},
+	IsPointBound: whereHelperbool{field: "\"orders\".\"is_point_bound\""},
+	IsAppBound:   whereHelperbool{field: "\"orders\".\"is_app_bound\""},
+	Archived:     whereHelperbool{field: "\"orders\".\"archived\""},
+	ArchivedAt:   whereHelpernull_Time{field: "\"orders\".\"archived_at\""},
+	UpdatedAt:    whereHelpertime_Time{field: "\"orders\".\"updated_at\""},
+	CreatedAt:    whereHelpertime_Time{field: "\"orders\".\"created_at\""},
+	CreatedByID:  whereHelperstring{field: "\"orders\".\"created_by_id\""},
 }
 
 // OrderRels is where relationship names are stored.
@@ -97,9 +107,9 @@ func (*orderR) NewStruct() *orderR {
 type orderL struct{}
 
 var (
-	orderAllColumns            = []string{"id", "code", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
+	orderAllColumns            = []string{"id", "code", "is_point_bound", "is_app_bound", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
 	orderColumnsWithoutDefault = []string{"code", "archived_at", "created_by_id"}
-	orderColumnsWithDefault    = []string{"id", "archived", "updated_at", "created_at"}
+	orderColumnsWithDefault    = []string{"id", "is_point_bound", "is_app_bound", "archived", "updated_at", "created_at"}
 	orderPrimaryKeyColumns     = []string{"id"}
 )
 

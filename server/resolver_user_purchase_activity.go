@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"genesis/db"
 	"genesis/graphql"
+	"log"
 
 	"github.com/gofrs/uuid"
 	"github.com/ninja-software/terror"
@@ -111,7 +112,49 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 		return nil, terror.New(err, "create user purchase")
 	}
 
-	// r.RecordUserActivity(ctx, "Created USer Purchase", graphql.ObjectTypeSku, &created.ID, &created.Code)
+	// Update user wallet points
+	user, err := r.UserStore.Get(userID)
+	if err != nil {
+		return nil, terror.New(err, "Error while getting user")
+	}
+
+	user.WalletPoints += created.LoyaltyPoints
+
+	// Update user
+	_, err = r.UserStore.Update(user)
+	if err != nil {
+		return nil, terror.New(err, "Error while updating user")
+	}
+
+	// Get referral if exists
+	referral, err := r.ReferralStore.GetByUserID(user.ID)
+	if err != nil {
+		referral = nil
+	}
+
+	if referral != nil && !referral.IsRedemmed {
+		// Update wallet points of the referee with 10 points
+		refID, _ := uuid.FromString(referral.ReferredByID.String)
+		referee, err := r.UserStore.Get(refID)
+		if err != nil {
+			log.Println("Referee not found in users db")
+		}
+		referee.WalletPoints += 10
+
+		// Update referee
+		_, err = r.UserStore.Update(referee)
+		if err != nil {
+			fmt.Println("Error while updating referee")
+		}
+
+		referral.IsRedemmed = true
+		_, err = r.ReferralStore.Update(referral)
+		if err != nil {
+			fmt.Println("Error while updating referral")
+		}
+	}
+
+	// r.RecordUserActivity(ctx, "Created User Purchase", graphql.ObjectTypeSku, &created.ID, &created.Code)
 
 	return created, nil
 }

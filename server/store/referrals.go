@@ -45,6 +45,11 @@ func (s *Referrals) All(txes ...*sql.Tx) (db.ReferralSlice, error) {
 	return db.Referrals().All(s.Conn)
 }
 
+// Count gives the amount of referrals
+func (s *Referrals) Count() (int64, error) {
+	return db.Referrals().Count(s.Conn)
+}
+
 // SearchSelect searchs/selects referrals
 func (s *Referrals) SearchSelect(search graphql.SearchFilter, limit int, offset int) (int64, []*db.Referral, error) {
 	queries := []qm.QueryMod{}
@@ -106,6 +111,15 @@ func (s *Referrals) SearchSelect(search graphql.SearchFilter, limit int, offset 
 // 	}
 // 	return dat, nil
 // }
+
+// GetByCode by code
+func (s *Referrals) GetByCode(code string, txes ...*sql.Tx) (*db.Referral, error) {
+	dat, err := db.Referrals(db.ReferralWhere.Code.EQ(code)).One(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
 
 // GetReferee returns a referral given an userID
 func (s *Referrals) GetReferee(refereeID string, txes ...*sql.Tx) (*db.User, error) {
@@ -176,8 +190,6 @@ func (s *Referrals) GetByUserID(userID string, txes ...*sql.Tx) (*db.Referral, e
 // Insert a referral
 func (s *Referrals) Insert(u *db.Referral, txes ...*sql.Tx) (*db.Referral, error) {
 	var err error
-
-	fmt.Println("Referral Store: Insert")
 
 	handleTransactions(s.Conn, func(tx *sql.Tx) error {
 		return u.Insert(tx, boil.Infer())

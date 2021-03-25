@@ -24,6 +24,7 @@ import (
 // UserTask is an object representing the database table.
 type UserTask struct {
 	ID         string      `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
+	Code       string      `db:"code" boil:"code" json:"code" toml:"code" yaml:"code"`
 	TaskID     null.String `db:"task_id" boil:"task_id" json:"task_id,omitempty" toml:"task_id" yaml:"task_id,omitempty"`
 	UserID     string      `db:"user_id" boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 	Status     string      `db:"status" boil:"status" json:"status" toml:"status" yaml:"status"`
@@ -37,6 +38,7 @@ type UserTask struct {
 
 var UserTaskColumns = struct {
 	ID         string
+	Code       string
 	TaskID     string
 	UserID     string
 	Status     string
@@ -45,6 +47,7 @@ var UserTaskColumns = struct {
 	CreatedAt  string
 }{
 	ID:         "id",
+	Code:       "code",
 	TaskID:     "task_id",
 	UserID:     "user_id",
 	Status:     "status",
@@ -57,6 +60,7 @@ var UserTaskColumns = struct {
 
 var UserTaskWhere = struct {
 	ID         whereHelperstring
+	Code       whereHelperstring
 	TaskID     whereHelpernull_String
 	UserID     whereHelperstring
 	Status     whereHelperstring
@@ -65,6 +69,7 @@ var UserTaskWhere = struct {
 	CreatedAt  whereHelpertime_Time
 }{
 	ID:         whereHelperstring{field: "\"user_tasks\".\"id\""},
+	Code:       whereHelperstring{field: "\"user_tasks\".\"code\""},
 	TaskID:     whereHelpernull_String{field: "\"user_tasks\".\"task_id\""},
 	UserID:     whereHelperstring{field: "\"user_tasks\".\"user_id\""},
 	Status:     whereHelperstring{field: "\"user_tasks\".\"status\""},
@@ -100,8 +105,8 @@ func (*userTaskR) NewStruct() *userTaskR {
 type userTaskL struct{}
 
 var (
-	userTaskAllColumns            = []string{"id", "task_id", "user_id", "status", "is_complete", "updated_at", "created_at"}
-	userTaskColumnsWithoutDefault = []string{"task_id", "user_id", "status"}
+	userTaskAllColumns            = []string{"id", "code", "task_id", "user_id", "status", "is_complete", "updated_at", "created_at"}
+	userTaskColumnsWithoutDefault = []string{"code", "task_id", "user_id", "status"}
 	userTaskColumnsWithDefault    = []string{"id", "is_complete", "updated_at", "created_at"}
 	userTaskPrimaryKeyColumns     = []string{"id"}
 )

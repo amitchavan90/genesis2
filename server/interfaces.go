@@ -231,7 +231,7 @@ type UserStorer interface {
 	SearchSelect(search graphql.SearchFilter, limit int, offset int, consumer bool) (int64, []*db.User, error)
 	GetByOrganisation(orgID uuid.UUID, txes ...*sql.Tx) (db.UserSlice, error)
 	Insert(u *db.User, tx ...*sql.Tx) (*db.User, error)
-	InsertUserAndReferral(u *db.User, referredByID string, tx ...*sql.Tx) (*db.User, error)
+	// InsertUserAndReferral(u *db.User, referredByID string, tx ...*sql.Tx) (*db.User, error)
 	Update(u *db.User, tx ...*sql.Tx) (*db.User, error)
 	Archive(id uuid.UUID, txes ...*sql.Tx) (*db.User, error)
 	Unarchive(id uuid.UUID, txes ...*sql.Tx) (*db.User, error)
@@ -245,8 +245,10 @@ type ReferralStorer interface {
 	// GetByReferredByID(refByID null.String, txes ...*sql.Tx) (*db.Referral, error)
 	GetByUserID(userID string, txes ...*sql.Tx) (*db.Referral, error)
 	Get(id uuid.UUID, txes ...*sql.Tx) (*db.Referral, error)
+	GetByCode(code string, txes ...*sql.Tx) (*db.Referral, error)
 	GetMany(keys []string, txes ...*sql.Tx) (db.ReferralSlice, []error)
 	All(txes ...*sql.Tx) (db.ReferralSlice, error)
+	Count() (int64, error)
 	SearchSelect(search graphql.SearchFilter, limit int, offset int) (int64, []*db.Referral, error)
 	Insert(u *db.Referral, tx ...*sql.Tx) (*db.Referral, error)
 	Update(u *db.Referral, tx ...*sql.Tx) (*db.Referral, error)
@@ -272,6 +274,7 @@ type RoleStorer interface {
 // TaskStorer collects all role methods
 type TaskStorer interface {
 	Get(id uuid.UUID, txes ...*sql.Tx) (*db.Task, error)
+	GetByCode(code string, txes ...*sql.Tx) (*db.Task, error)
 	GetMany(keys []string, txes ...*sql.Tx) (db.TaskSlice, []error)
 	GetSubtasks(taskID string, txes ...*sql.Tx) (db.SubtaskSlice, error)
 	GetSku(skuID string, txes ...*sql.Tx) (*db.StockKeepingUnit, error)
@@ -288,6 +291,7 @@ type TaskStorer interface {
 // UserTaskStorer collects all role methods
 type UserTaskStorer interface {
 	Get(id uuid.UUID, txes ...*sql.Tx) (*db.UserTask, error)
+	GetByCode(code string, txes ...*sql.Tx) (*db.UserTask, error)
 	GetMany(keys []string, txes ...*sql.Tx) (db.UserTaskSlice, []error)
 	GetSubtasks(userTaskID string, txes ...*sql.Tx) (db.UserSubtaskSlice, error)
 	GetSubtask(subTaskID string, txes ...*sql.Tx) (*db.Subtask, error)

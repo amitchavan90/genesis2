@@ -209,10 +209,33 @@ func (r *mutationResolver) UserCreate(ctx context.Context, input graphql.UpdateU
 
 	// Set/Genetate referral code
 	u.ReferralCode = null.StringFrom(helpers.GenerateID(7))
-	referredByID := referee.ID
+	// referredByID := referee.ID
 
 	// Create user
-	created, err := r.UserStore.InsertUserAndReferral(u, referredByID)
+	created, err := r.UserStore.Insert(u)
+	if err != nil {
+		return nil, terror.New(err, "create user")
+	}
+
+	// Get Referral count
+	count, err := r.ReferralStore.Count()
+	if err != nil {
+		return nil, terror.New(err, "create referral: Error while fetching referral count from db")
+	}
+
+	// Define Referrel model
+	ref := &db.Referral{
+		Code: fmt.Sprintf("T%05d", count+1),
+	}
+
+	refID, _ := uuid.NewV4()
+	ref.ID = refID.String()
+	ref.UserID = created.ID
+	ref.ReferredByID = null.StringFrom(referee.ID)
+	ref.IsRedemmed = false
+
+	// Create referral
+	_, err = r.ReferralStore.Insert(ref)
 	if err != nil {
 		return nil, terror.New(err, "create user")
 	}

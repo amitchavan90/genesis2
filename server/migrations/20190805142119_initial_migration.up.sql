@@ -60,6 +60,7 @@ CREATE TABLE users (
     affiliate_org text,
     referral_code text,
     mobile_phone text UNIQUE,
+    wallet_points integer NOT NULL DEFAULT 0,
     mobile_verified boolean NOT NULL DEFAULT FALSE,
     wechat_id text UNIQUE,
     verified boolean NOT NULL DEFAULT FALSE,
@@ -75,6 +76,7 @@ CREATE TABLE users (
 );
 CREATE TABLE referrals (
     id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid (),
+    code text UNIQUE NOT NULL,
     user_id uuid NOT NULL REFERENCES users (id),
     referred_by_id uuid REFERENCES users (id),
     is_redemmed boolean NOT NULL DEFAULT FALSE,
@@ -175,6 +177,7 @@ CREATE TABLE subtasks (
 );
 CREATE TABLE user_tasks (
     id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid (),
+    code text UNIQUE NOT NULL,
     task_id uuid REFERENCES tasks (id),
     user_id uuid NOT NULL REFERENCES users (id),
     status text NOT NULL,
@@ -211,6 +214,8 @@ CREATE TABLE contracts (
 CREATE TABLE orders (
     id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid (),
     code text UNIQUE NOT NULL,
+    is_point_bound boolean NOT NULL DEFAULT FALSE,
+    is_app_bound boolean NOT NULL DEFAULT FALSE,
     archived boolean NOT NULL DEFAULT FALSE,
     archived_at timestamptz,
     updated_at timestamptz NOT NULL DEFAULT NOW(),
@@ -272,8 +277,8 @@ CREATE TABLE products (
     description text NOT NULL DEFAULT '',
     register_id uuid NOT NULL DEFAULT gen_random_uuid (),
     is_beef boolean NOT NULL DEFAULT FALSE,
-    is_point_product boolean NOT NULL DEFAULT FALSE,
-    is_app_product boolean NOT NULL DEFAULT FALSE,
+    is_point_bound boolean NOT NULL DEFAULT FALSE,
+    is_app_bound boolean NOT NULL DEFAULT FALSE,
     loyalty_points int NOT NULL DEFAULT 0,
     loyalty_points_expire timestamptz NOT NULL DEFAULT NOW(),
     sku_id uuid REFERENCES stock_keeping_units (id),

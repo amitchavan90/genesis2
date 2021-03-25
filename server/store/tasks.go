@@ -52,7 +52,7 @@ func (s *Tasks) All(txes ...*sql.Tx) (db.TaskSlice, error) {
 
 // Count gives the amount of tasks
 func (s *Tasks) Count() (int64, error) {
-	return db.StockKeepingUnits().Count(s.Conn)
+	return db.Tasks().Count(s.Conn)
 }
 
 // SearchSelect searchs/selects tasks
@@ -117,6 +117,15 @@ func (s *Tasks) SearchSelect(search graphql.SearchFilter, limit int, offset int)
 	}
 
 	return count, records, nil
+}
+
+// GetByCode by code
+func (s *Tasks) GetByCode(code string, txes ...*sql.Tx) (*db.Task, error) {
+	dat, err := db.Tasks(db.TaskWhere.Code.EQ(code)).One(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
 }
 
 // GetSku by skuID

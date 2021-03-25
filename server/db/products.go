@@ -28,8 +28,8 @@ type Product struct {
 	Description         string      `db:"description" boil:"description" json:"description" toml:"description" yaml:"description"`
 	RegisterID          string      `db:"register_id" boil:"register_id" json:"register_id" toml:"register_id" yaml:"register_id"`
 	IsBeef              bool        `db:"is_beef" boil:"is_beef" json:"is_beef" toml:"is_beef" yaml:"is_beef"`
-	IsPointProduct      bool        `db:"is_point_product" boil:"is_point_product" json:"is_point_product" toml:"is_point_product" yaml:"is_point_product"`
-	IsAppProduct        bool        `db:"is_app_product" boil:"is_app_product" json:"is_app_product" toml:"is_app_product" yaml:"is_app_product"`
+	IsPointBound        bool        `db:"is_point_bound" boil:"is_point_bound" json:"is_point_bound" toml:"is_point_bound" yaml:"is_point_bound"`
+	IsAppBound          bool        `db:"is_app_bound" boil:"is_app_bound" json:"is_app_bound" toml:"is_app_bound" yaml:"is_app_bound"`
 	LoyaltyPoints       int         `db:"loyalty_points" boil:"loyalty_points" json:"loyalty_points" toml:"loyalty_points" yaml:"loyalty_points"`
 	LoyaltyPointsExpire time.Time   `db:"loyalty_points_expire" boil:"loyalty_points_expire" json:"loyalty_points_expire" toml:"loyalty_points_expire" yaml:"loyalty_points_expire"`
 	SkuID               null.String `db:"sku_id" boil:"sku_id" json:"sku_id,omitempty" toml:"sku_id" yaml:"sku_id,omitempty"`
@@ -55,8 +55,8 @@ var ProductColumns = struct {
 	Description         string
 	RegisterID          string
 	IsBeef              string
-	IsPointProduct      string
-	IsAppProduct        string
+	IsPointBound        string
+	IsAppBound          string
 	LoyaltyPoints       string
 	LoyaltyPointsExpire string
 	SkuID               string
@@ -77,8 +77,8 @@ var ProductColumns = struct {
 	Description:         "description",
 	RegisterID:          "register_id",
 	IsBeef:              "is_beef",
-	IsPointProduct:      "is_point_product",
-	IsAppProduct:        "is_app_product",
+	IsPointBound:        "is_point_bound",
+	IsAppBound:          "is_app_bound",
 	LoyaltyPoints:       "loyalty_points",
 	LoyaltyPointsExpire: "loyalty_points_expire",
 	SkuID:               "sku_id",
@@ -103,8 +103,8 @@ var ProductWhere = struct {
 	Description         whereHelperstring
 	RegisterID          whereHelperstring
 	IsBeef              whereHelperbool
-	IsPointProduct      whereHelperbool
-	IsAppProduct        whereHelperbool
+	IsPointBound        whereHelperbool
+	IsAppBound          whereHelperbool
 	LoyaltyPoints       whereHelperint
 	LoyaltyPointsExpire whereHelpertime_Time
 	SkuID               whereHelpernull_String
@@ -125,8 +125,8 @@ var ProductWhere = struct {
 	Description:         whereHelperstring{field: "\"products\".\"description\""},
 	RegisterID:          whereHelperstring{field: "\"products\".\"register_id\""},
 	IsBeef:              whereHelperbool{field: "\"products\".\"is_beef\""},
-	IsPointProduct:      whereHelperbool{field: "\"products\".\"is_point_product\""},
-	IsAppProduct:        whereHelperbool{field: "\"products\".\"is_app_product\""},
+	IsPointBound:        whereHelperbool{field: "\"products\".\"is_point_bound\""},
+	IsAppBound:          whereHelperbool{field: "\"products\".\"is_app_bound\""},
 	LoyaltyPoints:       whereHelperint{field: "\"products\".\"loyalty_points\""},
 	LoyaltyPointsExpire: whereHelpertime_Time{field: "\"products\".\"loyalty_points_expire\""},
 	SkuID:               whereHelpernull_String{field: "\"products\".\"sku_id\""},
@@ -188,9 +188,9 @@ func (*productR) NewStruct() *productR {
 type productL struct{}
 
 var (
-	productAllColumns            = []string{"id", "code", "description", "register_id", "is_beef", "is_point_product", "is_app_product", "loyalty_points", "loyalty_points_expire", "sku_id", "carton_id", "order_id", "contract_id", "distributor_id", "close_register_id", "transaction_hash", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
+	productAllColumns            = []string{"id", "code", "description", "register_id", "is_beef", "is_point_bound", "is_app_bound", "loyalty_points", "loyalty_points_expire", "sku_id", "carton_id", "order_id", "contract_id", "distributor_id", "close_register_id", "transaction_hash", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
 	productColumnsWithoutDefault = []string{"code", "sku_id", "carton_id", "order_id", "contract_id", "distributor_id", "close_register_id", "transaction_hash", "archived_at", "created_by_id"}
-	productColumnsWithDefault    = []string{"id", "description", "register_id", "is_beef", "is_point_product", "is_app_product", "loyalty_points", "loyalty_points_expire", "archived", "updated_at", "created_at"}
+	productColumnsWithDefault    = []string{"id", "description", "register_id", "is_beef", "is_point_bound", "is_app_bound", "loyalty_points", "loyalty_points_expire", "archived", "updated_at", "created_at"}
 	productPrimaryKeyColumns     = []string{"id"}
 )
 

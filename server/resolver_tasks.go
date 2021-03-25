@@ -74,9 +74,8 @@ func (r *taskResolver) BannerPhoto(ctx context.Context, obj *db.Task) (*db.Blob,
 //   Query   //
 ///////////////
 
-func (r *queryResolver) Task(ctx context.Context, id *string) (*db.Task, error) {
-	taskUUID, err := uuid.FromString(*id)
-	task, err := r.TaskStore.Get(taskUUID)
+func (r *queryResolver) Task(ctx context.Context, code *string) (*db.Task, error) {
+	task, err := r.TaskStore.GetByCode(*code)
 	if err != nil {
 		return nil, terror.New(err, "get task")
 	}
@@ -111,7 +110,7 @@ func (r *mutationResolver) TaskCreate(ctx context.Context, input graphql.UpdateT
 
 	// Create Task
 	t := &db.Task{
-		Code: fmt.Sprintf("T%05d", count),
+		Code: fmt.Sprintf("T%05d", count+1),
 	}
 
 	taskUUID, _ := uuid.NewV4()

@@ -1,5 +1,6 @@
 type Referral {
 	id: ID!
+	code: String!
 	user: User
 	referee: User
 	isRedemmed: Boolean!

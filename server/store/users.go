@@ -239,32 +239,32 @@ func (s *Users) Insert(u *db.User, txes ...*sql.Tx) (*db.User, error) {
 }
 
 // InsertUserAndReferral a user
-func (s *Users) InsertUserAndReferral(u *db.User, referredByID string, txes ...*sql.Tx) (*db.User, error) {
-	var err error
+// func (s *Users) InsertUserAndReferral(u *db.User, referredByID string, txes ...*sql.Tx) (*db.User, error) {
+// 	var err error
 
-	handleTransactions(s.Conn, func(tx *sql.Tx) error {
-		return u.Insert(tx, boil.Infer())
-	}, txes...)
+// 	handleTransactions(s.Conn, func(tx *sql.Tx) error {
+// 		return u.Insert(tx, boil.Infer())
+// 	}, txes...)
 
-	err = u.Reload(s.Conn)
-	if err != nil {
-		return nil, terror.New(err, "")
-	}
+// 	err = u.Reload(s.Conn)
+// 	if err != nil {
+// 		return nil, terror.New(err, "")
+// 	}
 
-	// Define Referrel model
-	ref := db.Referral{}
-	refID, _ := uuid.NewV4()
-	ref.ID = refID.String()
-	ref.UserID = u.ID
-	ref.ReferredByID = null.StringFrom(referredByID)
-	ref.IsRedemmed = false
+// 	// Define Referrel model
+// 	ref := db.Referral{}
+// 	refID, _ := uuid.NewV4()
+// 	ref.ID = refID.String()
+// 	ref.UserID = u.ID
+// 	ref.ReferredByID = null.StringFrom(referredByID)
+// 	ref.IsRedemmed = false
 
-	handleTransactions(s.Conn, func(tx *sql.Tx) error {
-		return ref.Insert(tx, boil.Infer())
-	}, txes...)
+// 	handleTransactions(s.Conn, func(tx *sql.Tx) error {
+// 		return ref.Insert(tx, boil.Infer())
+// 	}, txes...)
 
-	return u, nil
-}
+// 	return u, nil
+// }
 
 // Update a user
 func (s *Users) Update(u *db.User, txes ...*sql.Tx) (*db.User, error) {
