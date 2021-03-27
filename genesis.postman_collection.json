@@ -20,15 +20,45 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8081/api/auth/login",
+					"raw": "localhost:8080/api/auth/login",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"auth",
 						"login"
+					]
+				},
+				"description": "Login returns header with Set-Cookie, where jwt token is defined"
+			},
+			"response": []
+		},
+		{
+			"name": "Register User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"usernamae@example.com\",\n    \"firstName\": \"User\",\n    \"lastName\": \"Name\",\n    \"mobilePhone\": \"789456125\",\n    \"roleID\": \"ee3e2c32-853d-4649-a6fb-aa68f657cd47\",\n    \"password\": \"Password$123\",\n    \"referredByCode\": \"3645748\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/auth/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"register"
 					]
 				},
 				"description": "Login returns header with Set-Cookie, where jwt token is defined"
@@ -43,23 +73,23 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiI3NzYwZmI3ZS0yZjFmLTRhNGItODhhOC1lNTAxZmYwZjMwOGEiLCJ0b2tlbklkIjoiYzhlNWNlNTItYjBiYy00MDlhLWE0YjctNzE5NjQyYmI1ZTYzIiwidWlkIjoiMTdlNTIzYzUtNDA1Zi00YzRjLWFlODctOGYzNGYyMzU4ZWM1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Y9VHqsW_BOaMBJx4mcC9yEnsjT1mF9xUVrlthsaXIys; Path=/; Expires=Thu, 15 Apr 2021 14:04:30 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJlZTNlMmMzMi04NTNkLTQ2NDktYTZmYi1hYTY4ZjY1N2NkNDciLCJ0b2tlbklkIjoiOWVhZWI0MjctYTUxZC00NzdmLWJmMTctYzI4ZTk1OWFlMTFiIiwidWlkIjoiNWI3YjFjMGUtYmUwNC00OTYwLTk5ZjItNjFlZDU2ZTNjYTRkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.eGx2dbR0FeDXaXvFteRDz_wLo2UvaboNNZnc37RdAno; Path=/; Expires=Sat, 24 Apr 2021 05:25:36 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query {\n  referrals(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      referrals {\n          id,\n          referee {\n              id,\n              firstName,\n              lastName,\n              referralCode\n          },\n          isRedemmed,\n          createdAt,\n          user {\n              firstName,\n              lastName,\n              email\n          }\n      }\n      total\n  }\n}",
+						"query": "query {\n  referrals(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      referrals {\n          id,\n          code,\n          referee {\n              id,\n              firstName,\n              lastName,\n              referralCode\n          },\n          isRedemmed,\n          createdAt,\n          user {\n              firstName,\n              lastName,\n              email\n          }\n      }\n      total\n  }\n}",
 						"variables": ""
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/api/gql/query",
+					"raw": "http://localhost:8080/api/gql/query",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"gql",
@@ -71,30 +101,30 @@
 			"response": []
 		},
 		{
-			"name": "User LIst",
+			"name": "User List",
 			"request": {
 				"method": "POST",
 				"header": [
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJlZTNlMmMzMi04NTNkLTQ2NDktYTZmYi1hYTY4ZjY1N2NkNDciLCJ0b2tlbklkIjoiOWVhZWI0MjctYTUxZC00NzdmLWJmMTctYzI4ZTk1OWFlMTFiIiwidWlkIjoiNWI3YjFjMGUtYmUwNC00OTYwLTk5ZjItNjFlZDU2ZTNjYTRkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.eGx2dbR0FeDXaXvFteRDz_wLo2UvaboNNZnc37RdAno; Path=/; Expires=Sat, 24 Apr 2021 05:25:36 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query {\n  users(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      users {\n          id,\n          email,\n          firstName,\n          lastName,\n          mobilePhone,\n          organisation {\n              id\n          },\n          role {\n              id\n          },\n          referrals {\n            id,\n            user {\n                id,\n                firstName\n            },\n            referee {\n                id,\n                firstName,\n                referralCode\n            },\n            isRedemmed,\n            createdAt\n          }\n      }\n      total\n  }\n}",
+						"query": "query {\n  users(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      users {\n          id,\n          email,\n          firstName,\n          lastName,\n          mobilePhone,\n          walletPoints,\n          referralCode,\n          organisation {\n              id\n          },\n          role {\n              id\n          },\n          referrals {\n            id,\n            user {\n                id,\n                firstName\n            },\n            referee {\n                id,\n                firstName,\n                referralCode\n            },\n            isRedemmed,\n            createdAt\n          }\n      }\n      total\n  }\n}",
 						"variables": ""
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/api/gql/query",
+					"raw": "http://localhost:8080/api/gql/query",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"gql",
@@ -183,13 +213,13 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJlZTNlMmMzMi04NTNkLTQ2NDktYTZmYi1hYTY4ZjY1N2NkNDciLCJ0b2tlbklkIjoiOWVhZWI0MjctYTUxZC00NzdmLWJmMTctYzI4ZTk1OWFlMTFiIiwidWlkIjoiNWI3YjFjMGUtYmUwNC00OTYwLTk5ZjItNjFlZDU2ZTNjYTRkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.eGx2dbR0FeDXaXvFteRDz_wLo2UvaboNNZnc37RdAno; Path=/; Expires=Sat, 24 Apr 2021 05:25:36 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query {\n  tasks(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      tasks {\n          id,\n          code,\n          title,\n          description,\n          isTimeBound,\n          isPeopleBound,\n          isProductRelevant,\n          isFinal,\n          finishDate,\n          maximumPeople,\n          skuID,\n          subtasks {\n              id,\n              title,\n              description\n          },\n          createdAt\n      }\n      total\n  }\n}",
+						"query": "query {\n  tasks(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      tasks {\n          id,\n          code,\n          title,\n          description,\n          isTimeBound,\n          isPeopleBound,\n          isProductRelevant,\n          isFinal,\n          finishDate,\n          maximumPeople,\n          skuID,\n          subtasks {\n              id,\n              title,\n              description\n          },\n          brandLogo {\n              id\n          },\n          bannerPhoto {\n              id\n          }\n          createdAt\n      }\n      total\n  }\n}",
 						"variables": ""
 					}
 				},
@@ -211,20 +241,20 @@
 			"response": []
 		},
 		{
-			"name": "Task Get By ID",
+			"name": "Task Get By Code",
 			"request": {
 				"method": "POST",
 				"header": [
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJlZTNlMmMzMi04NTNkLTQ2NDktYTZmYi1hYTY4ZjY1N2NkNDciLCJ0b2tlbklkIjoiOWVhZWI0MjctYTUxZC00NzdmLWJmMTctYzI4ZTk1OWFlMTFiIiwidWlkIjoiNWI3YjFjMGUtYmUwNC00OTYwLTk5ZjItNjFlZDU2ZTNjYTRkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.eGx2dbR0FeDXaXvFteRDz_wLo2UvaboNNZnc37RdAno; Path=/; Expires=Sat, 24 Apr 2021 05:25:36 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query task {\n  task(id: \"45690607-4ff8-4dbd-ba52-6441d0003e36\") {\n    id,\n    title,\n    description,\n    loyaltyPoints,\n    isTimeBound,\n    isPeopleBound,\n    isProductRelevant,\n    finishDate,\n    maximumPeople,\n    skuID,\n    subtasks {\n        id,\n        title,\n        description\n    }\n    createdAt\n  }\n}",
+						"query": "query task {\n  task(code: \"T00002\") {\n    id,\n    code,\n    title,\n    description,\n    loyaltyPoints,\n    isTimeBound,\n    isPeopleBound,\n    isProductRelevant,\n    finishDate,\n    maximumPeople,\n    skuID,\n    subtasks {\n        id,\n        title,\n        description\n    }\n    createdAt\n  }\n}",
 						"variables": ""
 					}
 				},
@@ -253,13 +283,13 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJjOTlmNGMxYy1iNjhmLTQ2NzQtOGJiZi1jYzQyMDZlNDdhMzUiLCJ0b2tlbklkIjoiYTQ0NDE0MmMtZTgxNi00NWYyLWI2ZmQtMzIyYmE5MjVkMDNlIiwidWlkIjoiNGEzZDcxZjAtZTQzYy00NTA3LTgyYWQtNDViNDA1MmRlNzE5IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.lnztxQGBmft9Kx2KsdKfPWGOgKN0EQROLV9eNz5tp2E; Path=/; Expires=Fri, 23 Apr 2021 07:52:35 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation taskCreate {\n    taskCreate(\n        input: {\n            title: \"Task 1\"\n            description: \"Task One\"\n            loyaltyPoints: 50\n            isTimeBound: true\n            isPeopleBound: true\n            isProductRelevant: false\n            finishDate: \"2021-04-06T15:04:05Z\"\n            maximumPeople: 10\n            subtasks: [\n                {\n                    title: \"Subtask 1\"\n                    description: \"Subtask One\"\n                },\n                {\n                    title: \"Subtask 2\"\n                    description: \"Subtask Two\"\n                }\n            ]\n        }\n    ) {\n        id,\n        code,\n        title,\n        description,\n        loyaltyPoints,\n        isTimeBound,\n        isPeopleBound,\n        isProductRelevant,\n        isFinal,\n        finishDate,\n        maximumPeople,\n        skuID,\n        subtasks {\n            id,\n            title,\n            description\n        }\n    }\n}",
+						"query": "mutation taskCreate {\n    taskCreate(\n        input: {\n            title: \"Task 2\"\n            description: \"Task Two\"\n            loyaltyPoints: 50\n            isTimeBound: true\n            isPeopleBound: true\n            isProductRelevant: false\n            finishDate: \"2021-04-06T15:04:05Z\"\n            maximumPeople: 10\n            subtasks: [\n                {\n                    title: \"Subtask 3\"\n                    description: \"Subtask Three\"\n                },\n                {\n                    title: \"Subtask 4\"\n                    description: \"Subtask Four\"\n                }\n            ]\n        }\n    ) {\n        id,\n        code,\n        title,\n        description,\n        loyaltyPoints,\n        isTimeBound,\n        isPeopleBound,\n        isProductRelevant,\n        isFinal,\n        finishDate,\n        maximumPeople,\n        skuID,\n        subtasks {\n            id,\n            title,\n            description\n        }\n    }\n}",
 						"variables": ""
 					}
 				},
@@ -288,23 +318,23 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiN2Q0ZmRiMDktZDlhZS00NDg3LThiYzUtODczNDAxZGQwMDZmIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Gm_pA--TZoC-eV4gtH4sRGIEGcGU0R5z5bIHpZEsNog; Path=/; Expires=Thu, 22 Apr 2021 13:05:19 GMT; HttpOnly; SameSite=NoneQC"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJlZTNlMmMzMi04NTNkLTQ2NDktYTZmYi1hYTY4ZjY1N2NkNDciLCJ0b2tlbklkIjoiOWVhZWI0MjctYTUxZC00NzdmLWJmMTctYzI4ZTk1OWFlMTFiIiwidWlkIjoiNWI3YjFjMGUtYmUwNC00OTYwLTk5ZjItNjFlZDU2ZTNjYTRkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.eGx2dbR0FeDXaXvFteRDz_wLo2UvaboNNZnc37RdAno; Path=/; Expires=Sat, 24 Apr 2021 05:25:36 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query {\n  skus(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      skus {\n          id,\n          name,\n          code,\n          description,\n          weight,\n          weightUnit,\n          price,\n          currency,\n          isBeef,\n          isAppSku,\n          isPointSku,\n          hasClones,\n          masterPlan {\n              id\n          },\n          video {\n              id\n          }\n          loyaltyPoints,\n          cloneParentID,\n          archived,\n          createdAt,\n          urls {\n              title,\n              content\n          },\n          productInfo {\n              title,\n              content\n          },\n          photos {\n              id\n          },\n          categories {\n              id,\n              name\n          },\n          productCategories {\n              id,\n              name\n          },\n          productCount\n      }\n      total\n  }\n}",
+						"query": "query {\n  skus(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      skus {\n          id,\n          code,\n          name,\n          description,\n          weight,\n          weightUnit,\n          price,\n          currency,\n          isBeef,\n          isAppSku,\n          isPointSku,\n          hasClones,\n          masterPlan {\n              id\n          },\n          video {\n              id\n          }\n          loyaltyPoints,\n          cloneParentID,\n          archived,\n          createdAt,\n          urls {\n              title,\n              content\n          },\n          productInfo {\n              title,\n              content\n          },\n          photos {\n              id\n          },\n          categories {\n              id,\n              name\n          },\n          productCategories {\n              id,\n              name\n          },\n          productCount\n      }\n      total\n  }\n}",
 						"variables": ""
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/api/gql/query",
+					"raw": "http://localhost:8080/api/gql/query",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"gql",
@@ -323,23 +353,23 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiN2Q0ZmRiMDktZDlhZS00NDg3LThiYzUtODczNDAxZGQwMDZmIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Gm_pA--TZoC-eV4gtH4sRGIEGcGU0R5z5bIHpZEsNog; Path=/; Expires=Thu, 22 Apr 2021 13:05:19 GMT; HttpOnly; SameSite=NoneQC"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJlZTNlMmMzMi04NTNkLTQ2NDktYTZmYi1hYTY4ZjY1N2NkNDciLCJ0b2tlbklkIjoiOWVhZWI0MjctYTUxZC00NzdmLWJmMTctYzI4ZTk1OWFlMTFiIiwidWlkIjoiNWI3YjFjMGUtYmUwNC00OTYwLTk5ZjItNjFlZDU2ZTNjYTRkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.eGx2dbR0FeDXaXvFteRDz_wLo2UvaboNNZnc37RdAno; Path=/; Expires=Sat, 24 Apr 2021 05:25:36 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation productCreate {\n    productCreate(\n        input: {\n            skuID: \"d9be308d-5bde-47ae-abd9-6b2e0f17b94a\",\n            description: \"Sample Description\"\n        }\n    ) {\n        id,\n        code,\n        registerID,\n        loyaltyPoints,\n        sku {\n            id,\n            code,\n            name\n        }\n\n    }\n}",
+						"query": "mutation productCreate {\n    productCreate(\n        input: {\n            skuID: \"db65d71c-92c5-45db-a96c-c4ac75096a13\",\n            description: \"Sample Description\"\n        }\n    ) {\n        id,\n        code,\n        registerID,\n        loyaltyPoints,\n        sku {\n            id,\n            code,\n            name\n        }\n\n    }\n}",
 						"variables": ""
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/api/gql/query",
+					"raw": "http://localhost:8080/api/gql/query",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"gql",
@@ -358,7 +388,7 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiN2Q0ZmRiMDktZDlhZS00NDg3LThiYzUtODczNDAxZGQwMDZmIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Gm_pA--TZoC-eV4gtH4sRGIEGcGU0R5z5bIHpZEsNog; Path=/; Expires=Thu, 22 Apr 2021 13:05:19 GMT; HttpOnly; SameSite=NoneQC"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJlZTNlMmMzMi04NTNkLTQ2NDktYTZmYi1hYTY4ZjY1N2NkNDciLCJ0b2tlbklkIjoiNjk4MjY0MmEtZTIzNC00NjAwLTkyMjYtYWU3OWYwNGU2NGY4IiwidWlkIjoiNmY2NjY1M2ItMGJhNy00Y2Q4LWE5MmUtNmJlMTQxNDgwYzZlIiwidXNlcm5hbWUiOiJhYmhpbmFuZGFuQGV4YW1wbGUuY29tIn0.7HDk6L39puapNYh3xqtrspX9420suuDTpuboN3jyP_c; Path=/; Expires=Sat, 24 Apr 2021 11:24:13 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
@@ -393,7 +423,7 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiN2Q0ZmRiMDktZDlhZS00NDg3LThiYzUtODczNDAxZGQwMDZmIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Gm_pA--TZoC-eV4gtH4sRGIEGcGU0R5z5bIHpZEsNog; Path=/; Expires=Thu, 22 Apr 2021 13:05:19 GMT; HttpOnly; SameSite=NoneQC"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJlZTNlMmMzMi04NTNkLTQ2NDktYTZmYi1hYTY4ZjY1N2NkNDciLCJ0b2tlbklkIjoiOWVhZWI0MjctYTUxZC00NzdmLWJmMTctYzI4ZTk1OWFlMTFiIiwidWlkIjoiNWI3YjFjMGUtYmUwNC00OTYwLTk5ZjItNjFlZDU2ZTNjYTRkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.eGx2dbR0FeDXaXvFteRDz_wLo2UvaboNNZnc37RdAno; Path=/; Expires=Sat, 24 Apr 2021 05:25:36 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
@@ -404,12 +434,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/api/gql/query",
+					"raw": "http://localhost:8080/api/gql/query",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"gql",
@@ -428,7 +458,7 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiN2Q0ZmRiMDktZDlhZS00NDg3LThiYzUtODczNDAxZGQwMDZmIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Gm_pA--TZoC-eV4gtH4sRGIEGcGU0R5z5bIHpZEsNog; Path=/; Expires=Thu, 22 Apr 2021 13:05:19 GMT; HttpOnly; SameSite=NoneQC"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJlZTNlMmMzMi04NTNkLTQ2NDktYTZmYi1hYTY4ZjY1N2NkNDciLCJ0b2tlbklkIjoiOWVhZWI0MjctYTUxZC00NzdmLWJmMTctYzI4ZTk1OWFlMTFiIiwidWlkIjoiNWI3YjFjMGUtYmUwNC00OTYwLTk5ZjItNjFlZDU2ZTNjYTRkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.eGx2dbR0FeDXaXvFteRDz_wLo2UvaboNNZnc37RdAno; Path=/; Expires=Sat, 24 Apr 2021 05:25:36 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
@@ -463,23 +493,23 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiN2Q0ZmRiMDktZDlhZS00NDg3LThiYzUtODczNDAxZGQwMDZmIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.Gm_pA--TZoC-eV4gtH4sRGIEGcGU0R5z5bIHpZEsNog; Path=/; Expires=Thu, 22 Apr 2021 13:05:19 GMT; HttpOnly; SameSite=NoneQC"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJlZTNlMmMzMi04NTNkLTQ2NDktYTZmYi1hYTY4ZjY1N2NkNDciLCJ0b2tlbklkIjoiNjk4MjY0MmEtZTIzNC00NjAwLTkyMjYtYWU3OWYwNGU2NGY4IiwidWlkIjoiNmY2NjY1M2ItMGJhNy00Y2Q4LWE5MmUtNmJlMTQxNDgwYzZlIiwidXNlcm5hbWUiOiJhYmhpbmFuZGFuQGV4YW1wbGUuY29tIn0.7HDk6L39puapNYh3xqtrspX9420suuDTpuboN3jyP_c; Path=/; Expires=Sat, 24 Apr 2021 11:24:13 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation userPurchaseActivityCreate {\n    userPurchaseActivityCreate(\n        input: {\n            productID: \"37c39456-b81a-452d-80eb-6d2046a201fc\",\n        }\n    ) {\n        id,\n        code,\n        loyaltyPoints,\n        user {\n            id,\n            firstName\n        }\n        product {\n            id,\n            code,\n            registerID,\n            loyaltyPoints,\n        }\n\n    }\n}",
+						"query": "mutation userPurchaseActivityCreate {\n    userPurchaseActivityCreate(\n        input: {\n            productID: \"31c4c41e-f91c-4156-b2f9-78dc6f2436f6\",\n        }\n    ) {\n        id,\n        code,\n        loyaltyPoints,\n        user {\n            id,\n            firstName,\n            walletPoints\n        }\n        product {\n            id,\n            code,\n            registerID,\n            loyaltyPoints,\n        }\n\n    }\n}",
 						"variables": ""
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/api/gql/query",
+					"raw": "http://localhost:8080/api/gql/query",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8080",
 					"path": [
 						"api",
 						"gql",
@@ -498,13 +528,13 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJjOTlmNGMxYy1iNjhmLTQ2NzQtOGJiZi1jYzQyMDZlNDdhMzUiLCJ0b2tlbklkIjoiYTQ0NDE0MmMtZTgxNi00NWYyLWI2ZmQtMzIyYmE5MjVkMDNlIiwidWlkIjoiNGEzZDcxZjAtZTQzYy00NTA3LTgyYWQtNDViNDA1MmRlNzE5IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.lnztxQGBmft9Kx2KsdKfPWGOgKN0EQROLV9eNz5tp2E; Path=/; Expires=Fri, 23 Apr 2021 07:52:35 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation userCreate {\n    userCreate(\n        input: {\n            email: \"tiger@example.com\"\n            firstName: \"Tiger\"\n            lastName: \"Darbey\"\n            roleID: \"91464930-c501-4918-b61f-0f8fb1d25450\"\n            password: \"tiger$123\"\n            mobilePhone: \"1234567891\"\n        }\n    ) {\n        id,\n        email,\n        firstName,\n        lastName,\n        referralCode\n    }\n}",
+						"query": "mutation userCreate {\n    userCreate(\n        input: {\n            email: \"tiger@example.com\"\n            firstName: \"Tiger\"\n            lastName: \"Darbey\"\n            roleID: \"c99f4c1c-b68f-4674-8bbf-cc4206e47a35\"\n            password: \"tiger$123\"\n            mobilePhone: \"1234567890\"\n        }\n    ) {\n        id,\n        email,\n        firstName,\n        lastName,\n        referralCode\n    }\n}",
 						"variables": ""
 					}
 				},
@@ -525,6 +555,40 @@
 			"response": []
 		},
 		{
+			"name": "User Create With Referral Code",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": ""
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation userCreate {\n    userCreate(\n        input: {\n            email: \"steve@example.com\"\n            firstName: \"Steve\"\n            lastName: \"Smith\"\n            roleID: \"ee3e2c32-853d-4649-a6fb-aa68f657cd47\"\n            password: \"steve$123\"\n            mobilePhone: \"1234567894\"\n            referredByCode: \"3645748\"\n        }\n    ) {\n        id,\n        email,\n        firstName,\n        lastName,\n        referralCode\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "User Get By Email",
 			"request": {
 				"method": "POST",
@@ -532,13 +596,13 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJlZTNlMmMzMi04NTNkLTQ2NDktYTZmYi1hYTY4ZjY1N2NkNDciLCJ0b2tlbklkIjoiZWVkYjZhZDAtYjhlMy00ZDk3LWFhNmMtYTFkYjkxMmI0MjQ5IiwidWlkIjoiNWI3YjFjMGUtYmUwNC00OTYwLTk5ZjItNjFlZDU2ZTNjYTRkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.oA3jHnabHF9zsl02n9eXIKfR7bNjPB5wdVIUNEv1vBY; Path=/; Expires=Mon, 26 Apr 2021 09:29:55 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query user {\n  user(email: \"tiger@example.com\") {\n    id,\n    email,\n    firstName,\n    lastName,\n    mobilePhone,\n    organisation {\n        id\n    },\n    role {\n        id\n    },\n    referrals {\n      id,\n      user {\n          id\n      },\n      referee {\n          id\n      },\n      isRedemmed,\n      createdAt\n    }\n  }\n}",
+						"query": "query user {\n  user(email: \"tiger@example.com\") {\n    id,\n    email,\n    firstName,\n    lastName,\n    mobilePhone,\n    walletPoints,\n    referralCode,\n    organisation {\n        id\n    },\n    role {\n        id\n    },\n    referrals {\n      id,\n      user {\n          id,\n          firstName,\n          lastName,\n          email,\n          walletPoints\n      },\n      isRedemmed,\n      createdAt\n    }\n  }\n}",
 						"variables": ""
 					}
 				},

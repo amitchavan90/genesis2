@@ -13,14 +13,17 @@ import (
 	"github.com/99designs/gqlgen/handler"
 	"github.com/gofrs/uuid"
 	"github.com/mailgun/mailgun-go/v3"
+	"github.com/volatiletech/null"
 
 	"context"
 	"fmt"
 	"genesis/blockchain"
 	"genesis/canlog"
 	"genesis/config"
+	"genesis/crypto"
 	"genesis/db"
 	"genesis/graphql"
+	"genesis/helpers"
 	"genesis/restpkg/routes"
 	"net/http"
 	"time"
@@ -35,6 +38,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/render"
 
 	"github.com/go-chi/chi"
 )
@@ -73,7 +77,7 @@ func NewAPIController(
 	blk *blockchain.Service,
 	systemTicker *genesis.SystemTicker,
 ) http.Handler {
-	authentication := NewAuthRoutes(auther, config.UserAuth, userStore, userActivityStore)
+	authentication := NewAuthRoutes(auther, config.UserAuth, userStore, roleStore, organisationStore, referralStore, userActivityStore)
 
 	websocketUpgrader := websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
@@ -322,6 +326,9 @@ func NewAPIController(
 // AuthController contains handlers involving authentication
 type AuthController struct {
 	UserStore         genesis.UserStorer
+	RoleStore         genesis.RoleStorer
+	OrganisationStore genesis.OrganisationStorer
+	ReferralStore     genesis.ReferralStorer
 	UserActivityStore genesis.UserActivityStorer
 	auther            *genesis.Auther
 	authConfig        *config.UserAuth
@@ -337,7 +344,7 @@ type CookieSettings struct {
 }
 
 // NewAuthRoutes returns a router for use in authentication
-func NewAuthRoutes(auther *genesis.Auther, authConfig *config.UserAuth, userStore genesis.UserStorer, userActivityStore genesis.UserActivityStorer) chi.Router {
+func NewAuthRoutes(auther *genesis.Auther, authConfig *config.UserAuth, userStore genesis.UserStorer, roleStore genesis.RoleStorer, organisationStore genesis.OrganisationStorer, referralStore genesis.ReferralStorer, userActivityStore genesis.UserActivityStorer) chi.Router {
 	cookieDefaults := CookieSettings{
 		SameSite: http.SameSiteNoneMode,
 		HTTPOnly: true,
@@ -345,16 +352,42 @@ func NewAuthRoutes(auther *genesis.Auther, authConfig *config.UserAuth, userStor
 	}
 	c := &AuthController{
 		userStore,
+		roleStore,
+		organisationStore,
+		referralStore,
 		userActivityStore,
 		auther,
 		authConfig,
 		cookieDefaults,
 	}
 	r := chi.NewRouter()
+	r.Post("/register", c.register())
 	r.Post("/login", c.login())
 	r.Post("/logout", c.logout())
 	r.Post("/verify_account", c.verifyAccount())
 	return r
+}
+
+// RegisterRequest structs for the HTTP request/response cycle
+type RegisterRequest struct {
+	FirstName      string `json:"firstName"`
+	LastName       string `json:"lastName"`
+	Email          string `json:"email"`
+	MobilePhone    string `json:"mobilePhone"`
+	Password       string `json:"password"`
+	RoleID         string `json:"roleID"`
+	AffilatedOrg   string `json:"affiliateOrg"`
+	ReferredByCode string `json:"referredByCode"`
+}
+
+type RegisterResponse struct {
+	FirstName    null.String `json:"firstName"`
+	LastName     null.String `json:"lastName"`
+	Email        null.String `json:"email"`
+	MobilePhone  null.String `json:"mobilePhone"`
+	RoleID       string      `json:"roleID"`
+	AffilatedOrg null.String `json:"affiliateOrg"`
+	ReferralCode null.String `json:"referredByCode"`
 }
 
 // LoginRequest structs for the HTTP request/response cycle
@@ -372,6 +405,168 @@ type LoginResponse struct {
 // writeError writes a http errors to the ResponseWriter
 func writeError(w http.ResponseWriter, err error, message string, code int) {
 	http.Error(w, fmt.Sprintf(`{"error":"%s","message":"%s"}`, err.Error(), message), code)
+}
+
+// RestResponse handles the http status and renders body in JSON
+func RestResponse(w http.ResponseWriter, r *http.Request, status int, body interface{}) {
+	render.Status(r, status)
+	render.JSON(w, r, body)
+}
+
+// register creates a user
+func (c *AuthController) register() func(w http.ResponseWriter, r *http.Request) {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		input := &RegisterRequest{}
+		user := &db.User{}
+
+		failedMsg := "Register failed, please try again."
+
+		err := json.NewDecoder(r.Body).Decode(input)
+		if err != nil {
+			writeError(w, err, failedMsg, http.StatusInternalServerError)
+			return
+		}
+		defer r.Body.Close()
+
+		if input.Email == "" {
+			RestResponse(w, r, http.StatusBadRequest, "Email is required")
+			return
+		}
+		if input.FirstName == "" {
+			RestResponse(w, r, http.StatusBadRequest, "First Name is required")
+			return
+		}
+		if input.LastName == "" {
+			RestResponse(w, r, http.StatusBadRequest, "Last Name is required")
+			return
+		}
+		if input.MobilePhone == "" {
+			RestResponse(w, r, http.StatusBadRequest, "Mobile number is required")
+			return
+		}
+		if input.RoleID == "" {
+			RestResponse(w, r, http.StatusBadRequest, "Role ID is required")
+			return
+		}
+		if input.Password == "" {
+			RestResponse(w, r, http.StatusBadRequest, "Password is required")
+			return
+		}
+
+		email := strings.ToLower(input.Email)
+
+		// Verify email
+		u, _ := c.UserStore.GetByEmail(email)
+		if u != nil {
+			failedMsg := "Email already registered, please try again."
+			RestResponse(w, r, http.StatusBadRequest, failedMsg)
+			return
+		}
+
+		// Verify role
+		roleUUID, err := uuid.FromString(input.RoleID)
+		if err != nil {
+			writeError(w, err, failedMsg, http.StatusInternalServerError)
+			return
+		}
+		_, err = c.auther.RoleStore.Get(roleUUID)
+		if err != nil {
+			failedMsg := "Role does not exist. Please verify role ID"
+			RestResponse(w, r, http.StatusBadRequest, failedMsg)
+			return
+		}
+
+		// Verify affilited org
+		if input.AffilatedOrg != "" {
+			orgUUID, err := uuid.FromString(input.RoleID)
+			if err != nil {
+				writeError(w, err, failedMsg, http.StatusInternalServerError)
+				return
+			}
+			_, err = c.OrganisationStore.Get(orgUUID)
+			if err != nil {
+				failedMsg := "Organisation does not exist. Please verify organisation ID"
+				RestResponse(w, r, http.StatusBadRequest, failedMsg)
+				return
+			}
+			user.AffiliateOrg = null.StringFrom(input.AffilatedOrg)
+		}
+
+		// Set/Generate password
+		password := ""
+		if input.Password != "" {
+			password = input.Password
+		} else {
+			g, err := uuid.NewV4()
+			if err != nil {
+				RestResponse(w, r, http.StatusInternalServerError, failedMsg)
+				return
+			}
+			password = g.String()
+		}
+		hashed := crypto.HashPassword(password)
+		input.Password = hashed
+
+		user.FirstName = null.StringFrom(input.FirstName)
+		user.LastName = null.StringFrom(input.LastName)
+		user.Email = null.StringFrom(input.Email)
+		user.MobilePhone = null.StringFrom(input.MobilePhone)
+		user.RoleID = input.RoleID
+		user.PasswordHash = hashed
+		user.ReferralCode = null.StringFrom(helpers.GenerateID(7))
+
+		created, err := c.UserStore.Insert(user)
+		if err != nil {
+			RestResponse(w, r, http.StatusInternalServerError, failedMsg)
+			return
+		}
+
+		// Verify referee by referral code
+		if input.ReferredByCode != "" {
+			referee, err := c.UserStore.GetByReferralCode(input.ReferredByCode)
+			if err != nil {
+				failedMsg := "Referee does not exist. Please verify referral code"
+				RestResponse(w, r, http.StatusBadRequest, failedMsg)
+				return
+			}
+
+			// Get Referral count
+			count, err := c.ReferralStore.Count()
+			if err != nil {
+				failedMsg := "create referral: Error while fetching referral count from db"
+				RestResponse(w, r, http.StatusBadRequest, failedMsg)
+				return
+			}
+
+			refID, _ := uuid.NewV4()
+			referral := &db.Referral{
+				Code:         fmt.Sprintf("T%05d", count+1),
+				ID:           refID.String(),
+				UserID:       created.ID,
+				ReferredByID: null.StringFrom(referee.ID),
+				IsRedemmed:   false,
+			}
+
+			_, err = c.ReferralStore.Insert(referral)
+			if err != nil {
+				failedMsg := "Error while creating referral"
+				RestResponse(w, r, http.StatusInternalServerError, failedMsg)
+				return
+			}
+		}
+
+		response := RegisterResponse{}
+		response.FirstName = created.FirstName
+		response.LastName = created.LastName
+		response.Email = created.Email
+		response.MobilePhone = created.MobilePhone
+		response.RoleID = created.RoleID
+		response.ReferralCode = created.ReferralCode
+
+		RestResponse(w, r, http.StatusOK, response)
+	}
+
+	return fn
 }
 
 // login logs a user in

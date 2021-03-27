@@ -18,6 +18,7 @@ require (
 	github.com/go-chi/chi v4.0.0+incompatible
 	github.com/go-chi/cors v1.1.1
 	github.com/go-chi/jwtauth v3.3.0+incompatible
+	github.com/go-chi/render v1.0.1
 	github.com/go-siris/siris v7.4.0+incompatible // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
