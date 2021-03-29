@@ -184,6 +184,9 @@ func (r *mutationResolver) UserTaskCreate(ctx context.Context, input UpdateUserT
 func (r *mutationResolver) UserTaskUpdate(ctx context.Context, id string, input UpdateUserTask) (*db.UserTask, error) {
 	panic("not implemented")
 }
+func (r *mutationResolver) UserTaskApprove(ctx context.Context, id string) (*db.UserTask, error) {
+	panic("not implemented")
+}
 func (r *mutationResolver) SkuCreate(ctx context.Context, input UpdateSku) (*db.StockKeepingUnit, error) {
 	panic("not implemented")
 }

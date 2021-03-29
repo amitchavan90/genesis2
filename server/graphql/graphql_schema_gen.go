@@ -251,6 +251,7 @@ type ComplexityRoot struct {
 		UserCreate                 func(childComplexity int, input UpdateUser) int
 		UserPurchaseActivityCreate func(childComplexity int, input UpdateUserPurchaseActivity) int
 		UserPurchaseActivityUpdate func(childComplexity int, id string, input UpdateUserPurchaseActivity) int
+		UserTaskApprove            func(childComplexity int, id string) int
 		UserTaskCreate             func(childComplexity int, input UpdateUserTask) int
 		UserTaskUpdate             func(childComplexity int, id string, input UpdateUserTask) int
 		UserUnarchive              func(childComplexity int, id string) int
@@ -679,6 +680,7 @@ type MutationResolver interface {
 	TaskUnarchive(ctx context.Context, id string) (*db.Task, error)
 	UserTaskCreate(ctx context.Context, input UpdateUserTask) (*db.UserTask, error)
 	UserTaskUpdate(ctx context.Context, id string, input UpdateUserTask) (*db.UserTask, error)
+	UserTaskApprove(ctx context.Context, id string) (*db.UserTask, error)
 	SkuCreate(ctx context.Context, input UpdateSku) (*db.StockKeepingUnit, error)
 	SkuUpdate(ctx context.Context, id string, input UpdateSku) (*db.StockKeepingUnit, error)
 	SkuArchive(ctx context.Context, id string) (*db.StockKeepingUnit, error)
@@ -2154,6 +2156,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UserPurchaseActivityUpdate(childComplexity, args["id"].(string), args["input"].(UpdateUserPurchaseActivity)), true
+
+	case "Mutation.userTaskApprove":
+		if e.complexity.Mutation.UserTaskApprove == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_userTaskApprove_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UserTaskApprove(childComplexity, args["id"].(string)), true
 
 	case "Mutation.userTaskCreate":
 		if e.complexity.Mutation.UserTaskCreate == nil {
@@ -5408,6 +5422,7 @@ extend type Query {
 extend type Mutation {
 	userTaskCreate(input: UpdateUserTask!): UserTask! @hasPerm(p: UserTaskCreate)
 	userTaskUpdate(id: ID!, input: UpdateUserTask!): UserTask! @hasPerm(p: UserTaskUpdate)
+	userTaskApprove(id: ID!): UserTask! @hasPerm(p: UserTaskUpdate)
 }
 `},
 	&ast.Source{Name: "schema_users.graphql", Input: `type Organisation {
@@ -6638,6 +6653,20 @@ func (ec *executionContext) field_Mutation_userPurchaseActivityUpdate_args(ctx c
 		}
 	}
 	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_userTaskApprove_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -11628,6 +11657,74 @@ func (ec *executionContext) _Mutation_userTaskUpdate(ctx context.Context, field 
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
 			return ec.resolvers.Mutation().UserTaskUpdate(rctx, args["id"].(string), args["input"].(UpdateUserTask))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "UserTaskUpdate")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasPerm == nil {
+				return nil, errors.New("directive hasPerm is not implemented")
+			}
+			return ec.directives.HasPerm(ctx, nil, directive0, p)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*db.UserTask); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *genesis/db.UserTask`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*db.UserTask)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUserTask2ᚖgenesisᚋdbᚐUserTask(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_userTaskApprove(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_userTaskApprove_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UserTaskApprove(rctx, args["id"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "UserTaskUpdate")
@@ -28922,6 +29019,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "userTaskUpdate":
 			out.Values[i] = ec._Mutation_userTaskUpdate(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "userTaskApprove":
+			out.Values[i] = ec._Mutation_userTaskApprove(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

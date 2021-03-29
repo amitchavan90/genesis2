@@ -173,3 +173,47 @@ func (r *mutationResolver) UserTaskUpdate(ctx context.Context, id string, input 
 
 	return updated, nil
 }
+
+// UserTaskApprove archives a userTask
+func (r *mutationResolver) UserTaskApprove(ctx context.Context, id string) (*db.UserTask, error) {
+	// Get UserTask
+	userTaskUUID, err := uuid.FromString(id)
+	if err != nil {
+		return nil, terror.New(terror.ErrParse, "")
+	}
+
+	ut, err := r.UserTaskStore.Get(userTaskUUID)
+	if err != nil {
+		return nil, terror.New(terror.ErrParse, "")
+	}
+
+	if ut.IsComplete {
+		return nil, terror.New(terror.ErrParse, "User task is already complete and approved")
+	}
+
+	ut.IsComplete = true
+	ut.Status = "Complete"
+
+	// Get user
+	userUUID, err := uuid.FromString(ut.UserID)
+	if err != nil {
+		return nil, terror.New(terror.ErrParse, "")
+	}
+	u, err := r.UserStore.Get(userUUID)
+
+	u.WalletPoints += ut.R.Task.LoyaltyPoints
+
+	// Update UserTask
+	updated, err := r.UserTaskStore.Update(ut)
+	if err != nil {
+		return nil, terror.New(err, "update user task")
+	}
+
+	// Update User
+	_, err = r.UserStore.Update(u)
+	if err != nil {
+		return nil, terror.New(err, "update user")
+	}
+
+	return updated, nil
+}
