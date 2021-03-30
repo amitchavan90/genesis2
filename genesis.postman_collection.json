@@ -114,7 +114,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query {\n  users(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      users {\n          id,\n          email,\n          firstName,\n          lastName,\n          mobilePhone,\n          walletPoints,\n          referralCode,\n          organisation {\n              id\n          },\n          role {\n              id\n          },\n          referrals {\n            id,\n            user {\n                id,\n                firstName\n            },\n            referee {\n                id,\n                firstName,\n                referralCode\n            },\n            isRedemmed,\n            createdAt\n          }\n      }\n      total\n  }\n}",
+						"query": "query {\n  users(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      users {\n          id,\n          email,\n          firstName,\n          lastName,\n          mobilePhone,\n          walletPoints,\n          referralCode,\n          organisation {\n              id\n          },\n          role {\n              id\n          },\n          referrals {\n            id,\n            user {\n                id,\n                firstName\n            },\n            isRedemmed,\n            createdAt\n          }\n      }\n      total\n  }\n}",
 						"variables": ""
 					}
 				},
@@ -172,6 +172,41 @@
 		},
 		{
 			"name": "User Task Create",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiMzk0MTYxMi1kZTFlLTRkM2UtOWZlYS1mMTc5MjUwNDUwNDAiLCJ0b2tlbklkIjoiNGZmZDdlNDQtZjg5ZS00MzFiLWFiMmYtODI2M2QwYjI2ZTcyIiwidWlkIjoiNDMwMDk0ZWItMDYxMC00ZmEwLThiODQtOTVkMWFjNmNjYjY1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.THYqwlC2bUbcoCP1Eolvc_Sq9t3CaHRtmU1GTglhwdk; Path=/; Expires=Thu, 22 Apr 2021 13:23:47 GMT; HttpOnly; SameSite=None"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation userTaskCreate {\n    userTaskCreate(\n        input: {\n            taskID: \"45690607-4ff8-4dbd-ba52-6441d0003e36\"\n        }\n    ) {\n        id,\n        isComplete,\n        status,\n        task {\n            id,\n            code,\n            title,\n            description\n        },\n        user {\n            id,\n            firstName,\n            lastName,\n            email\n        },\n        userSubtasks {\n            id\n        }\n        createdAt\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "User Task Approve",
 			"request": {
 				"method": "POST",
 				"header": [
