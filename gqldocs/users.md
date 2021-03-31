@@ -74,7 +74,6 @@ mutation userCreate {
             lastName: "Name"
             roleID: "5d23a6d4-6ea4-462c-9e13-b7def16af3df"
             password: "password"
-            affiliateOrg: "e39e4131-fd0e-4560-b129-59a4c7fe1f3f"
             mobilePhone: "1234567890"
             referredByCode: "1234567"
         }
@@ -82,7 +81,8 @@ mutation userCreate {
         id,
         email,
         firstName,
-        lastName
+        lastName,
+        referralCode
     }
 }
 `

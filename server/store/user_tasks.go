@@ -180,7 +180,7 @@ func (s *UserTasks) GetMany(keys []string, txes ...*sql.Tx) (db.UserTaskSlice, [
 // Get a task given their ID
 func (s *UserTasks) Get(id uuid.UUID, txes ...*sql.Tx) (*db.UserTask, error) {
 	dat, err := db.UserTasks(db.UserTaskWhere.ID.EQ(id.String()),
-		qm.Load(db.UserTaskRels.UserSubtasks, qm.Select(db.UserSubtaskColumns.ID, db.UserSubtaskColumns.UserTaskID, db.UserSubtaskColumns.SubtaskID)),
+		qm.Load(db.UserTaskRels.Task, qm.Select(db.TaskColumns.ID, db.TaskColumns.LoyaltyPoints)),
 	).One(s.Conn)
 	if err != nil {
 		return nil, terror.New(err, "")
