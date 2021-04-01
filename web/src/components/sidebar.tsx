@@ -82,7 +82,7 @@ export const SideBar = () => {
 	const accordionPanelApp: string = css({
 		transformOrigin: "top",
 		transform: expandAppPanel ? "scaleY(1)" : "scaleY(0)",
-		maxHeight: expandAppPanel ? "150px" : "0px",
+		maxHeight: expandAppPanel ? "300px" : "0px",
 		transition: "0.25s",
 	})
 
@@ -206,6 +206,12 @@ export const SideBar = () => {
 							{hasPermission(Perm.ReferralList) && (
 								<SideMenuButton index={index++} subMenu icon="user-chart" label="Referrals" url="/portal/referrals" />
 							)}
+							{hasPermission(Perm.UserPurchaseActivityList) && (
+								<SideMenuButton index={index++} subMenu icon="steak" label="Purchase Activity" url="/portal/purchesActivity" />
+							)}
+							{hasPermission(Perm.UserTaskList) && ( 
+							<SideMenuButton index={index++} subMenu icon="users" label="User Tasks" url="/portal/userTasks"/>
+							)}
 						</div>
 					</>
 				)}
@@ -236,10 +242,6 @@ export const SideBar = () => {
 						</div>
 					</>
 				)}
-			    {/* {hasPermission(Perm.TaskList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="Tasks" url="/portal/tasks" altURL="/portal/task" />} */}
-				{/* {hasPermission(Perm.ReferralList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="Referrals" url="/portal/referrals" altURL="/portal/referral" />} */}
-				{hasPermission(Perm.UserPurchaseActivityList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="Purchase Activity" url="/portal/purchesActivity" altURL="/portal/purchesActivity" />}
-				{hasPermission(Perm.UserTaskList) && <SideMenuButton index={index++} icon="file-contract" iconLight label="User Task" url="/portal/userTasks" altURL="/portal/userTask" />}
 			</div>
 		</div>
 	)

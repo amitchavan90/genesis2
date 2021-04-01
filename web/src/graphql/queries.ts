@@ -593,7 +593,7 @@ const USER_PURCHASE_ACTIVITIES = gql`
 			total
 		}
 	}
-	${fragment.USER_PURCHASE_ACTIVITIES}
+	${fragment.USER_PURCHASE_ACTIVITY}
 `
 export const query = {
 	ME,

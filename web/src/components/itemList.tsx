@@ -230,6 +230,7 @@ export const ItemList = (props: ItemListProps) => {
 			case "referral":
 				return graphql.query.REFERRALS	
 			case "userPurchaseActivity":
+				console.log("USER_PURCHASE_ACTIVITIES-->",graphql.query.USER_PURCHASE_ACTIVITIES)
 				return graphql.query.USER_PURCHASE_ACTIVITIES
 			case "userTask":
 				return graphql.query.REFERRALS		

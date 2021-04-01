@@ -108,7 +108,7 @@ export interface Task{
 	id:string
     title:string
 	code: string
-    description:String
+    description:string
     loyaltyPoints:number
     isTimeBound:boolean
     isPeopleBound:boolean

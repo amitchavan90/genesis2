@@ -50,7 +50,7 @@ type FormData = {
 const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	const code = props.match.params.code
 	const isNewSKU = code === "new"
-
+	
 	const sQuery = new URLSearchParams(props.location.search)
 	const cloneFrom = isNewSKU ? sQuery.get("clone") : null
 
@@ -117,7 +117,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 	const onSubmit = handleSubmit(async ({ name,brand, price, purchasePoints, weight, ingredients, code, urls, productInfo, loyaltyPoints}) => {
 		setTimedOut(false)
-		console.log("purchasePoints----------->",purchasePoints);
+		
 		// Upload Master Plan
 		let masterPlanBlobID: string | null = null
 		if (uploadMasterPlan) {
@@ -181,7 +181,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 		} else if (cloneFrom && sku) {
 			photoBlobIDs = sku.photos.map(p => p.id)
 		}
-		console.log("categories--------------->",categories);
+		
 		const input = {
 			name,
 			brand,
@@ -206,13 +206,11 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 		}
 
 		if (isNewSKU) {
-			console.log("input---------------->",input);
 			updateSKU({
 				variables: { input },
 				update: (cache: any) => invalidateListQueries(cache, "skus"),
 			})
 		} else if (sku) {
-			console.log("update-------->",sku);
 			promiseTimeout(updateSKU({ variables: { id: sku.id, input } })).catch(reason => {
 				if (reason !== TIMED_OUT) return
 				setTimedOut(true)
@@ -228,7 +226,6 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	React.useEffect(() => {
 		if (activeKey != "#details") return
 		if (!sku) return
-		console.log("sku---------------------->",sku);
 		setValue("name", sku.name)
 		setValue("brand", sku.brand)
 		setValue("price", sku.price)
@@ -377,7 +374,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 					Is Beef
 				</Checkbox>
 			</FormControl>
-			{isBeef?
+			{!isBeef?
 			<ImageUpload.Single
 				// client requested to rename it to Hero Image
 				label="GIF image"

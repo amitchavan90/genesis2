@@ -25,9 +25,7 @@ import { Tabs, Tab } from "baseui/tabs"
 import { Modal, ModalButton, ModalFooter, ModalHeader } from "baseui/modal"
 import { promiseTimeout, TIMED_OUT } from "../../../helpers/timeout"
 import { paddingZero} from "../../../themeOverrides"
-import { ItemList } from "../../../components/itemList"
-import { FilterOption } from "../../../types/enums"
-import { ActionItemSet } from "../../../types/actions"
+
 
 
 type FormData = {
@@ -40,9 +38,10 @@ type FormData = {
 }
 
 const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
-	console.log("i am in task update")
 	const code = props.match.params.code
+	console.log("code ---------------->",code);
 	const isNewTask = code ==="new"
+	console.log("isNewTask ---------------->",isNewTask);
 	const history = useHistory()
 	const [activeKey, setActiveKey] = React.useState(props.location.hash || "#details")
 	const [showPreviewModal, setShowPreviewModal] = React.useState<boolean>()
@@ -125,12 +124,17 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 	React.useEffect(() => {
 		if (!task) return
-		setValue("title",task.title)
-		setValue("loyaltyPoints", task.loyaltyPoints)
-		setValue("maximumPeople", task.maximumPeople)
+		
 		setValue("code", task.code)
-		setfinishDate(new Date(task.finishDate))
+		setValue("title", task.title)
+		setDescription(task.description)
+		setIsPeopleBound(task.isPeopleBound)
+		setIsTimeBound(task.isTimeBound)
+		setIsProductRelevant(task.isProductRelevant)
+		setValue("loyaltyPoints", task.loyaltyPoints)
+		if (task.finishDate) setfinishDate(new Date(task.finishDate))
 		if (task.sku) setSKU([{ id: task.sku.id, label: task.sku.code }])
+		if (task.maximumPeople) setValue("maximumPeople",task.maximumPeople)
 		setSubTasksCount(task.subtasks.length)
 		task.subtasks.forEach((info, index) => {
 			setValue(`subtasks[${index}].title`, info.title)
@@ -188,7 +192,7 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 				/>
 			</FormControl>
 
-			<FormControl label="LoyaltyPoints" error={errors.title ? errors.title.message : ""} positive="">
+			<FormControl label="LoyaltyPoints" error={errors.loyaltyPoints ? errors.loyaltyPoints.message : ""} positive="">
 				<Input name="loyaltyPoints" type="number" inputRef={register}/>
 			</FormControl>
 
@@ -210,7 +214,7 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 			</FormControl>
 			{breakLine}
 			{isPeopleBound?
-			<FormControl label="Maximum People" error={errors.maximumPeople ? errors.maximumPeople.message : ""} positive="">
+			<FormControl label="MaximumPeople" error={errors.maximumPeople ? errors.maximumPeople.message : ""} positive="">
 				<Input name="maximumPeople" type="number" inputRef={register}/>
 			</FormControl>:<div></div>}
 			{isTimeBound?
@@ -311,31 +315,6 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 					>
 						{editForm}
 					</Tab>
-					{!isNewTask && task && (
-						<Tab
-							key="#products"
-							title={
-								<Spaced>
-									<FontAwesomeIcon icon={["fal", "steak"]} />
-									<div>Products</div>
-								</Spaced>
-							}
-						>
-							<ItemList
-								taskID={task.id}
-								itemName="product"
-								query={graphql.query.PRODUCTS}
-								batchActionMutation={graphql.mutation.BATCH_ACTION_PRODUCT}
-								extraFilterOptions={[
-									{ label: "Not in Carton", id: FilterOption.ProductWithoutCarton },
-									{ label: "Not in Order", id: FilterOption.ProductWithoutOrder },
-								]}
-								itemLinks={["order", "contract", "distributor", "carton"]}
-								actions={ActionItemSet.Products}
-								showQRCodesToggle
-							/>
-						</Tab>
-					)}
 				</Tabs>
 			)}
 			
