@@ -219,7 +219,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation userTaskCreate {\n    userTaskCreate(\n        input: {\n            taskID: \"45690607-4ff8-4dbd-ba52-6441d0003e36\"\n        }\n    ) {\n        id,\n        isComplete,\n        status,\n        task {\n            id,\n            code,\n            title,\n            description\n        },\n        user {\n            id,\n            firstName,\n            lastName,\n            email\n        },\n        userSubtasks {\n            id\n        }\n        createdAt\n    }\n}",
+						"query": "mutation userTaskApprove {\n    userTaskApprove(id: \"userTaskID\") {\n        id,\n        isComplete,\n        status,\n        task {\n            id,\n            code,\n            title,\n            description\n        },\n        user {\n            id,\n            firstName,\n            lastName,\n            email\n        },\n        userSubtasks {\n            id\n        }\n        createdAt\n    }\n}",
 						"variables": ""
 					}
 				},
