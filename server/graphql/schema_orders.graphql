@@ -1,6 +1,7 @@
 type Order {
 	id: ID!
 	code: String!
+	isAppBound: Boolean!
 	archived: Boolean!
 	createdAt: Time!
 
@@ -19,6 +20,7 @@ input UpdateOrder {
 input CreateOrder {
 	contractID: NullString
 	skuID: NullString
+	isAppBound: Boolean!
 	quantity: Int!
 }
 

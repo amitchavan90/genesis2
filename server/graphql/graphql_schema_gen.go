@@ -263,6 +263,7 @@ type ComplexityRoot struct {
 		Code         func(childComplexity int) int
 		CreatedAt    func(childComplexity int) int
 		ID           func(childComplexity int) int
+		IsAppBound   func(childComplexity int) int
 		ProductCount func(childComplexity int) int
 		Sku          func(childComplexity int) int
 	}
@@ -2244,6 +2245,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Order.ID(childComplexity), true
+
+	case "Order.isAppBound":
+		if e.complexity.Order.IsAppBound == nil {
+			break
+		}
+
+		return e.complexity.Order.IsAppBound(childComplexity), true
 
 	case "Order.productCount":
 		if e.complexity.Order.ProductCount == nil {
@@ -4820,6 +4828,7 @@ extend type Query {
 	&ast.Source{Name: "schema_orders.graphql", Input: `type Order {
 	id: ID!
 	code: String!
+	isAppBound: Boolean!
 	archived: Boolean!
 	createdAt: Time!
 
@@ -4838,6 +4847,7 @@ input UpdateOrder {
 input CreateOrder {
 	contractID: NullString
 	skuID: NullString
+	isAppBound: Boolean!
 	quantity: Int!
 }
 
@@ -4943,6 +4953,7 @@ input UpdateProduct {
 	loyaltyPointsExpire: NullTime
 	inheritCartonHistory: NullBool
 	description: NullString
+	isAppBound: Boolean!
 }
 
 extend type Query {
@@ -14910,6 +14921,43 @@ func (ec *executionContext) _Order_code(ctx context.Context, field graphql.Colle
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Order_isAppBound(ctx context.Context, field graphql.CollectedField, obj *db.Order) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Order",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsAppBound, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Order_archived(ctx context.Context, field graphql.CollectedField, obj *db.Order) (ret graphql.Marshaler) {
@@ -27115,6 +27163,12 @@ func (ec *executionContext) unmarshalInputCreateOrder(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
+		case "isAppBound":
+			var err error
+			it.IsAppBound, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "quantity":
 			var err error
 			it.Quantity, err = ec.unmarshalNInt2int(ctx, v)
@@ -27694,6 +27748,12 @@ func (ec *executionContext) unmarshalInputUpdateProduct(ctx context.Context, obj
 		case "description":
 			var err error
 			it.Description, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isAppBound":
+			var err error
+			it.IsAppBound, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -29286,6 +29346,11 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "code":
 			out.Values[i] = ec._Order_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "isAppBound":
+			out.Values[i] = ec._Order_isAppBound(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
