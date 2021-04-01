@@ -54,6 +54,7 @@ type CreateContainer struct {
 type CreateOrder struct {
 	ContractID *null.String `json:"contractID"`
 	SkuID      *null.String `json:"skuID"`
+	IsAppBound bool         `json:"isAppBound"`
 	Quantity   int          `json:"quantity"`
 }
 
@@ -256,6 +257,7 @@ type UpdateProduct struct {
 	LoyaltyPointsExpire  *null.Time   `json:"loyaltyPointsExpire"`
 	InheritCartonHistory *null.Bool   `json:"inheritCartonHistory"`
 	Description          *null.String `json:"description"`
+	IsAppBound           bool         `json:"isAppBound"`
 }
 
 type UpdateProductCategory struct {

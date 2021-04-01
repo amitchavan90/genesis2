@@ -219,7 +219,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation userTaskCreate {\n    userTaskCreate(\n        input: {\n            taskID: \"45690607-4ff8-4dbd-ba52-6441d0003e36\"\n        }\n    ) {\n        id,\n        isComplete,\n        status,\n        task {\n            id,\n            code,\n            title,\n            description\n        },\n        user {\n            id,\n            firstName,\n            lastName,\n            email\n        },\n        userSubtasks {\n            id\n        }\n        createdAt\n    }\n}",
+						"query": "mutation userTaskApprove {\n    userTaskApprove(id: \"userTaskID\") {\n        id,\n        isComplete,\n        status,\n        task {\n            id,\n            code,\n            title,\n            description\n        },\n        user {\n            id,\n            firstName,\n            lastName,\n            email\n        },\n        userSubtasks {\n            id\n        }\n        createdAt\n    }\n}",
 						"variables": ""
 					}
 				},
@@ -290,6 +290,41 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "query task {\n  task(code: \"T00002\") {\n    id,\n    code,\n    title,\n    description,\n    loyaltyPoints,\n    isTimeBound,\n    isPeopleBound,\n    isProductRelevant,\n    finishDate,\n    maximumPeople,\n    skuID,\n    subtasks {\n        id,\n        title,\n        description\n    }\n    createdAt\n  }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/gql/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "User Task Get By Code",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJlZTNlMmMzMi04NTNkLTQ2NDktYTZmYi1hYTY4ZjY1N2NkNDciLCJ0b2tlbklkIjoiOWVhZWI0MjctYTUxZC00NzdmLWJmMTctYzI4ZTk1OWFlMTFiIiwidWlkIjoiNWI3YjFjMGUtYmUwNC00OTYwLTk5ZjItNjFlZDU2ZTNjYTRkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.eGx2dbR0FeDXaXvFteRDz_wLo2UvaboNNZnc37RdAno; Path=/; Expires=Sat, 24 Apr 2021 05:25:36 GMT; HttpOnly; SameSite=None"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query usertask {\n  usertask(code: \"T00002\") {\n    id,\n    isComplete,\n    status,\n    task {\n        id,\n        title,\n        description,\n    },\n    user {\n        id,\n        firstName,\n        lastName,\n        email\n    }\n    userSubtasks {\n        id,\n        isComplete,\n        status\n    },\n    createdAt\n  }\n}",
 						"variables": ""
 					}
 				},
