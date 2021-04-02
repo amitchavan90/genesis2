@@ -114,6 +114,14 @@ func (r *skuResolver) ProductCategories(ctx context.Context, obj *db.StockKeepin
 	return dat, nil
 }
 
+func (r *skuResolver) RetailLinks(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.RetailLink, error) {
+	dat, err := r.SKUStore.GetRetailLinks(obj.ID)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
 ///////////////
 //   Query   //
 ///////////////
@@ -315,15 +323,15 @@ func (r *mutationResolver) SkuCreate(ctx context.Context, input graphql.UpdateSk
 	} else {
 		u.Currency = "AUD"
 	}
-	if !input.IsPointSku.Bool {
+	if !input.IsPointBound.Bool {
 		if input.Price != nil {
-			u.Price = input.Price.Int
+			u.Price = *input.Price
 		} else {
 			return nil, terror.New(err, "create sku: Price required")
 		}
 		u.PurchasePoints = 0
 	}
-	if input.IsPointSku.Bool {
+	if input.IsPointBound.Bool {
 		if input.PurchasePoints != nil {
 			u.PurchasePoints = input.PurchasePoints.Int
 		} else {
@@ -337,14 +345,14 @@ func (r *mutationResolver) SkuCreate(ctx context.Context, input graphql.UpdateSk
 		u.WeightUnit = "Kilograms"
 	}
 	if input.Weight != nil {
-		u.Weight = input.Weight.Int
+		u.Weight = *input.Weight
 	} else {
 		u.Weight = 0
 	}
 
 	u.IsBeef = input.IsBeef.Bool
-	u.IsPointSku = input.IsPointSku.Bool
-	u.IsAppSku = input.IsAppSku.Bool
+	u.IsPointBound = input.IsPointBound.Bool
+	u.IsAppBound = input.IsAppBound.Bool
 
 	created, err := r.SKUStore.Insert(u)
 	if err != nil {
@@ -394,6 +402,22 @@ func (r *mutationResolver) SkuCreate(ctx context.Context, input graphql.UpdateSk
 			pcat.SkuID = created.ID
 			pcat.Name = input.ProductCategories[i].Name
 			_, err = r.SKUStore.InsertProductCategory(pcat)
+			if err != nil {
+				return nil, terror.New(err, "create sku")
+			}
+		}
+	}
+
+	// Add retail links
+	if len(input.RetailLinks) >= 0 {
+		for i := range input.RetailLinks {
+			rl := &db.RetailLink{}
+			id, _ := uuid.NewV4()
+			rl.ID = id.String()
+			rl.SkuID = created.ID
+			rl.Name = input.RetailLinks[i].Name
+			rl.URL = input.RetailLinks[i].URL
+			_, err = r.SKUStore.InsertRetailLink(rl)
 			if err != nil {
 				return nil, terror.New(err, "create sku")
 			}
@@ -473,15 +497,15 @@ func (r *mutationResolver) SkuUpdate(ctx context.Context, id string, input graph
 	} else {
 		u.Currency = "AUD"
 	}
-	if !input.IsPointSku.Bool {
+	if !input.IsPointBound.Bool {
 		if input.Price != nil {
-			u.Price = input.Price.Int
+			u.Price = *input.Price
 		} else {
 			return nil, terror.New(err, "create sku: Price required")
 		}
 		u.PurchasePoints = 0
 	}
-	if input.IsPointSku.Bool {
+	if input.IsPointBound.Bool {
 		if input.PurchasePoints != nil {
 			u.PurchasePoints = input.PurchasePoints.Int
 		} else {
@@ -495,14 +519,14 @@ func (r *mutationResolver) SkuUpdate(ctx context.Context, id string, input graph
 		u.WeightUnit = "Kilograms"
 	}
 	if input.Weight != nil {
-		u.Weight = input.Weight.Int
+		u.Weight = *input.Weight
 	} else {
 		u.Weight = 0
 	}
 
 	u.IsBeef = input.IsBeef.Bool
-	u.IsPointSku = input.IsPointSku.Bool
-	u.IsAppSku = input.IsAppSku.Bool
+	u.IsPointBound = input.IsPointBound.Bool
+	u.IsAppBound = input.IsAppBound.Bool
 
 	updated, err := r.SKUStore.Update(u)
 	if err != nil {

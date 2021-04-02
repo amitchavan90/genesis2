@@ -14,6 +14,14 @@ input SKUContentInput {
 	title: String!
 	content: String!
 }
+type RetailLink {
+	name: String!
+	url: String!
+}
+input RetailLinkInput {
+	name: String!
+	url: String!
+}
 
 type SKU {
 	id: ID!
@@ -22,15 +30,15 @@ type SKU {
 	brand: String!
 	description: String!
 	ingredients: String!
-	weight: Int!
+	weight: Float!
 	weightUnit: String!
-	price: Int!
+	price: Float!
 	purchasePoints: Int!
 	loyaltyPoints: Int!
 	currency: String!
 	isBeef: Boolean!
-	isPointSku: Boolean!
-	isAppSku: Boolean!
+	isPointBound: Boolean!
+	isAppBound: Boolean!
 	archived: Boolean!
 	createdAt: Time!
 
@@ -45,6 +53,7 @@ type SKU {
 	photos: [Blob!]!
 	categories: [Category!]!
 	productCategories: [ProductCategory!]!
+	retailLinks: [RetailLink!]!
 
 	productCount: Int!
 }
@@ -68,18 +77,16 @@ input UpdateSKU {
 	description: NullString
 	ingredients: NullString
 
-	weight: NullInt
+	weight: Float
 	weightUnit: NullString
-	price: NullInt
+	price: Float
 	currency: NullString
 	purchasePoints: NullInt
 	loyaltyPoints: NullInt
 
 	isBeef: NullBool
-	isRetailSku: NullBool
-	isPointSku: NullBool
-	isAppSku: NullBool
-	isMiniappSku: NullBool
+	isPointBound: NullBool
+	isAppBound: NullBool
 
 	masterPlanBlobID: NullString
 	videoBlobID: NullString
@@ -89,6 +96,7 @@ input UpdateSKU {
 	photoBlobIDs: [String!]
 	categories: [UpdateCategory]
 	productCategories: [UpdateProductCategory]
+	retailLinks: [RetailLinkInput]
 
 	cloneParentID: NullString
 }

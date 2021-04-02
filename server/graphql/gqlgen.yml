@@ -62,6 +62,8 @@ models:
     model: genesis/db.Category
   ProductCategory:
     model: genesis/db.ProductCategory
+  RetailLink:
+    model: genesis/db.RetailLink
   Container:
     model: genesis/db.Container
   Pallet:

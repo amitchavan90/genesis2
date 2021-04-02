@@ -99,14 +99,15 @@ CREATE TABLE stock_keeping_units (
     brand text NOT NULL,
     ingredients text NOT NULL,
     description text NOT NULL,
-    weight int NOT NULL DEFAULT 0,
+    weight float NOT NULL DEFAULT 0,
     weight_unit text NOT NULL,
-    price int NOT NULL DEFAULT 0,
+    price float NOT NULL DEFAULT 0,
     purchase_points int NOT NULL DEFAULT 0,
     loyalty_points int NOT NULL DEFAULT 0,
     currency text NOT NULL,
     is_beef boolean NOT NULL DEFAULT FALSE,
-    is_point_sku boolean NOT NULL DEFAULT FALSE,
+    is_point_bound boolean NOT NULL DEFAULT FALSE,
+    is_app_bound boolean NOT NULL DEFAULT FALSE,
     is_app_sku boolean NOT NULL DEFAULT FALSE,
     brand_logo_blob_id uuid REFERENCES blobs (id),
     master_plan_blob_id uuid REFERENCES blobs (id),
@@ -132,6 +133,14 @@ CREATE TABLE stock_keeping_unit_photos (
     photo_id uuid NOT NULL REFERENCES blobs (id),
     sort_index integer NOT NULL DEFAULT 0,
     PRIMARY KEY (sku_id, photo_id)
+);
+-- Retail Links
+CREATE TABLE retail_links (
+    id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid (),
+    sku_id uuid NOT NULL REFERENCES stock_keeping_units (id),
+    name text NOT NULL,
+    url text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT NOW()
 );
 -- Categories
 CREATE TABLE categories (

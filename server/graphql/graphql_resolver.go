@@ -578,6 +578,9 @@ func (r *skuResolver) ProductCategories(ctx context.Context, obj *db.StockKeepin
 func (r *skuResolver) ProductCount(ctx context.Context, obj *db.StockKeepingUnit) (int, error) {
 	panic("not implemented")
 }
+func (r *skuResolver) RetailLinks(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.RetailLink, error) {
+	panic("not implemented")
+}
 
 type settingsResolver struct{ *Resolver }
 

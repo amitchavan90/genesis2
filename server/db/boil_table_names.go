@@ -19,6 +19,7 @@ var TableNames = struct {
 	Products                string
 	Prospects               string
 	Referrals               string
+	RetailLinks             string
 	RoleTrackActions        string
 	Roles                   string
 	SchemaMigrations        string
@@ -52,6 +53,7 @@ var TableNames = struct {
 	Products:                "products",
 	Prospects:               "prospects",
 	Referrals:               "referrals",
+	RetailLinks:             "retail_links",
 	RoleTrackActions:        "role_track_actions",
 	Roles:                   "roles",
 	SchemaMigrations:        "schema_migrations",
