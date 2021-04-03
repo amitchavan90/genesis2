@@ -165,6 +165,15 @@ func (s *Users) GetReferrals(refByID string, txes ...*sql.Tx) (db.ReferralSlice,
 	return dat, nil
 }
 
+// GetWalletHistory users by referredByID
+func (s *Users) GetWalletHistory(userID string, txes ...*sql.Tx) (db.WalletHistorySlice, error) {
+	dat, err := db.WalletHistories(db.WalletHistoryWhere.UserID.EQ(userID)).All(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
 // GetMany users given a list of IDs
 func (s *Users) GetMany(keys []string, txes ...*sql.Tx) (db.UserSlice, []error) {
 	if len(keys) == 0 {

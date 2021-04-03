@@ -108,13 +108,13 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJlZTNlMmMzMi04NTNkLTQ2NDktYTZmYi1hYTY4ZjY1N2NkNDciLCJ0b2tlbklkIjoiOWVhZWI0MjctYTUxZC00NzdmLWJmMTctYzI4ZTk1OWFlMTFiIiwidWlkIjoiNWI3YjFjMGUtYmUwNC00OTYwLTk5ZjItNjFlZDU2ZTNjYTRkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.eGx2dbR0FeDXaXvFteRDz_wLo2UvaboNNZnc37RdAno; Path=/; Expires=Sat, 24 Apr 2021 05:25:36 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiI4YTgzOGY0YS0zY2NkLTQ5N2YtODY0OS1iN2VkMjhiM2MxNWYiLCJ0b2tlbklkIjoiYTlhMTFlZjctNWJjOS00N2RkLWI4OTEtOWJjYzhjMGVmMGM3IiwidWlkIjoiZThhZTU5YmUtZTk5MS00NmYyLWEzOGEtYmNiMDI1ZWI0NjQzIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.LZnLOl4Q1bN4hVRvzScaip9bOczO_gRbmJobqqEMaYc; Path=/; Expires=Mon, 03 May 2021 05:28:43 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query {\n  users(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      users {\n          id,\n          email,\n          firstName,\n          lastName,\n          mobilePhone,\n          walletPoints,\n          referralCode,\n          organisation {\n              id\n          },\n          role {\n              id\n          },\n          referrals {\n            id,\n            user {\n                id,\n                firstName\n            },\n            isRedemmed,\n            createdAt\n          }\n      }\n      total\n  }\n}",
+						"query": "query {\n  users(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      users {\n          id,\n          email,\n          firstName,\n          lastName,\n          mobilePhone,\n          walletPoints,\n          referralCode,\n          organisation {\n              id\n          },\n          role {\n              id\n          },\n          referrals {\n            id,\n            user {\n                id,\n                firstName\n            },\n            isRedemmed,\n            createdAt\n          },\n          walletHistory {\n              loyaltyPoints,\n              message,\n              isCredit\n          }\n      }\n      total\n  }\n}",
 						"variables": ""
 					}
 				},

@@ -44,6 +44,8 @@ models:
     model: genesis/db.User
   Referral:
     model: genesis/db.Referral
+  WalletHistory:
+    model: genesis/db.WalletHistory
   Task:
     model: genesis/db.Task
   Subtask:

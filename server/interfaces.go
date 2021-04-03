@@ -225,6 +225,7 @@ type UserStorer interface {
 	GetByEmail(email string, txes ...*sql.Tx) (*db.User, error)
 	GetByReferralCode(referralCode string, txes ...*sql.Tx) (*db.User, error)
 	GetReferrals(refByID string, txes ...*sql.Tx) (db.ReferralSlice, error)
+	GetWalletHistory(userID string, txes ...*sql.Tx) (db.WalletHistorySlice, error)
 	GetByWechatID(wechatID string, txes ...*sql.Tx) (*db.User, error)
 	Get(id uuid.UUID, txes ...*sql.Tx) (*db.User, error)
 	GetWithPermissions(id uuid.UUID, txes ...*sql.Tx) (*db.User, error)

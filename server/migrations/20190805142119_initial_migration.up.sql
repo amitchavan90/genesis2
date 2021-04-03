@@ -448,4 +448,14 @@ CREATE TABLE user_purchase_activities (
     transaction_hash text,
     created_at timestamptz NOT NULL DEFAULT NOW()
 );
+-- Wallet History
+CREATE TABLE wallet_history (
+    id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid (),
+    user_id uuid NOT NULL REFERENCES users (id),
+    loyalty_points int NOT NULL,
+    message text NOT NULL DEFAULT '',
+    is_credit boolean NOT NULL DEFAULT FALSE,
+    transaction_hash text,
+    created_at timestamptz NOT NULL DEFAULT NOW()
+);
 COMMIT;

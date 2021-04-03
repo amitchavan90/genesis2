@@ -159,6 +159,20 @@ func (r *queryResolver) Skus(ctx context.Context, search graphql.SearchFilter, l
 	return result, nil
 }
 
+func (r *queryResolver) PointEnabledSkus(ctx context.Context, search graphql.SearchFilter, limit int, offset int, isPointEnabled bool) (*graphql.SKUResult, error) {
+	total, skus, err := r.SKUStore.SearchSelect(search, limit, offset)
+	if err != nil {
+		return nil, terror.New(err, "list sku")
+	}
+
+	result := &graphql.SKUResult{
+		Skus:  skus,
+		Total: int(total),
+	}
+
+	return result, nil
+}
+
 func (r *queryResolver) SkuCloneTree(ctx context.Context, id string) ([]*graphql.SKUClone, error) {
 	cloneTree := []*graphql.SKUClone{}
 

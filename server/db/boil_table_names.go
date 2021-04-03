@@ -37,6 +37,7 @@ var TableNames = struct {
 	UserSubtasks            string
 	UserTasks               string
 	Users                   string
+	WalletHistory           string
 }{
 	Blobs:                   "blobs",
 	Cartons:                 "cartons",
@@ -71,4 +72,5 @@ var TableNames = struct {
 	UserSubtasks:            "user_subtasks",
 	UserTasks:               "user_tasks",
 	Users:                   "users",
+	WalletHistory:           "wallet_history",
 }

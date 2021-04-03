@@ -266,6 +266,15 @@ func (s *SKU) GetContent(sku *db.StockKeepingUnit, contentType string) (db.Stock
 	return sku.SkuStockKeepingUnitContents(db.StockKeepingUnitContentWhere.ContentType.EQ(contentType)).All(s.Conn)
 }
 
+// GetPointBoundList skus by isIsPointBound
+// func (s *SKU) GetPointBoundList(isPointBound bool, txes ...*sql.Tx) (db.StockKeepingUnitSlice, error) {
+// 	dat, err := db.StockKeepingUnit(db.StockKeepingUnitWhere.IsPointBound.EQ(isPointBound)).All(s.Conn)
+// 	if err != nil {
+// 		return nil, terror.New(err, "")
+// 	}
+// 	return dat, nil
+// }
+
 // GetCategories skus by skuID
 func (s *SKU) GetCategories(skuID string, txes ...*sql.Tx) (db.CategorySlice, error) {
 	dat, err := db.Categories(db.CategoryWhere.SkuID.EQ(skuID)).All(s.Conn)

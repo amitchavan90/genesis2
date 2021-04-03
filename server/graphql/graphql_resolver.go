@@ -442,6 +442,9 @@ func (r *queryResolver) VerifyResetToken(ctx context.Context, token string, emai
 func (r *queryResolver) Skus(ctx context.Context, search SearchFilter, limit int, offset int) (*SKUResult, error) {
 	panic("not implemented")
 }
+func (r *queryResolver) PointEnabledSkus(ctx context.Context, search SearchFilter, limit int, offset int, isPointEnabled bool) (*SKUResult, error) {
+	panic("not implemented")
+}
 func (r *queryResolver) Sku(ctx context.Context, code string) (*db.StockKeepingUnit, error) {
 	panic("not implemented")
 }
@@ -669,6 +672,9 @@ func (r *userResolver) LoyaltyPoints(ctx context.Context, obj *db.User) (int, er
 	panic("not implemented")
 }
 func (r *userResolver) Referrals(ctx context.Context, obj *db.User) ([]*db.Referral, error) {
+	panic("not implemented")
+}
+func (r *userResolver) WalletHistory(ctx context.Context, obj *db.User) ([]*db.WalletHistory, error) {
 	panic("not implemented")
 }
 
