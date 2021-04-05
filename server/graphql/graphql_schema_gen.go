@@ -428,6 +428,7 @@ type ComplexityRoot struct {
 		CreatedAt         func(childComplexity int) int
 		Currency          func(childComplexity int) int
 		Description       func(childComplexity int) int
+		Gif               func(childComplexity int) int
 		HasClones         func(childComplexity int) int
 		ID                func(childComplexity int) int
 		Ingredients       func(childComplexity int) int
@@ -649,7 +650,7 @@ type ComplexityRoot struct {
 		Users func(childComplexity int) int
 	}
 
-	WalletHistory struct {
+	WalletTransaction struct {
 		ID            func(childComplexity int) int
 		IsCredit      func(childComplexity int) int
 		LoyaltyPoints func(childComplexity int) int
@@ -833,6 +834,7 @@ type SKUResolver interface {
 	MasterPlan(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error)
 	Video(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error)
 	BrandLogo(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error)
+	Gif(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error)
 	Urls(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.StockKeepingUnitContent, error)
 	ProductInfo(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.StockKeepingUnitContent, error)
 	Photos(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.Blob, error)
@@ -879,7 +881,7 @@ type UserResolver interface {
 
 	LoyaltyPoints(ctx context.Context, obj *db.User) (int, error)
 	Referrals(ctx context.Context, obj *db.User) ([]*db.Referral, error)
-	WalletHistory(ctx context.Context, obj *db.User) ([]*db.WalletHistory, error)
+	WalletHistory(ctx context.Context, obj *db.User) ([]*db.WalletTransaction, error)
 }
 type UserActivityResolver interface {
 	User(ctx context.Context, obj *db.UserActivity) (*db.User, error)
@@ -3309,6 +3311,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Sku.Description(childComplexity), true
 
+	case "SKU.gif":
+		if e.complexity.Sku.Gif == nil {
+			break
+		}
+
+		return e.complexity.Sku.Gif(childComplexity), true
+
 	case "SKU.hasClones":
 		if e.complexity.Sku.HasClones == nil {
 			break
@@ -4359,33 +4368,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UsersResult.Users(childComplexity), true
 
-	case "WalletHistory.id":
-		if e.complexity.WalletHistory.ID == nil {
+	case "WalletTransaction.id":
+		if e.complexity.WalletTransaction.ID == nil {
 			break
 		}
 
-		return e.complexity.WalletHistory.ID(childComplexity), true
+		return e.complexity.WalletTransaction.ID(childComplexity), true
 
-	case "WalletHistory.isCredit":
-		if e.complexity.WalletHistory.IsCredit == nil {
+	case "WalletTransaction.isCredit":
+		if e.complexity.WalletTransaction.IsCredit == nil {
 			break
 		}
 
-		return e.complexity.WalletHistory.IsCredit(childComplexity), true
+		return e.complexity.WalletTransaction.IsCredit(childComplexity), true
 
-	case "WalletHistory.loyaltyPoints":
-		if e.complexity.WalletHistory.LoyaltyPoints == nil {
+	case "WalletTransaction.loyaltyPoints":
+		if e.complexity.WalletTransaction.LoyaltyPoints == nil {
 			break
 		}
 
-		return e.complexity.WalletHistory.LoyaltyPoints(childComplexity), true
+		return e.complexity.WalletTransaction.LoyaltyPoints(childComplexity), true
 
-	case "WalletHistory.message":
-		if e.complexity.WalletHistory.Message == nil {
+	case "WalletTransaction.message":
+		if e.complexity.WalletTransaction.Message == nil {
 			break
 		}
 
-		return e.complexity.WalletHistory.Message(childComplexity), true
+		return e.complexity.WalletTransaction.Message(childComplexity), true
 
 	}
 	return 0, false
@@ -5168,6 +5177,7 @@ type SKU {
 	masterPlan: Blob
 	video: Blob
 	brandLogo: Blob
+	gif: Blob
 	urls: [SKUContent!]!
 	productInfo: [SKUContent!]!
 	photos: [Blob!]!
@@ -5211,6 +5221,7 @@ input UpdateSKU {
 	masterPlanBlobID: NullString
 	videoBlobID: NullString
 	brandLogoBlobID: NullString
+	gifBlobID: NullString
 	urls: [SKUContentInput!]
 	productInfo: [SKUContentInput!]
 	photoBlobIDs: [String!]
@@ -5536,7 +5547,7 @@ extend type Mutation {
 	name: String!
 	users: [User!]!
 }
-type WalletHistory {
+type WalletTransaction {
 	id: ID!,
 	loyaltyPoints: Int!,
 	message: String!,
@@ -5560,7 +5571,7 @@ type User {
 	wechatID: NullString
 	loyaltyPoints: Int!
 	referrals: [Referral!]! @hasPerm(p: ReferralList)
-	walletHistory: [WalletHistory!]!
+	walletHistory: [WalletTransaction!]!
 
 	affiliateOrg: NullString
 	createdAt: Time!
@@ -21275,6 +21286,40 @@ func (ec *executionContext) _SKU_brandLogo(ctx context.Context, field graphql.Co
 	return ec.marshalOBlob2ᚖgenesisᚋdbᚐBlob(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _SKU_gif(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "SKU",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.SKU().Gif(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*db.Blob)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOBlob2ᚖgenesisᚋdbᚐBlob(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _SKU_urls(ctx context.Context, field graphql.CollectedField, obj *db.StockKeepingUnit) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -24650,10 +24695,10 @@ func (ec *executionContext) _User_walletHistory(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*db.WalletHistory)
+	res := resTmp.([]*db.WalletTransaction)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNWalletHistory2ᚕᚖgenesisᚋdbᚐWalletHistoryᚄ(ctx, field.Selections, res)
+	return ec.marshalNWalletTransaction2ᚕᚖgenesisᚋdbᚐWalletTransactionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_affiliateOrg(ctx context.Context, field graphql.CollectedField, obj *db.User) (ret graphql.Marshaler) {
@@ -26260,7 +26305,7 @@ func (ec *executionContext) _UsersResult_total(ctx context.Context, field graphq
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _WalletHistory_id(ctx context.Context, field graphql.CollectedField, obj *db.WalletHistory) (ret graphql.Marshaler) {
+func (ec *executionContext) _WalletTransaction_id(ctx context.Context, field graphql.CollectedField, obj *db.WalletTransaction) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -26270,7 +26315,7 @@ func (ec *executionContext) _WalletHistory_id(ctx context.Context, field graphql
 		ec.Tracer.EndFieldExecution(ctx)
 	}()
 	rctx := &graphql.ResolverContext{
-		Object:   "WalletHistory",
+		Object:   "WalletTransaction",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -26297,7 +26342,7 @@ func (ec *executionContext) _WalletHistory_id(ctx context.Context, field graphql
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _WalletHistory_loyaltyPoints(ctx context.Context, field graphql.CollectedField, obj *db.WalletHistory) (ret graphql.Marshaler) {
+func (ec *executionContext) _WalletTransaction_loyaltyPoints(ctx context.Context, field graphql.CollectedField, obj *db.WalletTransaction) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -26307,7 +26352,7 @@ func (ec *executionContext) _WalletHistory_loyaltyPoints(ctx context.Context, fi
 		ec.Tracer.EndFieldExecution(ctx)
 	}()
 	rctx := &graphql.ResolverContext{
-		Object:   "WalletHistory",
+		Object:   "WalletTransaction",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -26334,7 +26379,7 @@ func (ec *executionContext) _WalletHistory_loyaltyPoints(ctx context.Context, fi
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _WalletHistory_message(ctx context.Context, field graphql.CollectedField, obj *db.WalletHistory) (ret graphql.Marshaler) {
+func (ec *executionContext) _WalletTransaction_message(ctx context.Context, field graphql.CollectedField, obj *db.WalletTransaction) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -26344,7 +26389,7 @@ func (ec *executionContext) _WalletHistory_message(ctx context.Context, field gr
 		ec.Tracer.EndFieldExecution(ctx)
 	}()
 	rctx := &graphql.ResolverContext{
-		Object:   "WalletHistory",
+		Object:   "WalletTransaction",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -26371,7 +26416,7 @@ func (ec *executionContext) _WalletHistory_message(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _WalletHistory_isCredit(ctx context.Context, field graphql.CollectedField, obj *db.WalletHistory) (ret graphql.Marshaler) {
+func (ec *executionContext) _WalletTransaction_isCredit(ctx context.Context, field graphql.CollectedField, obj *db.WalletTransaction) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -26381,7 +26426,7 @@ func (ec *executionContext) _WalletHistory_isCredit(ctx context.Context, field g
 		ec.Tracer.EndFieldExecution(ctx)
 	}()
 	rctx := &graphql.ResolverContext{
-		Object:   "WalletHistory",
+		Object:   "WalletTransaction",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -28444,6 +28489,12 @@ func (ec *executionContext) unmarshalInputUpdateSKU(ctx context.Context, obj int
 		case "brandLogoBlobID":
 			var err error
 			it.BrandLogoBlobID, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "gifBlobID":
+			var err error
+			it.GifBlobID, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -31466,6 +31517,17 @@ func (ec *executionContext) _SKU(ctx context.Context, sel ast.SelectionSet, obj 
 				res = ec._SKU_brandLogo(ctx, field, obj)
 				return res
 			})
+		case "gif":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SKU_gif(ctx, field, obj)
+				return res
+			})
 		case "urls":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -32902,34 +32964,34 @@ func (ec *executionContext) _UsersResult(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var walletHistoryImplementors = []string{"WalletHistory"}
+var walletTransactionImplementors = []string{"WalletTransaction"}
 
-func (ec *executionContext) _WalletHistory(ctx context.Context, sel ast.SelectionSet, obj *db.WalletHistory) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.RequestContext, sel, walletHistoryImplementors)
+func (ec *executionContext) _WalletTransaction(ctx context.Context, sel ast.SelectionSet, obj *db.WalletTransaction) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, walletTransactionImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("WalletHistory")
+			out.Values[i] = graphql.MarshalString("WalletTransaction")
 		case "id":
-			out.Values[i] = ec._WalletHistory_id(ctx, field, obj)
+			out.Values[i] = ec._WalletTransaction_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "loyaltyPoints":
-			out.Values[i] = ec._WalletHistory_loyaltyPoints(ctx, field, obj)
+			out.Values[i] = ec._WalletTransaction_loyaltyPoints(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "message":
-			out.Values[i] = ec._WalletHistory_message(ctx, field, obj)
+			out.Values[i] = ec._WalletTransaction_message(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "isCredit":
-			out.Values[i] = ec._WalletHistory_isCredit(ctx, field, obj)
+			out.Values[i] = ec._WalletTransaction_isCredit(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -35252,11 +35314,11 @@ func (ec *executionContext) marshalNUsersResult2ᚖgenesisᚋgraphqlᚐUsersResu
 	return ec._UsersResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWalletHistory2genesisᚋdbᚐWalletHistory(ctx context.Context, sel ast.SelectionSet, v db.WalletHistory) graphql.Marshaler {
-	return ec._WalletHistory(ctx, sel, &v)
+func (ec *executionContext) marshalNWalletTransaction2genesisᚋdbᚐWalletTransaction(ctx context.Context, sel ast.SelectionSet, v db.WalletTransaction) graphql.Marshaler {
+	return ec._WalletTransaction(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWalletHistory2ᚕᚖgenesisᚋdbᚐWalletHistoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.WalletHistory) graphql.Marshaler {
+func (ec *executionContext) marshalNWalletTransaction2ᚕᚖgenesisᚋdbᚐWalletTransactionᚄ(ctx context.Context, sel ast.SelectionSet, v []*db.WalletTransaction) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -35280,7 +35342,7 @@ func (ec *executionContext) marshalNWalletHistory2ᚕᚖgenesisᚋdbᚐWalletHis
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNWalletHistory2ᚖgenesisᚋdbᚐWalletHistory(ctx, sel, v[i])
+			ret[i] = ec.marshalNWalletTransaction2ᚖgenesisᚋdbᚐWalletTransaction(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -35293,14 +35355,14 @@ func (ec *executionContext) marshalNWalletHistory2ᚕᚖgenesisᚋdbᚐWalletHis
 	return ret
 }
 
-func (ec *executionContext) marshalNWalletHistory2ᚖgenesisᚋdbᚐWalletHistory(ctx context.Context, sel ast.SelectionSet, v *db.WalletHistory) graphql.Marshaler {
+func (ec *executionContext) marshalNWalletTransaction2ᚖgenesisᚋdbᚐWalletTransaction(ctx context.Context, sel ast.SelectionSet, v *db.WalletTransaction) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	return ec._WalletHistory(ctx, sel, v)
+	return ec._WalletTransaction(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

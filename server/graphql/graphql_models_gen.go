@@ -293,6 +293,7 @@ type UpdateSku struct {
 	MasterPlanBlobID  *null.String             `json:"masterPlanBlobID"`
 	VideoBlobID       *null.String             `json:"videoBlobID"`
 	BrandLogoBlobID   *null.String             `json:"brandLogoBlobID"`
+	GifBlobID         *null.String             `json:"gifBlobID"`
 	Urls              []*SKUContentInput       `json:"urls"`
 	ProductInfo       []*SKUContentInput       `json:"productInfo"`
 	PhotoBlobIDs      []string                 `json:"photoBlobIDs"`

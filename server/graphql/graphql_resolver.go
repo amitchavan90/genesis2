@@ -562,7 +562,9 @@ func (r *skuResolver) Video(ctx context.Context, obj *db.StockKeepingUnit) (*db.
 func (r *skuResolver) BrandLogo(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error) {
 	panic("not implemented")
 }
-
+func (r *skuResolver) Gif(ctx context.Context, obj *db.StockKeepingUnit) (*db.Blob, error) {
+	panic("not implemented")
+}
 func (r *skuResolver) Urls(ctx context.Context, obj *db.StockKeepingUnit) ([]*db.StockKeepingUnitContent, error) {
 	panic("not implemented")
 }
@@ -674,7 +676,7 @@ func (r *userResolver) LoyaltyPoints(ctx context.Context, obj *db.User) (int, er
 func (r *userResolver) Referrals(ctx context.Context, obj *db.User) ([]*db.Referral, error) {
 	panic("not implemented")
 }
-func (r *userResolver) WalletHistory(ctx context.Context, obj *db.User) ([]*db.WalletHistory, error) {
+func (r *userResolver) WalletHistory(ctx context.Context, obj *db.User) ([]*db.WalletTransaction, error) {
 	panic("not implemented")
 }
 

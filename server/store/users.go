@@ -166,8 +166,8 @@ func (s *Users) GetReferrals(refByID string, txes ...*sql.Tx) (db.ReferralSlice,
 }
 
 // GetWalletHistory users by referredByID
-func (s *Users) GetWalletHistory(userID string, txes ...*sql.Tx) (db.WalletHistorySlice, error) {
-	dat, err := db.WalletHistories(db.WalletHistoryWhere.UserID.EQ(userID)).All(s.Conn)
+func (s *Users) GetWalletHistory(userID string, txes ...*sql.Tx) (db.WalletTransactionSlice, error) {
+	dat, err := db.WalletTransactions(db.WalletTransactionWhere.UserID.EQ(userID)).All(s.Conn)
 	if err != nil {
 		return nil, terror.New(err, "")
 	}

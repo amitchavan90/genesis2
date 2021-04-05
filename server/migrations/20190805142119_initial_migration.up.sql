@@ -110,6 +110,7 @@ CREATE TABLE stock_keeping_units (
     is_app_bound boolean NOT NULL DEFAULT FALSE,
     is_app_sku boolean NOT NULL DEFAULT FALSE,
     brand_logo_blob_id uuid REFERENCES blobs (id),
+    gif_blob_id uuid REFERENCES blobs (id),
     master_plan_blob_id uuid REFERENCES blobs (id),
     video_blob_id uuid REFERENCES blobs (id),
     clone_parent_id uuid REFERENCES stock_keeping_units (id),
@@ -448,8 +449,8 @@ CREATE TABLE user_purchase_activities (
     transaction_hash text,
     created_at timestamptz NOT NULL DEFAULT NOW()
 );
--- Wallet History
-CREATE TABLE wallet_history (
+-- Wallet Transaction
+CREATE TABLE wallet_transaction (
     id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid (),
     user_id uuid NOT NULL REFERENCES users (id),
     loyalty_points int NOT NULL,

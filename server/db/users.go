@@ -169,7 +169,7 @@ var UserRels = struct {
 	UserLoyaltyActivities      string
 	UserPurchaseActivities     string
 	UserTasks                  string
-	WalletHistories            string
+	WalletTransactions         string
 }{
 	Organisation:               "Organisation",
 	Role:                       "Role",
@@ -190,7 +190,7 @@ var UserRels = struct {
 	UserLoyaltyActivities:      "UserLoyaltyActivities",
 	UserPurchaseActivities:     "UserPurchaseActivities",
 	UserTasks:                  "UserTasks",
-	WalletHistories:            "WalletHistories",
+	WalletTransactions:         "WalletTransactions",
 }
 
 // userR is where relationships are stored.
@@ -214,7 +214,7 @@ type userR struct {
 	UserLoyaltyActivities      UserLoyaltyActivitySlice
 	UserPurchaseActivities     UserPurchaseActivitySlice
 	UserTasks                  UserTaskSlice
-	WalletHistories            WalletHistorySlice
+	WalletTransactions         WalletTransactionSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -856,22 +856,22 @@ func (o *User) UserTasks(mods ...qm.QueryMod) userTaskQuery {
 	return query
 }
 
-// WalletHistories retrieves all the wallet_history's WalletHistories with an executor.
-func (o *User) WalletHistories(mods ...qm.QueryMod) walletHistoryQuery {
+// WalletTransactions retrieves all the wallet_transaction's WalletTransactions with an executor.
+func (o *User) WalletTransactions(mods ...qm.QueryMod) walletTransactionQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"wallet_history\".\"user_id\"=?", o.ID),
+		qm.Where("\"wallet_transaction\".\"user_id\"=?", o.ID),
 	)
 
-	query := WalletHistories(queryMods...)
-	queries.SetFrom(query.Query, "\"wallet_history\"")
+	query := WalletTransactions(queryMods...)
+	queries.SetFrom(query.Query, "\"wallet_transaction\"")
 
 	if len(queries.GetSelect(query.Query)) == 0 {
-		queries.SetSelect(query.Query, []string{"\"wallet_history\".*"})
+		queries.SetSelect(query.Query, []string{"\"wallet_transaction\".*"})
 	}
 
 	return query
@@ -2698,9 +2698,9 @@ func (userL) LoadUserTasks(e boil.Executor, singular bool, maybeUser interface{}
 	return nil
 }
 
-// LoadWalletHistories allows an eager lookup of values, cached into the
+// LoadWalletTransactions allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (userL) LoadWalletHistories(e boil.Executor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+func (userL) LoadWalletTransactions(e boil.Executor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
 	var slice []*User
 	var object *User
 
@@ -2737,29 +2737,29 @@ func (userL) LoadWalletHistories(e boil.Executor, singular bool, maybeUser inter
 		return nil
 	}
 
-	query := NewQuery(qm.From(`wallet_history`), qm.WhereIn(`wallet_history.user_id in ?`, args...))
+	query := NewQuery(qm.From(`wallet_transaction`), qm.WhereIn(`wallet_transaction.user_id in ?`, args...))
 	if mods != nil {
 		mods.Apply(query)
 	}
 
 	results, err := query.Query(e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load wallet_history")
+		return errors.Wrap(err, "failed to eager load wallet_transaction")
 	}
 
-	var resultSlice []*WalletHistory
+	var resultSlice []*WalletTransaction
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice wallet_history")
+		return errors.Wrap(err, "failed to bind eager loaded slice wallet_transaction")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on wallet_history")
+		return errors.Wrap(err, "failed to close results in eager load on wallet_transaction")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for wallet_history")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for wallet_transaction")
 	}
 
-	if len(walletHistoryAfterSelectHooks) != 0 {
+	if len(walletTransactionAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(e); err != nil {
 				return err
@@ -2767,10 +2767,10 @@ func (userL) LoadWalletHistories(e boil.Executor, singular bool, maybeUser inter
 		}
 	}
 	if singular {
-		object.R.WalletHistories = resultSlice
+		object.R.WalletTransactions = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
-				foreign.R = &walletHistoryR{}
+				foreign.R = &walletTransactionR{}
 			}
 			foreign.R.User = object
 		}
@@ -2780,9 +2780,9 @@ func (userL) LoadWalletHistories(e boil.Executor, singular bool, maybeUser inter
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
 			if local.ID == foreign.UserID {
-				local.R.WalletHistories = append(local.R.WalletHistories, foreign)
+				local.R.WalletTransactions = append(local.R.WalletTransactions, foreign)
 				if foreign.R == nil {
-					foreign.R = &walletHistoryR{}
+					foreign.R = &walletTransactionR{}
 				}
 				foreign.R.User = local
 				break
@@ -4009,11 +4009,11 @@ func (o *User) AddUserTasks(exec boil.Executor, insert bool, related ...*UserTas
 	return nil
 }
 
-// AddWalletHistories adds the given related objects to the existing relationships
+// AddWalletTransactions adds the given related objects to the existing relationships
 // of the user, optionally inserting them as new records.
-// Appends related to o.R.WalletHistories.
+// Appends related to o.R.WalletTransactions.
 // Sets related.R.User appropriately.
-func (o *User) AddWalletHistories(exec boil.Executor, insert bool, related ...*WalletHistory) error {
+func (o *User) AddWalletTransactions(exec boil.Executor, insert bool, related ...*WalletTransaction) error {
 	var err error
 	for _, rel := range related {
 		if insert {
@@ -4023,9 +4023,9 @@ func (o *User) AddWalletHistories(exec boil.Executor, insert bool, related ...*W
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
-				"UPDATE \"wallet_history\" SET %s WHERE %s",
+				"UPDATE \"wallet_transaction\" SET %s WHERE %s",
 				strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
-				strmangle.WhereClause("\"", "\"", 2, walletHistoryPrimaryKeyColumns),
+				strmangle.WhereClause("\"", "\"", 2, walletTransactionPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
 
@@ -4043,15 +4043,15 @@ func (o *User) AddWalletHistories(exec boil.Executor, insert bool, related ...*W
 
 	if o.R == nil {
 		o.R = &userR{
-			WalletHistories: related,
+			WalletTransactions: related,
 		}
 	} else {
-		o.R.WalletHistories = append(o.R.WalletHistories, related...)
+		o.R.WalletTransactions = append(o.R.WalletTransactions, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
-			rel.R = &walletHistoryR{
+			rel.R = &walletTransactionR{
 				User: o,
 			}
 		} else {

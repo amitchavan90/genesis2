@@ -207,6 +207,7 @@ var BlobWhere = struct {
 var BlobRels = struct {
 	PhotoStockKeepingUnitPhotos     string
 	BrandLogoBlobStockKeepingUnits  string
+	GifBlobStockKeepingUnits        string
 	MasterPlanBlobStockKeepingUnits string
 	VideoBlobStockKeepingUnits      string
 	BannerPhotoBlobTasks            string
@@ -216,6 +217,7 @@ var BlobRels = struct {
 }{
 	PhotoStockKeepingUnitPhotos:     "PhotoStockKeepingUnitPhotos",
 	BrandLogoBlobStockKeepingUnits:  "BrandLogoBlobStockKeepingUnits",
+	GifBlobStockKeepingUnits:        "GifBlobStockKeepingUnits",
 	MasterPlanBlobStockKeepingUnits: "MasterPlanBlobStockKeepingUnits",
 	VideoBlobStockKeepingUnits:      "VideoBlobStockKeepingUnits",
 	BannerPhotoBlobTasks:            "BannerPhotoBlobTasks",
@@ -228,6 +230,7 @@ var BlobRels = struct {
 type blobR struct {
 	PhotoStockKeepingUnitPhotos     StockKeepingUnitPhotoSlice
 	BrandLogoBlobStockKeepingUnits  StockKeepingUnitSlice
+	GifBlobStockKeepingUnits        StockKeepingUnitSlice
 	MasterPlanBlobStockKeepingUnits StockKeepingUnitSlice
 	VideoBlobStockKeepingUnits      StockKeepingUnitSlice
 	BannerPhotoBlobTasks            TaskSlice
@@ -520,6 +523,27 @@ func (o *Blob) BrandLogoBlobStockKeepingUnits(mods ...qm.QueryMod) stockKeepingU
 
 	queryMods = append(queryMods,
 		qm.Where("\"stock_keeping_units\".\"brand_logo_blob_id\"=?", o.ID),
+	)
+
+	query := StockKeepingUnits(queryMods...)
+	queries.SetFrom(query.Query, "\"stock_keeping_units\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"stock_keeping_units\".*"})
+	}
+
+	return query
+}
+
+// GifBlobStockKeepingUnits retrieves all the stock_keeping_unit's StockKeepingUnits with an executor via gif_blob_id column.
+func (o *Blob) GifBlobStockKeepingUnits(mods ...qm.QueryMod) stockKeepingUnitQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"stock_keeping_units\".\"gif_blob_id\"=?", o.ID),
 	)
 
 	query := StockKeepingUnits(queryMods...)
@@ -840,6 +864,101 @@ func (blobL) LoadBrandLogoBlobStockKeepingUnits(e boil.Executor, singular bool, 
 					foreign.R = &stockKeepingUnitR{}
 				}
 				foreign.R.BrandLogoBlob = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadGifBlobStockKeepingUnits allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (blobL) LoadGifBlobStockKeepingUnits(e boil.Executor, singular bool, maybeBlob interface{}, mods queries.Applicator) error {
+	var slice []*Blob
+	var object *Blob
+
+	if singular {
+		object = maybeBlob.(*Blob)
+	} else {
+		slice = *maybeBlob.(*[]*Blob)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &blobR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &blobR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.ID) {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`stock_keeping_units`), qm.WhereIn(`stock_keeping_units.gif_blob_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load stock_keeping_units")
+	}
+
+	var resultSlice []*StockKeepingUnit
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice stock_keeping_units")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on stock_keeping_units")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for stock_keeping_units")
+	}
+
+	if len(stockKeepingUnitAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.GifBlobStockKeepingUnits = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &stockKeepingUnitR{}
+			}
+			foreign.R.GifBlob = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if queries.Equal(local.ID, foreign.GifBlobID) {
+				local.R.GifBlobStockKeepingUnits = append(local.R.GifBlobStockKeepingUnits, foreign)
+				if foreign.R == nil {
+					foreign.R = &stockKeepingUnitR{}
+				}
+				foreign.R.GifBlob = local
 				break
 			}
 		}
@@ -1584,6 +1703,127 @@ func (o *Blob) RemoveBrandLogoBlobStockKeepingUnits(exec boil.Executor, related 
 				o.R.BrandLogoBlobStockKeepingUnits[i] = o.R.BrandLogoBlobStockKeepingUnits[ln-1]
 			}
 			o.R.BrandLogoBlobStockKeepingUnits = o.R.BrandLogoBlobStockKeepingUnits[:ln-1]
+			break
+		}
+	}
+
+	return nil
+}
+
+// AddGifBlobStockKeepingUnits adds the given related objects to the existing relationships
+// of the blob, optionally inserting them as new records.
+// Appends related to o.R.GifBlobStockKeepingUnits.
+// Sets related.R.GifBlob appropriately.
+func (o *Blob) AddGifBlobStockKeepingUnits(exec boil.Executor, insert bool, related ...*StockKeepingUnit) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			queries.Assign(&rel.GifBlobID, o.ID)
+			if err = rel.Insert(exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"stock_keeping_units\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"gif_blob_id"}),
+				strmangle.WhereClause("\"", "\"", 2, stockKeepingUnitPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+			if _, err = exec.Exec(updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			queries.Assign(&rel.GifBlobID, o.ID)
+		}
+	}
+
+	if o.R == nil {
+		o.R = &blobR{
+			GifBlobStockKeepingUnits: related,
+		}
+	} else {
+		o.R.GifBlobStockKeepingUnits = append(o.R.GifBlobStockKeepingUnits, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &stockKeepingUnitR{
+				GifBlob: o,
+			}
+		} else {
+			rel.R.GifBlob = o
+		}
+	}
+	return nil
+}
+
+// SetGifBlobStockKeepingUnits removes all previously related items of the
+// blob replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.GifBlob's GifBlobStockKeepingUnits accordingly.
+// Replaces o.R.GifBlobStockKeepingUnits with related.
+// Sets related.R.GifBlob's GifBlobStockKeepingUnits accordingly.
+func (o *Blob) SetGifBlobStockKeepingUnits(exec boil.Executor, insert bool, related ...*StockKeepingUnit) error {
+	query := "update \"stock_keeping_units\" set \"gif_blob_id\" = null where \"gif_blob_id\" = $1"
+	values := []interface{}{o.ID}
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, query)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+	_, err := exec.Exec(query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.GifBlobStockKeepingUnits {
+			queries.SetScanner(&rel.GifBlobID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.GifBlob = nil
+		}
+
+		o.R.GifBlobStockKeepingUnits = nil
+	}
+	return o.AddGifBlobStockKeepingUnits(exec, insert, related...)
+}
+
+// RemoveGifBlobStockKeepingUnits relationships from objects passed in.
+// Removes related items from R.GifBlobStockKeepingUnits (uses pointer comparison, removal does not keep order)
+// Sets related.R.GifBlob.
+func (o *Blob) RemoveGifBlobStockKeepingUnits(exec boil.Executor, related ...*StockKeepingUnit) error {
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.GifBlobID, nil)
+		if rel.R != nil {
+			rel.R.GifBlob = nil
+		}
+		if _, err = rel.Update(exec, boil.Whitelist("gif_blob_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.GifBlobStockKeepingUnits {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.GifBlobStockKeepingUnits)
+			if ln > 1 && i < ln-1 {
+				o.R.GifBlobStockKeepingUnits[i] = o.R.GifBlobStockKeepingUnits[ln-1]
+			}
+			o.R.GifBlobStockKeepingUnits = o.R.GifBlobStockKeepingUnits[:ln-1]
 			break
 		}
 	}

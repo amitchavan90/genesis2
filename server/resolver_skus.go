@@ -54,6 +54,16 @@ func (r *skuResolver) BrandLogo(ctx context.Context, sku *db.StockKeepingUnit) (
 	}
 	return r.BlobStore.Get(blobUUID)
 }
+func (r *skuResolver) Gif(ctx context.Context, sku *db.StockKeepingUnit) (*db.Blob, error) {
+	if !sku.GifBlobID.Valid {
+		return nil, nil
+	}
+	blobUUID, err := uuid.FromString(sku.GifBlobID.String)
+	if err != nil {
+		return nil, terror.New(terror.ErrParse, "")
+	}
+	return r.BlobStore.Get(blobUUID)
+}
 func (r *skuResolver) Urls(ctx context.Context, sku *db.StockKeepingUnit) ([]*db.StockKeepingUnitContent, error) {
 	content, err := r.SKUStore.GetContent(sku, db.ContentTypeURL)
 	if err != nil {
@@ -322,6 +332,13 @@ func (r *mutationResolver) SkuCreate(ctx context.Context, input graphql.UpdateSk
 			u.BrandLogoBlobID = null.StringFromPtr(nil)
 		} else {
 			u.BrandLogoBlobID = *input.BrandLogoBlobID
+		}
+	}
+	if input.GifBlobID != nil {
+		if input.GifBlobID.String == "-" {
+			u.GifBlobID = null.StringFromPtr(nil)
+		} else {
+			u.GifBlobID = *input.GifBlobID
 		}
 	}
 	if input.CloneParentID != nil {

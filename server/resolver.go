@@ -40,6 +40,7 @@ type Resolver struct {
 	TrackActionStore          TrackActionStorer
 	UserActivityStore         UserActivityStorer
 	UserPurchaseActivityStore UserPurchaseActivityStorer
+	WalletTransactionStore    WalletTransactionStorer
 	LoyaltyStore              LoyaltyStorer
 	Blacklister               BlacklistProvider
 	SmsMessenger              Messenger

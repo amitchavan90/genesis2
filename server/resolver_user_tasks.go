@@ -209,6 +209,21 @@ func (r *mutationResolver) UserTaskApprove(ctx context.Context, id string) (*db.
 		return nil, terror.New(err, "update user task")
 	}
 
+	// Update WalletTransactions
+	wtID, _ := uuid.NewV4()
+	wt := &db.WalletTransaction{
+		ID:            wtID.String(),
+		UserID:        u.ID,
+		LoyaltyPoints: ut.R.Task.LoyaltyPoints,
+		IsCredit:      true,
+		Message:       "Loyalty points awarded by completing the task",
+	}
+
+	_, err = r.WalletTransactionStore.Insert(wt)
+	if err != nil {
+		return nil, terror.New(err, "create wallet transaction")
+	}
+
 	// Update User
 	_, err = r.UserStore.Update(u)
 	if err != nil {
