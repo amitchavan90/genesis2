@@ -10,6 +10,7 @@
 //go:generate go run github.com/vektah/dataloaden SKULoader string *genesis/db.StockKeepingUnit
 //go:generate go run github.com/vektah/dataloaden CategoryLoader string *genesis/db.Category
 //go:generate go run github.com/vektah/dataloaden ProductCategoryLoader string *genesis/db.ProductCategory
+//go:generate go run github.com/vektah/dataloaden RetailLinkLoader string *genesis/db.RetailLink
 //go:generate go run github.com/vektah/dataloaden OrderLoader string *genesis/db.Order
 //go:generate go run github.com/vektah/dataloaden DistributorLoader string *genesis/db.Distributor
 //go:generate go run github.com/vektah/dataloaden ContainerLoader string *genesis/db.Container

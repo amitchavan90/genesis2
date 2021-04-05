@@ -44,6 +44,8 @@ models:
     model: genesis/db.User
   Referral:
     model: genesis/db.Referral
+  WalletTransaction:
+    model: genesis/db.WalletTransaction
   Task:
     model: genesis/db.Task
   Subtask:
@@ -62,6 +64,8 @@ models:
     model: genesis/db.Category
   ProductCategory:
     model: genesis/db.ProductCategory
+  RetailLink:
+    model: genesis/db.RetailLink
   Container:
     model: genesis/db.Container
   Pallet:

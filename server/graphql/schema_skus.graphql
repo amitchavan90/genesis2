@@ -14,6 +14,14 @@ input SKUContentInput {
 	title: String!
 	content: String!
 }
+type RetailLink {
+	name: String!
+	url: String!
+}
+input RetailLinkInput {
+	name: String!
+	url: String!
+}
 
 type SKU {
 	id: ID!
@@ -22,15 +30,15 @@ type SKU {
 	brand: String!
 	description: String!
 	ingredients: String!
-	weight: Int!
+	weight: Float!
 	weightUnit: String!
-	price: Int!
+	price: Float!
 	purchasePoints: Int!
 	loyaltyPoints: Int!
 	currency: String!
 	isBeef: Boolean!
-	isPointSku: Boolean!
-	isAppSku: Boolean!
+	isPointBound: Boolean!
+	isAppBound: Boolean!
 	archived: Boolean!
 	createdAt: Time!
 
@@ -40,11 +48,13 @@ type SKU {
 	masterPlan: Blob
 	video: Blob
 	brandLogo: Blob
+	gif: Blob
 	urls: [SKUContent!]!
 	productInfo: [SKUContent!]!
 	photos: [Blob!]!
 	categories: [Category!]!
 	productCategories: [ProductCategory!]!
+	retailLinks: [RetailLink!]!
 
 	productCount: Int!
 }
@@ -68,27 +78,27 @@ input UpdateSKU {
 	description: NullString
 	ingredients: NullString
 
-	weight: NullInt
+	weight: Float
 	weightUnit: NullString
-	price: NullInt
+	price: Float
 	currency: NullString
 	purchasePoints: NullInt
 	loyaltyPoints: NullInt
 
 	isBeef: NullBool
-	isRetailSku: NullBool
-	isPointSku: NullBool
-	isAppSku: NullBool
-	isMiniappSku: NullBool
+	isPointBound: NullBool
+	isAppBound: NullBool
 
 	masterPlanBlobID: NullString
 	videoBlobID: NullString
 	brandLogoBlobID: NullString
+	gifBlobID: NullString
 	urls: [SKUContentInput!]
 	productInfo: [SKUContentInput!]
 	photoBlobIDs: [String!]
 	categories: [UpdateCategory]
 	productCategories: [UpdateProductCategory]
+	retailLinks: [RetailLinkInput]
 
 	cloneParentID: NullString
 }
@@ -100,6 +110,7 @@ type SKUClone {
 
 extend type Query {
 	skus(search: SearchFilter!, limit: Int!, offset: Int!): SKUResult! @hasPerm(p: SKUList)
+	pointEnabledSkus(search: SearchFilter!, limit: Int!, offset: Int!, isPointEnabled: Boolean!): SKUResult! @hasPerm(p: SKUList)
 	sku(code: String!): SKU! @hasPerm(p: SKURead)
 	skuByID(id: ID!): SKU!
 

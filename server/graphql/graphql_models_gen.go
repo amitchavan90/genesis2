@@ -143,6 +143,11 @@ type RequestToken struct {
 	Password string `json:"password"`
 }
 
+type RetailLinkInput struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+
 type RolesResult struct {
 	Roles []*db.Role `json:"roles"`
 	Total int        `json:"total"`
@@ -276,25 +281,25 @@ type UpdateSku struct {
 	Brand             *null.String             `json:"brand"`
 	Description       *null.String             `json:"description"`
 	Ingredients       *null.String             `json:"ingredients"`
-	Weight            *null.Int                `json:"weight"`
+	Weight            *float64                 `json:"weight"`
 	WeightUnit        *null.String             `json:"weightUnit"`
-	Price             *null.Int                `json:"price"`
+	Price             *float64                 `json:"price"`
 	Currency          *null.String             `json:"currency"`
 	PurchasePoints    *null.Int                `json:"purchasePoints"`
 	LoyaltyPoints     *null.Int                `json:"loyaltyPoints"`
 	IsBeef            *null.Bool               `json:"isBeef"`
-	IsRetailSku       *null.Bool               `json:"isRetailSku"`
-	IsPointSku        *null.Bool               `json:"isPointSku"`
-	IsAppSku          *null.Bool               `json:"isAppSku"`
-	IsMiniappSku      *null.Bool               `json:"isMiniappSku"`
+	IsPointBound      *null.Bool               `json:"isPointBound"`
+	IsAppBound        *null.Bool               `json:"isAppBound"`
 	MasterPlanBlobID  *null.String             `json:"masterPlanBlobID"`
 	VideoBlobID       *null.String             `json:"videoBlobID"`
 	BrandLogoBlobID   *null.String             `json:"brandLogoBlobID"`
+	GifBlobID         *null.String             `json:"gifBlobID"`
 	Urls              []*SKUContentInput       `json:"urls"`
 	ProductInfo       []*SKUContentInput       `json:"productInfo"`
 	PhotoBlobIDs      []string                 `json:"photoBlobIDs"`
 	Categories        []*UpdateCategory        `json:"categories"`
 	ProductCategories []*UpdateProductCategory `json:"productCategories"`
+	RetailLinks       []*RetailLinkInput       `json:"retailLinks"`
 	CloneParentID     *null.String             `json:"cloneParentID"`
 }
 

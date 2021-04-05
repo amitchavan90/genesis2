@@ -29,16 +29,18 @@ type StockKeepingUnit struct {
 	Brand            string      `db:"brand" boil:"brand" json:"brand" toml:"brand" yaml:"brand"`
 	Ingredients      string      `db:"ingredients" boil:"ingredients" json:"ingredients" toml:"ingredients" yaml:"ingredients"`
 	Description      string      `db:"description" boil:"description" json:"description" toml:"description" yaml:"description"`
-	Weight           int         `db:"weight" boil:"weight" json:"weight" toml:"weight" yaml:"weight"`
+	Weight           float64     `db:"weight" boil:"weight" json:"weight" toml:"weight" yaml:"weight"`
 	WeightUnit       string      `db:"weight_unit" boil:"weight_unit" json:"weight_unit" toml:"weight_unit" yaml:"weight_unit"`
-	Price            int         `db:"price" boil:"price" json:"price" toml:"price" yaml:"price"`
+	Price            float64     `db:"price" boil:"price" json:"price" toml:"price" yaml:"price"`
 	PurchasePoints   int         `db:"purchase_points" boil:"purchase_points" json:"purchase_points" toml:"purchase_points" yaml:"purchase_points"`
 	LoyaltyPoints    int         `db:"loyalty_points" boil:"loyalty_points" json:"loyalty_points" toml:"loyalty_points" yaml:"loyalty_points"`
 	Currency         string      `db:"currency" boil:"currency" json:"currency" toml:"currency" yaml:"currency"`
 	IsBeef           bool        `db:"is_beef" boil:"is_beef" json:"is_beef" toml:"is_beef" yaml:"is_beef"`
-	IsPointSku       bool        `db:"is_point_sku" boil:"is_point_sku" json:"is_point_sku" toml:"is_point_sku" yaml:"is_point_sku"`
+	IsPointBound     bool        `db:"is_point_bound" boil:"is_point_bound" json:"is_point_bound" toml:"is_point_bound" yaml:"is_point_bound"`
+	IsAppBound       bool        `db:"is_app_bound" boil:"is_app_bound" json:"is_app_bound" toml:"is_app_bound" yaml:"is_app_bound"`
 	IsAppSku         bool        `db:"is_app_sku" boil:"is_app_sku" json:"is_app_sku" toml:"is_app_sku" yaml:"is_app_sku"`
 	BrandLogoBlobID  null.String `db:"brand_logo_blob_id" boil:"brand_logo_blob_id" json:"brand_logo_blob_id,omitempty" toml:"brand_logo_blob_id" yaml:"brand_logo_blob_id,omitempty"`
+	GifBlobID        null.String `db:"gif_blob_id" boil:"gif_blob_id" json:"gif_blob_id,omitempty" toml:"gif_blob_id" yaml:"gif_blob_id,omitempty"`
 	MasterPlanBlobID null.String `db:"master_plan_blob_id" boil:"master_plan_blob_id" json:"master_plan_blob_id,omitempty" toml:"master_plan_blob_id" yaml:"master_plan_blob_id,omitempty"`
 	VideoBlobID      null.String `db:"video_blob_id" boil:"video_blob_id" json:"video_blob_id,omitempty" toml:"video_blob_id" yaml:"video_blob_id,omitempty"`
 	CloneParentID    null.String `db:"clone_parent_id" boil:"clone_parent_id" json:"clone_parent_id,omitempty" toml:"clone_parent_id" yaml:"clone_parent_id,omitempty"`
@@ -66,9 +68,11 @@ var StockKeepingUnitColumns = struct {
 	LoyaltyPoints    string
 	Currency         string
 	IsBeef           string
-	IsPointSku       string
+	IsPointBound     string
+	IsAppBound       string
 	IsAppSku         string
 	BrandLogoBlobID  string
+	GifBlobID        string
 	MasterPlanBlobID string
 	VideoBlobID      string
 	CloneParentID    string
@@ -91,9 +95,11 @@ var StockKeepingUnitColumns = struct {
 	LoyaltyPoints:    "loyalty_points",
 	Currency:         "currency",
 	IsBeef:           "is_beef",
-	IsPointSku:       "is_point_sku",
+	IsPointBound:     "is_point_bound",
+	IsAppBound:       "is_app_bound",
 	IsAppSku:         "is_app_sku",
 	BrandLogoBlobID:  "brand_logo_blob_id",
+	GifBlobID:        "gif_blob_id",
 	MasterPlanBlobID: "master_plan_blob_id",
 	VideoBlobID:      "video_blob_id",
 	CloneParentID:    "clone_parent_id",
@@ -113,16 +119,18 @@ var StockKeepingUnitWhere = struct {
 	Brand            whereHelperstring
 	Ingredients      whereHelperstring
 	Description      whereHelperstring
-	Weight           whereHelperint
+	Weight           whereHelperfloat64
 	WeightUnit       whereHelperstring
-	Price            whereHelperint
+	Price            whereHelperfloat64
 	PurchasePoints   whereHelperint
 	LoyaltyPoints    whereHelperint
 	Currency         whereHelperstring
 	IsBeef           whereHelperbool
-	IsPointSku       whereHelperbool
+	IsPointBound     whereHelperbool
+	IsAppBound       whereHelperbool
 	IsAppSku         whereHelperbool
 	BrandLogoBlobID  whereHelpernull_String
+	GifBlobID        whereHelpernull_String
 	MasterPlanBlobID whereHelpernull_String
 	VideoBlobID      whereHelpernull_String
 	CloneParentID    whereHelpernull_String
@@ -138,16 +146,18 @@ var StockKeepingUnitWhere = struct {
 	Brand:            whereHelperstring{field: "\"stock_keeping_units\".\"brand\""},
 	Ingredients:      whereHelperstring{field: "\"stock_keeping_units\".\"ingredients\""},
 	Description:      whereHelperstring{field: "\"stock_keeping_units\".\"description\""},
-	Weight:           whereHelperint{field: "\"stock_keeping_units\".\"weight\""},
+	Weight:           whereHelperfloat64{field: "\"stock_keeping_units\".\"weight\""},
 	WeightUnit:       whereHelperstring{field: "\"stock_keeping_units\".\"weight_unit\""},
-	Price:            whereHelperint{field: "\"stock_keeping_units\".\"price\""},
+	Price:            whereHelperfloat64{field: "\"stock_keeping_units\".\"price\""},
 	PurchasePoints:   whereHelperint{field: "\"stock_keeping_units\".\"purchase_points\""},
 	LoyaltyPoints:    whereHelperint{field: "\"stock_keeping_units\".\"loyalty_points\""},
 	Currency:         whereHelperstring{field: "\"stock_keeping_units\".\"currency\""},
 	IsBeef:           whereHelperbool{field: "\"stock_keeping_units\".\"is_beef\""},
-	IsPointSku:       whereHelperbool{field: "\"stock_keeping_units\".\"is_point_sku\""},
+	IsPointBound:     whereHelperbool{field: "\"stock_keeping_units\".\"is_point_bound\""},
+	IsAppBound:       whereHelperbool{field: "\"stock_keeping_units\".\"is_app_bound\""},
 	IsAppSku:         whereHelperbool{field: "\"stock_keeping_units\".\"is_app_sku\""},
 	BrandLogoBlobID:  whereHelpernull_String{field: "\"stock_keeping_units\".\"brand_logo_blob_id\""},
+	GifBlobID:        whereHelpernull_String{field: "\"stock_keeping_units\".\"gif_blob_id\""},
 	MasterPlanBlobID: whereHelpernull_String{field: "\"stock_keeping_units\".\"master_plan_blob_id\""},
 	VideoBlobID:      whereHelpernull_String{field: "\"stock_keeping_units\".\"video_blob_id\""},
 	CloneParentID:    whereHelpernull_String{field: "\"stock_keeping_units\".\"clone_parent_id\""},
@@ -163,11 +173,13 @@ var StockKeepingUnitRels = struct {
 	BrandLogoBlob                string
 	CloneParent                  string
 	CreatedBy                    string
+	GifBlob                      string
 	MasterPlanBlob               string
 	VideoBlob                    string
 	SkuCategories                string
 	SkuProductCategories         string
 	SkuProducts                  string
+	SkuRetailLinks               string
 	SkuStockKeepingUnitContents  string
 	SkuStockKeepingUnitPhotos    string
 	CloneParentStockKeepingUnits string
@@ -176,11 +188,13 @@ var StockKeepingUnitRels = struct {
 	BrandLogoBlob:                "BrandLogoBlob",
 	CloneParent:                  "CloneParent",
 	CreatedBy:                    "CreatedBy",
+	GifBlob:                      "GifBlob",
 	MasterPlanBlob:               "MasterPlanBlob",
 	VideoBlob:                    "VideoBlob",
 	SkuCategories:                "SkuCategories",
 	SkuProductCategories:         "SkuProductCategories",
 	SkuProducts:                  "SkuProducts",
+	SkuRetailLinks:               "SkuRetailLinks",
 	SkuStockKeepingUnitContents:  "SkuStockKeepingUnitContents",
 	SkuStockKeepingUnitPhotos:    "SkuStockKeepingUnitPhotos",
 	CloneParentStockKeepingUnits: "CloneParentStockKeepingUnits",
@@ -192,11 +206,13 @@ type stockKeepingUnitR struct {
 	BrandLogoBlob                *Blob
 	CloneParent                  *StockKeepingUnit
 	CreatedBy                    *User
+	GifBlob                      *Blob
 	MasterPlanBlob               *Blob
 	VideoBlob                    *Blob
 	SkuCategories                CategorySlice
 	SkuProductCategories         ProductCategorySlice
 	SkuProducts                  ProductSlice
+	SkuRetailLinks               RetailLinkSlice
 	SkuStockKeepingUnitContents  StockKeepingUnitContentSlice
 	SkuStockKeepingUnitPhotos    StockKeepingUnitPhotoSlice
 	CloneParentStockKeepingUnits StockKeepingUnitSlice
@@ -212,9 +228,9 @@ func (*stockKeepingUnitR) NewStruct() *stockKeepingUnitR {
 type stockKeepingUnitL struct{}
 
 var (
-	stockKeepingUnitAllColumns            = []string{"id", "name", "code", "brand", "ingredients", "description", "weight", "weight_unit", "price", "purchase_points", "loyalty_points", "currency", "is_beef", "is_point_sku", "is_app_sku", "brand_logo_blob_id", "master_plan_blob_id", "video_blob_id", "clone_parent_id", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
-	stockKeepingUnitColumnsWithoutDefault = []string{"name", "code", "brand", "ingredients", "description", "weight_unit", "currency", "brand_logo_blob_id", "master_plan_blob_id", "video_blob_id", "clone_parent_id", "archived_at", "created_by_id"}
-	stockKeepingUnitColumnsWithDefault    = []string{"id", "weight", "price", "purchase_points", "loyalty_points", "is_beef", "is_point_sku", "is_app_sku", "archived", "updated_at", "created_at"}
+	stockKeepingUnitAllColumns            = []string{"id", "name", "code", "brand", "ingredients", "description", "weight", "weight_unit", "price", "purchase_points", "loyalty_points", "currency", "is_beef", "is_point_bound", "is_app_bound", "is_app_sku", "brand_logo_blob_id", "gif_blob_id", "master_plan_blob_id", "video_blob_id", "clone_parent_id", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
+	stockKeepingUnitColumnsWithoutDefault = []string{"name", "code", "brand", "ingredients", "description", "weight_unit", "currency", "brand_logo_blob_id", "gif_blob_id", "master_plan_blob_id", "video_blob_id", "clone_parent_id", "archived_at", "created_by_id"}
+	stockKeepingUnitColumnsWithDefault    = []string{"id", "weight", "price", "purchase_points", "loyalty_points", "is_beef", "is_point_bound", "is_app_bound", "is_app_sku", "archived", "updated_at", "created_at"}
 	stockKeepingUnitPrimaryKeyColumns     = []string{"id"}
 )
 
@@ -499,6 +515,20 @@ func (o *StockKeepingUnit) CreatedBy(mods ...qm.QueryMod) userQuery {
 	return query
 }
 
+// GifBlob pointed to by the foreign key.
+func (o *StockKeepingUnit) GifBlob(mods ...qm.QueryMod) blobQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.GifBlobID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	query := Blobs(queryMods...)
+	queries.SetFrom(query.Query, "\"blobs\"")
+
+	return query
+}
+
 // MasterPlanBlob pointed to by the foreign key.
 func (o *StockKeepingUnit) MasterPlanBlob(mods ...qm.QueryMod) blobQuery {
 	queryMods := []qm.QueryMod{
@@ -585,6 +615,27 @@ func (o *StockKeepingUnit) SkuProducts(mods ...qm.QueryMod) productQuery {
 
 	if len(queries.GetSelect(query.Query)) == 0 {
 		queries.SetSelect(query.Query, []string{"\"products\".*"})
+	}
+
+	return query
+}
+
+// SkuRetailLinks retrieves all the retail_link's RetailLinks with an executor via sku_id column.
+func (o *StockKeepingUnit) SkuRetailLinks(mods ...qm.QueryMod) retailLinkQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"retail_links\".\"sku_id\"=?", o.ID),
+	)
+
+	query := RetailLinks(queryMods...)
+	queries.SetFrom(query.Query, "\"retail_links\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"retail_links\".*"})
 	}
 
 	return query
@@ -977,6 +1028,111 @@ func (stockKeepingUnitL) LoadCreatedBy(e boil.Executor, singular bool, maybeStoc
 					foreign.R = &userR{}
 				}
 				foreign.R.CreatedByStockKeepingUnits = append(foreign.R.CreatedByStockKeepingUnits, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadGifBlob allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (stockKeepingUnitL) LoadGifBlob(e boil.Executor, singular bool, maybeStockKeepingUnit interface{}, mods queries.Applicator) error {
+	var slice []*StockKeepingUnit
+	var object *StockKeepingUnit
+
+	if singular {
+		object = maybeStockKeepingUnit.(*StockKeepingUnit)
+	} else {
+		slice = *maybeStockKeepingUnit.(*[]*StockKeepingUnit)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &stockKeepingUnitR{}
+		}
+		if !queries.IsNil(object.GifBlobID) {
+			args = append(args, object.GifBlobID)
+		}
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &stockKeepingUnitR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.GifBlobID) {
+					continue Outer
+				}
+			}
+
+			if !queries.IsNil(obj.GifBlobID) {
+				args = append(args, obj.GifBlobID)
+			}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`blobs`), qm.WhereIn(`blobs.id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Blob")
+	}
+
+	var resultSlice []*Blob
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Blob")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for blobs")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for blobs")
+	}
+
+	if len(stockKeepingUnitAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.GifBlob = foreign
+		if foreign.R == nil {
+			foreign.R = &blobR{}
+		}
+		foreign.R.GifBlobStockKeepingUnits = append(foreign.R.GifBlobStockKeepingUnits, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if queries.Equal(local.GifBlobID, foreign.ID) {
+				local.R.GifBlob = foreign
+				if foreign.R == nil {
+					foreign.R = &blobR{}
+				}
+				foreign.R.GifBlobStockKeepingUnits = append(foreign.R.GifBlobStockKeepingUnits, local)
 				break
 			}
 		}
@@ -1470,6 +1626,101 @@ func (stockKeepingUnitL) LoadSkuProducts(e boil.Executor, singular bool, maybeSt
 				local.R.SkuProducts = append(local.R.SkuProducts, foreign)
 				if foreign.R == nil {
 					foreign.R = &productR{}
+				}
+				foreign.R.Sku = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadSkuRetailLinks allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (stockKeepingUnitL) LoadSkuRetailLinks(e boil.Executor, singular bool, maybeStockKeepingUnit interface{}, mods queries.Applicator) error {
+	var slice []*StockKeepingUnit
+	var object *StockKeepingUnit
+
+	if singular {
+		object = maybeStockKeepingUnit.(*StockKeepingUnit)
+	} else {
+		slice = *maybeStockKeepingUnit.(*[]*StockKeepingUnit)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &stockKeepingUnitR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &stockKeepingUnitR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`retail_links`), qm.WhereIn(`retail_links.sku_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load retail_links")
+	}
+
+	var resultSlice []*RetailLink
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice retail_links")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on retail_links")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for retail_links")
+	}
+
+	if len(retailLinkAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.SkuRetailLinks = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &retailLinkR{}
+			}
+			foreign.R.Sku = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.SkuID {
+				local.R.SkuRetailLinks = append(local.R.SkuRetailLinks, foreign)
+				if foreign.R == nil {
+					foreign.R = &retailLinkR{}
 				}
 				foreign.R.Sku = local
 				break
@@ -2064,6 +2315,85 @@ func (o *StockKeepingUnit) SetCreatedBy(exec boil.Executor, insert bool, related
 	return nil
 }
 
+// SetGifBlob of the stockKeepingUnit to the related item.
+// Sets o.R.GifBlob to related.
+// Adds o to related.R.GifBlobStockKeepingUnits.
+func (o *StockKeepingUnit) SetGifBlob(exec boil.Executor, insert bool, related *Blob) error {
+	var err error
+	if insert {
+		if err = related.Insert(exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"stock_keeping_units\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"gif_blob_id"}),
+		strmangle.WhereClause("\"", "\"", 2, stockKeepingUnitPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, updateQuery)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+	if _, err = exec.Exec(updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	queries.Assign(&o.GifBlobID, related.ID)
+	if o.R == nil {
+		o.R = &stockKeepingUnitR{
+			GifBlob: related,
+		}
+	} else {
+		o.R.GifBlob = related
+	}
+
+	if related.R == nil {
+		related.R = &blobR{
+			GifBlobStockKeepingUnits: StockKeepingUnitSlice{o},
+		}
+	} else {
+		related.R.GifBlobStockKeepingUnits = append(related.R.GifBlobStockKeepingUnits, o)
+	}
+
+	return nil
+}
+
+// RemoveGifBlob relationship.
+// Sets o.R.GifBlob to nil.
+// Removes o from all passed in related items' relationships struct (Optional).
+func (o *StockKeepingUnit) RemoveGifBlob(exec boil.Executor, related *Blob) error {
+	var err error
+
+	queries.SetScanner(&o.GifBlobID, nil)
+	if _, err = o.Update(exec, boil.Whitelist("gif_blob_id")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.GifBlob = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.GifBlobStockKeepingUnits {
+		if queries.Equal(o.GifBlobID, ri.GifBlobID) {
+			continue
+		}
+
+		ln := len(related.R.GifBlobStockKeepingUnits)
+		if ln > 1 && i < ln-1 {
+			related.R.GifBlobStockKeepingUnits[i] = related.R.GifBlobStockKeepingUnits[ln-1]
+		}
+		related.R.GifBlobStockKeepingUnits = related.R.GifBlobStockKeepingUnits[:ln-1]
+		break
+	}
+	return nil
+}
+
 // SetMasterPlanBlob of the stockKeepingUnit to the related item.
 // Sets o.R.MasterPlanBlob to related.
 // Adds o to related.R.MasterPlanBlobStockKeepingUnits.
@@ -2444,6 +2774,58 @@ func (o *StockKeepingUnit) RemoveSkuProducts(exec boil.Executor, related ...*Pro
 		}
 	}
 
+	return nil
+}
+
+// AddSkuRetailLinks adds the given related objects to the existing relationships
+// of the stock_keeping_unit, optionally inserting them as new records.
+// Appends related to o.R.SkuRetailLinks.
+// Sets related.R.Sku appropriately.
+func (o *StockKeepingUnit) AddSkuRetailLinks(exec boil.Executor, insert bool, related ...*RetailLink) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.SkuID = o.ID
+			if err = rel.Insert(exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"retail_links\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"sku_id"}),
+				strmangle.WhereClause("\"", "\"", 2, retailLinkPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+			if _, err = exec.Exec(updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.SkuID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &stockKeepingUnitR{
+			SkuRetailLinks: related,
+		}
+	} else {
+		o.R.SkuRetailLinks = append(o.R.SkuRetailLinks, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &retailLinkR{
+				Sku: o,
+			}
+		} else {
+			rel.R.Sku = o
+		}
+	}
 	return nil
 }
 

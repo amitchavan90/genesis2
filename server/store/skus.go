@@ -180,6 +180,17 @@ func (s *SKU) InsertProductCategory(pcat *db.ProductCategory, txes ...*sql.Tx) (
 	return pcat, nil
 }
 
+// InsertRetailLink skus
+func (s *SKU) InsertRetailLink(retailLink *db.RetailLink, txes ...*sql.Tx) (*db.RetailLink, error) {
+	err := handleTransactions(s.Conn, func(tx *sql.Tx) error {
+		return retailLink.Insert(tx, boil.Infer())
+	}, txes...)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return retailLink, nil
+}
+
 // Update skus
 func (s *SKU) Update(record *db.StockKeepingUnit, txes ...*sql.Tx) (*db.StockKeepingUnit, error) {
 	record.UpdatedAt = time.Now()
@@ -255,6 +266,15 @@ func (s *SKU) GetContent(sku *db.StockKeepingUnit, contentType string) (db.Stock
 	return sku.SkuStockKeepingUnitContents(db.StockKeepingUnitContentWhere.ContentType.EQ(contentType)).All(s.Conn)
 }
 
+// GetPointBoundList skus by isIsPointBound
+// func (s *SKU) GetPointBoundList(isPointBound bool, txes ...*sql.Tx) (db.StockKeepingUnitSlice, error) {
+// 	dat, err := db.StockKeepingUnit(db.StockKeepingUnitWhere.IsPointBound.EQ(isPointBound)).All(s.Conn)
+// 	if err != nil {
+// 		return nil, terror.New(err, "")
+// 	}
+// 	return dat, nil
+// }
+
 // GetCategories skus by skuID
 func (s *SKU) GetCategories(skuID string, txes ...*sql.Tx) (db.CategorySlice, error) {
 	dat, err := db.Categories(db.CategoryWhere.SkuID.EQ(skuID)).All(s.Conn)
@@ -267,6 +287,15 @@ func (s *SKU) GetCategories(skuID string, txes ...*sql.Tx) (db.CategorySlice, er
 // GetProductCategories skus by skuID
 func (s *SKU) GetProductCategories(skuID string, txes ...*sql.Tx) (db.ProductCategorySlice, error) {
 	dat, err := db.ProductCategories(db.ProductCategoryWhere.SkuID.EQ(skuID)).All(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
+// GetRetailLinks skus by skuID
+func (s *SKU) GetRetailLinks(skuID string, txes ...*sql.Tx) (db.RetailLinkSlice, error) {
+	dat, err := db.RetailLinks(db.RetailLinkWhere.SkuID.EQ(skuID)).All(s.Conn)
 	if err != nil {
 		return nil, terror.New(err, "")
 	}

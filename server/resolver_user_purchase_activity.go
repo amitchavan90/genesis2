@@ -82,6 +82,18 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 		Code: fmt.Sprintf("P%05d", count),
 	}
 
+	// get user
+	userID, err := r.Auther.UserIDFromContext(ctx)
+	if err != nil {
+		return nil, terror.New(terror.ErrParse, "create userTask: Error while fetching user")
+	}
+
+	// Get user object
+	user, err := r.UserStore.Get(userID)
+	if err != nil {
+		return nil, terror.New(err, "Error while getting user")
+	}
+
 	purchaseID, _ := uuid.NewV4()
 	t.ID = purchaseID.String()
 
@@ -97,28 +109,30 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 		return nil, terror.New(terror.ErrParse, "create purchase: no product found with given id")
 	}
 
-	// get user
-	userID, err := r.Auther.UserIDFromContext(ctx)
+	// Get sku
+	skuUUID, _ := uuid.FromString(input.ProductID.String)
+	sku, err := r.SKUStore.Get(skuUUID)
 	if err != nil {
-		return nil, terror.New(terror.ErrParse, "create userTask: Error while fetching user")
+		return nil, terror.New(terror.ErrParse, "create purchase: no sku found with given id")
+	}
+
+	if product.IsPointBound {
+		if user.WalletPoints < sku.PurchasePoints {
+			return nil, terror.New(terror.ErrParse, "create purchase: not enough points in the wallet")
+		}
+		user.WalletPoints -= sku.PurchasePoints
+	} else {
+		user.WalletPoints += sku.LoyaltyPoints
 	}
 
 	t.UserID = userID.String()
 	t.ProductID = *input.ProductID
-	t.LoyaltyPoints = product.LoyaltyPoints
+	t.LoyaltyPoints = sku.LoyaltyPoints
 
 	created, err := r.UserPurchaseActivityStore.Insert(t)
 	if err != nil {
 		return nil, terror.New(err, "create user purchase")
 	}
-
-	// Update user wallet points
-	user, err := r.UserStore.Get(userID)
-	if err != nil {
-		return nil, terror.New(err, "Error while getting user")
-	}
-
-	user.WalletPoints += created.LoyaltyPoints
 
 	// Update user
 	_, err = r.UserStore.Update(user)
@@ -152,6 +166,40 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 		if err != nil {
 			fmt.Println("Error while updating referral")
 		}
+
+		// Update WalletTransactions
+		wtID, _ := uuid.NewV4()
+		wt := &db.WalletTransaction{
+			ID:            wtID.String(),
+			UserID:        referee.ID,
+			LoyaltyPoints: 10,
+			IsCredit:      true,
+			Message:       "Loyalty points awarded bt referral",
+		}
+
+		_, err = r.WalletTransactionStore.Insert(wt)
+		if err != nil {
+			return nil, terror.New(err, "create wallet transaction")
+		}
+	}
+
+	// Insert wallet transaction
+	wtID, _ := uuid.NewV4()
+	wt := &db.WalletTransaction{
+		ID:     wtID.String(),
+		UserID: user.ID,
+	}
+	if product.IsPointBound {
+		wt.LoyaltyPoints -= sku.PurchasePoints
+		wt.Message = "Loyalty points deducted by purchase of product"
+	} else {
+		wt.LoyaltyPoints += sku.LoyaltyPoints
+		wt.Message = "Loyalty points awarded by purchase of product"
+	}
+
+	_, err = r.WalletTransactionStore.Insert(wt)
+	if err != nil {
+		return nil, terror.New(err, "create wallet transaction")
 	}
 
 	// r.RecordUserActivity(ctx, "Created User Purchase", graphql.ObjectTypeSku, &created.ID, &created.Code)

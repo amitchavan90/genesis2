@@ -62,6 +62,14 @@ func (r *userResolver) Referrals(ctx context.Context, obj *db.User) ([]*db.Refer
 	return result, nil
 }
 
+func (r *userResolver) WalletHistory(ctx context.Context, obj *db.User) ([]*db.WalletTransaction, error) {
+	result, err := r.UserStore.GetWalletHistory(obj.ID)
+	if err != nil {
+		return nil, terror.New(err, "get referrals")
+	}
+	return result, nil
+}
+
 ///////////////
 //   Query   //
 ///////////////

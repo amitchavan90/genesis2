@@ -169,6 +169,7 @@ var UserRels = struct {
 	UserLoyaltyActivities      string
 	UserPurchaseActivities     string
 	UserTasks                  string
+	WalletTransactions         string
 }{
 	Organisation:               "Organisation",
 	Role:                       "Role",
@@ -189,6 +190,7 @@ var UserRels = struct {
 	UserLoyaltyActivities:      "UserLoyaltyActivities",
 	UserPurchaseActivities:     "UserPurchaseActivities",
 	UserTasks:                  "UserTasks",
+	WalletTransactions:         "WalletTransactions",
 }
 
 // userR is where relationships are stored.
@@ -212,6 +214,7 @@ type userR struct {
 	UserLoyaltyActivities      UserLoyaltyActivitySlice
 	UserPurchaseActivities     UserPurchaseActivitySlice
 	UserTasks                  UserTaskSlice
+	WalletTransactions         WalletTransactionSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -848,6 +851,27 @@ func (o *User) UserTasks(mods ...qm.QueryMod) userTaskQuery {
 
 	if len(queries.GetSelect(query.Query)) == 0 {
 		queries.SetSelect(query.Query, []string{"\"user_tasks\".*"})
+	}
+
+	return query
+}
+
+// WalletTransactions retrieves all the wallet_transaction's WalletTransactions with an executor.
+func (o *User) WalletTransactions(mods ...qm.QueryMod) walletTransactionQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"wallet_transaction\".\"user_id\"=?", o.ID),
+	)
+
+	query := WalletTransactions(queryMods...)
+	queries.SetFrom(query.Query, "\"wallet_transaction\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"wallet_transaction\".*"})
 	}
 
 	return query
@@ -2674,6 +2698,101 @@ func (userL) LoadUserTasks(e boil.Executor, singular bool, maybeUser interface{}
 	return nil
 }
 
+// LoadWalletTransactions allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (userL) LoadWalletTransactions(e boil.Executor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+	var slice []*User
+	var object *User
+
+	if singular {
+		object = maybeUser.(*User)
+	} else {
+		slice = *maybeUser.(*[]*User)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &userR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`wallet_transaction`), qm.WhereIn(`wallet_transaction.user_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.Query(e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load wallet_transaction")
+	}
+
+	var resultSlice []*WalletTransaction
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice wallet_transaction")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on wallet_transaction")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for wallet_transaction")
+	}
+
+	if len(walletTransactionAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.WalletTransactions = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &walletTransactionR{}
+			}
+			foreign.R.User = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.UserID {
+				local.R.WalletTransactions = append(local.R.WalletTransactions, foreign)
+				if foreign.R == nil {
+					foreign.R = &walletTransactionR{}
+				}
+				foreign.R.User = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // SetOrganisation of the user to the related item.
 // Sets o.R.Organisation to related.
 // Adds o to related.R.Users.
@@ -3881,6 +4000,58 @@ func (o *User) AddUserTasks(exec boil.Executor, insert bool, related ...*UserTas
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &userTaskR{
+				User: o,
+			}
+		} else {
+			rel.R.User = o
+		}
+	}
+	return nil
+}
+
+// AddWalletTransactions adds the given related objects to the existing relationships
+// of the user, optionally inserting them as new records.
+// Appends related to o.R.WalletTransactions.
+// Sets related.R.User appropriately.
+func (o *User) AddWalletTransactions(exec boil.Executor, insert bool, related ...*WalletTransaction) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.UserID = o.ID
+			if err = rel.Insert(exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"wallet_transaction\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
+				strmangle.WhereClause("\"", "\"", 2, walletTransactionPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+			if _, err = exec.Exec(updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.UserID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &userR{
+			WalletTransactions: related,
+		}
+	} else {
+		o.R.WalletTransactions = append(o.R.WalletTransactions, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &walletTransactionR{
 				User: o,
 			}
 		} else {

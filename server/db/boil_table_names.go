@@ -19,6 +19,7 @@ var TableNames = struct {
 	Products                string
 	Prospects               string
 	Referrals               string
+	RetailLinks             string
 	RoleTrackActions        string
 	Roles                   string
 	SchemaMigrations        string
@@ -36,6 +37,7 @@ var TableNames = struct {
 	UserSubtasks            string
 	UserTasks               string
 	Users                   string
+	WalletTransaction       string
 }{
 	Blobs:                   "blobs",
 	Cartons:                 "cartons",
@@ -52,6 +54,7 @@ var TableNames = struct {
 	Products:                "products",
 	Prospects:               "prospects",
 	Referrals:               "referrals",
+	RetailLinks:             "retail_links",
 	RoleTrackActions:        "role_track_actions",
 	Roles:                   "roles",
 	SchemaMigrations:        "schema_migrations",
@@ -69,4 +72,5 @@ var TableNames = struct {
 	UserSubtasks:            "user_subtasks",
 	UserTasks:               "user_tasks",
 	Users:                   "users",
+	WalletTransaction:       "wallet_transaction",
 }

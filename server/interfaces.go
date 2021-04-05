@@ -79,11 +79,13 @@ type SKUStorer interface {
 	GetMany(keys []string) (db.StockKeepingUnitSlice, []error)
 	GetCategories(skuID string, txes ...*sql.Tx) (db.CategorySlice, error)
 	GetProductCategories(skuID string, txes ...*sql.Tx) (db.ProductCategorySlice, error)
+	GetRetailLinks(skuID string, txes ...*sql.Tx) (db.RetailLinkSlice, error)
 	All() (db.StockKeepingUnitSlice, error)
 	SearchSelect(search graphql.SearchFilter, limit int, offset int) (int64, db.StockKeepingUnitSlice, error)
 	Insert(u *db.StockKeepingUnit, tx ...*sql.Tx) (*db.StockKeepingUnit, error)
 	InsertCategory(cat *db.Category, txes ...*sql.Tx) (*db.Category, error)
 	InsertProductCategory(pcat *db.ProductCategory, txes ...*sql.Tx) (*db.ProductCategory, error)
+	InsertRetailLink(retailLink *db.RetailLink, txes ...*sql.Tx) (*db.RetailLink, error)
 	Update(u *db.StockKeepingUnit, tx ...*sql.Tx) (*db.StockKeepingUnit, error)
 	Archive(id uuid.UUID, txes ...*sql.Tx) (*db.StockKeepingUnit, error)
 	Unarchive(id uuid.UUID, txes ...*sql.Tx) (*db.StockKeepingUnit, error)
@@ -223,6 +225,7 @@ type UserStorer interface {
 	GetByEmail(email string, txes ...*sql.Tx) (*db.User, error)
 	GetByReferralCode(referralCode string, txes ...*sql.Tx) (*db.User, error)
 	GetReferrals(refByID string, txes ...*sql.Tx) (db.ReferralSlice, error)
+	GetWalletHistory(userID string, txes ...*sql.Tx) (db.WalletTransactionSlice, error)
 	GetByWechatID(wechatID string, txes ...*sql.Tx) (*db.User, error)
 	Get(id uuid.UUID, txes ...*sql.Tx) (*db.User, error)
 	GetWithPermissions(id uuid.UUID, txes ...*sql.Tx) (*db.User, error)
@@ -382,6 +385,17 @@ type UserPurchaseActivityStorer interface {
 	SearchSelect(search graphql.SearchFilter, limit int, offset int) (int64, []*db.UserPurchaseActivity, error)
 	Insert(record *db.UserPurchaseActivity, tx ...*sql.Tx) (*db.UserPurchaseActivity, error)
 	Update(record *db.UserPurchaseActivity, tx ...*sql.Tx) (*db.UserPurchaseActivity, error)
+}
+
+// WalletTransactionStorer collects all role methods
+type WalletTransactionStorer interface {
+	Get(id uuid.UUID, txes ...*sql.Tx) (*db.WalletTransaction, error)
+	GetMany(keys []string, txes ...*sql.Tx) (db.WalletTransactionSlice, []error)
+	All(txes ...*sql.Tx) (db.WalletTransactionSlice, error)
+	Count() (int64, error)
+	SearchSelect(search graphql.SearchFilter, limit int, offset int) (int64, []*db.WalletTransaction, error)
+	Insert(record *db.WalletTransaction, tx ...*sql.Tx) (*db.WalletTransaction, error)
+	Update(record *db.WalletTransaction, tx ...*sql.Tx) (*db.WalletTransaction, error)
 }
 
 // TransactionStorer collects all Transaction methods

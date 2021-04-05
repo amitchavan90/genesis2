@@ -3,6 +3,12 @@ type Organisation {
 	name: String!
 	users: [User!]!
 }
+type WalletTransaction {
+	id: ID!,
+	loyaltyPoints: Int!,
+	message: String!,
+	isCredit: Boolean!
+}
 type User {
 	id: ID!
 	firstName: NullString
@@ -21,6 +27,7 @@ type User {
 	wechatID: NullString
 	loyaltyPoints: Int!
 	referrals: [Referral!]! @hasPerm(p: ReferralList)
+	walletHistory: [WalletTransaction!]!
 
 	affiliateOrg: NullString
 	createdAt: Time!
