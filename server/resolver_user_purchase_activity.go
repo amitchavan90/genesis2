@@ -174,7 +174,7 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 			UserID:        referee.ID,
 			LoyaltyPoints: 10,
 			IsCredit:      true,
-			Message:       "Loyalty points awarded by referral",
+			Message:       fmt.Sprintf("Loyalty points awarded by referral %v", userID),
 		}
 
 		_, err = r.UserStore.InsertWalletTransaction(wt)
@@ -192,11 +192,11 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 	if sku.IsPointBound {
 		wt.LoyaltyPoints = sku.PurchasePoints
 		wt.IsCredit = false
-		wt.Message = "Loyalty points deducted by purchase of product"
+		wt.Message = fmt.Sprintf("Loyalty points deducted by purchase of product %v", product.Code)
 	} else {
 		wt.LoyaltyPoints = sku.LoyaltyPoints
 		wt.IsCredit = true
-		wt.Message = "Loyalty points awarded by purchase of product"
+		wt.Message = fmt.Sprintf("Loyalty points awarded by purchase of product %v", product.Code)
 	}
 
 	_, err = r.UserStore.InsertWalletTransaction(wt)
