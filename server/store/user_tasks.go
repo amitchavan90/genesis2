@@ -225,22 +225,6 @@ func (s *UserTasks) Update(u *db.UserTask, txes ...*sql.Tx) (*db.UserTask, error
 	return u, nil
 }
 
-// InsertWalletTransaction a wallet transaction
-func (s *UserTasks) InsertWalletTransaction(t *db.WalletTransaction, txes ...*sql.Tx) (*db.WalletTransaction, error) {
-	var err error
-
-	handleTransactions(s.Conn, func(tx *sql.Tx) error {
-		return t.Insert(tx, boil.Infer())
-	}, txes...)
-
-	err = t.Reload(s.Conn)
-	if err != nil {
-		return nil, terror.New(err, "")
-	}
-
-	return t, nil
-}
-
 // Create a task
 func (s *UserTasks) Create(input *db.UserTask, txes ...*sql.Tx) (*db.UserTask, error) {
 	err := input.Insert(s.Conn, boil.Infer())
