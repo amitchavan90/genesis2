@@ -304,6 +304,7 @@ type UserTaskStorer interface {
 	Count() (int64, error)
 	SearchSelect(search graphql.SearchFilter, limit int, offset int) (int64, []*db.UserTask, error)
 	Insert(record *db.UserTask, tx ...*sql.Tx) (*db.UserTask, error)
+	InsertWalletTransaction(t *db.WalletTransaction, txes ...*sql.Tx) (*db.WalletTransaction, error)
 	InsertSubtask(st *db.UserSubtask, txes ...*sql.Tx) (*db.UserSubtask, error)
 	Update(record *db.UserTask, tx ...*sql.Tx) (*db.UserTask, error)
 }

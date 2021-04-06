@@ -557,7 +557,7 @@ func (c *AuthController) register() func(w http.ResponseWriter, r *http.Request)
 
 			refID, _ := uuid.NewV4()
 			referral := &db.Referral{
-				Code:         fmt.Sprintf("T%05d", count+1),
+				Code:         fmt.Sprintf("R%05d", count+1),
 				ID:           refID.String(),
 				UserID:       created.ID,
 				ReferredByID: null.StringFrom(referee.ID),
