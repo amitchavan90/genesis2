@@ -37,6 +37,7 @@ type Product struct {
 	OrderID             null.String `db:"order_id" boil:"order_id" json:"order_id,omitempty" toml:"order_id" yaml:"order_id,omitempty"`
 	ContractID          null.String `db:"contract_id" boil:"contract_id" json:"contract_id,omitempty" toml:"contract_id" yaml:"contract_id,omitempty"`
 	DistributorID       null.String `db:"distributor_id" boil:"distributor_id" json:"distributor_id,omitempty" toml:"distributor_id" yaml:"distributor_id,omitempty"`
+	IsClosed            bool        `db:"is_closed" boil:"is_closed" json:"is_closed" toml:"is_closed" yaml:"is_closed"`
 	CloseRegisterID     null.String `db:"close_register_id" boil:"close_register_id" json:"close_register_id,omitempty" toml:"close_register_id" yaml:"close_register_id,omitempty"`
 	TransactionHash     string      `db:"transaction_hash" boil:"transaction_hash" json:"transaction_hash" toml:"transaction_hash" yaml:"transaction_hash"`
 	Archived            bool        `db:"archived" boil:"archived" json:"archived" toml:"archived" yaml:"archived"`
@@ -64,6 +65,7 @@ var ProductColumns = struct {
 	OrderID             string
 	ContractID          string
 	DistributorID       string
+	IsClosed            string
 	CloseRegisterID     string
 	TransactionHash     string
 	Archived            string
@@ -86,6 +88,7 @@ var ProductColumns = struct {
 	OrderID:             "order_id",
 	ContractID:          "contract_id",
 	DistributorID:       "distributor_id",
+	IsClosed:            "is_closed",
 	CloseRegisterID:     "close_register_id",
 	TransactionHash:     "transaction_hash",
 	Archived:            "archived",
@@ -112,6 +115,7 @@ var ProductWhere = struct {
 	OrderID             whereHelpernull_String
 	ContractID          whereHelpernull_String
 	DistributorID       whereHelpernull_String
+	IsClosed            whereHelperbool
 	CloseRegisterID     whereHelpernull_String
 	TransactionHash     whereHelperstring
 	Archived            whereHelperbool
@@ -134,6 +138,7 @@ var ProductWhere = struct {
 	OrderID:             whereHelpernull_String{field: "\"products\".\"order_id\""},
 	ContractID:          whereHelpernull_String{field: "\"products\".\"contract_id\""},
 	DistributorID:       whereHelpernull_String{field: "\"products\".\"distributor_id\""},
+	IsClosed:            whereHelperbool{field: "\"products\".\"is_closed\""},
 	CloseRegisterID:     whereHelpernull_String{field: "\"products\".\"close_register_id\""},
 	TransactionHash:     whereHelperstring{field: "\"products\".\"transaction_hash\""},
 	Archived:            whereHelperbool{field: "\"products\".\"archived\""},
@@ -188,9 +193,9 @@ func (*productR) NewStruct() *productR {
 type productL struct{}
 
 var (
-	productAllColumns            = []string{"id", "code", "description", "register_id", "is_beef", "is_point_bound", "is_app_bound", "loyalty_points", "loyalty_points_expire", "sku_id", "carton_id", "order_id", "contract_id", "distributor_id", "close_register_id", "transaction_hash", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
+	productAllColumns            = []string{"id", "code", "description", "register_id", "is_beef", "is_point_bound", "is_app_bound", "loyalty_points", "loyalty_points_expire", "sku_id", "carton_id", "order_id", "contract_id", "distributor_id", "is_closed", "close_register_id", "transaction_hash", "archived", "archived_at", "updated_at", "created_at", "created_by_id"}
 	productColumnsWithoutDefault = []string{"code", "sku_id", "carton_id", "order_id", "contract_id", "distributor_id", "close_register_id", "transaction_hash", "archived_at", "created_by_id"}
-	productColumnsWithDefault    = []string{"id", "description", "register_id", "is_beef", "is_point_bound", "is_app_bound", "loyalty_points", "loyalty_points_expire", "archived", "updated_at", "created_at"}
+	productColumnsWithDefault    = []string{"id", "description", "register_id", "is_beef", "is_point_bound", "is_app_bound", "loyalty_points", "loyalty_points_expire", "is_closed", "archived", "updated_at", "created_at"}
 	productPrimaryKeyColumns     = []string{"id"}
 )
 

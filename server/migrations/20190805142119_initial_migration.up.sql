@@ -297,6 +297,7 @@ CREATE TABLE products (
     contract_id uuid REFERENCES contracts (id),
     distributor_id uuid REFERENCES distributors (id),
     -- require this to close register, regenerate each time user scan QR2
+    is_closed boolean NOT NULL DEFAULT FALSE,
     close_register_id uuid,
     transaction_hash text NOT NULL,
     archived boolean NOT NULL DEFAULT FALSE,

@@ -311,6 +311,7 @@ type ComplexityRoot struct {
 		ID                  func(childComplexity int) int
 		IsAppBound          func(childComplexity int) int
 		IsBeef              func(childComplexity int) int
+		IsClosed            func(childComplexity int) int
 		IsPointBound        func(childComplexity int) int
 		LatestTrackAction   func(childComplexity int) int
 		LoyaltyPoints       func(childComplexity int) int
@@ -631,6 +632,7 @@ type ComplexityRoot struct {
 	}
 
 	UserTask struct {
+		Code         func(childComplexity int) int
 		CreatedAt    func(childComplexity int) int
 		ID           func(childComplexity int) int
 		IsComplete   func(childComplexity int) int
@@ -2476,6 +2478,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Product.IsBeef(childComplexity), true
 
+	case "Product.isClosed":
+		if e.complexity.Product.IsClosed == nil {
+			break
+		}
+
+		return e.complexity.Product.IsClosed(childComplexity), true
+
 	case "Product.isPointBound":
 		if e.complexity.Product.IsPointBound == nil {
 			break
@@ -4291,6 +4300,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserSubtask.Status(childComplexity), true
 
+	case "UserTask.code":
+		if e.complexity.UserTask.Code == nil {
+			break
+		}
+
+		return e.complexity.UserTask.Code(childComplexity), true
+
 	case "UserTask.createdAt":
 		if e.complexity.UserTask.CreatedAt == nil {
 			break
@@ -5024,6 +5040,7 @@ extend type Mutation {
 	isBeef: Boolean!
 	isPointBound: Boolean!
 	isAppBound: Boolean!
+	isClosed: Boolean!
 
 	registered: Boolean!
 	registeredBy: User
@@ -5514,6 +5531,7 @@ extend type Mutation {
 }
 type UserTask {
 	id: ID!
+	code: String!
 	task: Task!
 	user: User!
 	status: String!
@@ -16480,6 +16498,43 @@ func (ec *executionContext) _Product_isAppBound(ctx context.Context, field graph
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Product_isClosed(ctx context.Context, field graphql.CollectedField, obj *db.Product) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Product",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsClosed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Product_registered(ctx context.Context, field graphql.CollectedField, obj *db.Product) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -25935,6 +25990,43 @@ func (ec *executionContext) _UserTask_id(ctx context.Context, field graphql.Coll
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _UserTask_code(ctx context.Context, field graphql.CollectedField, obj *db.UserTask) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "UserTask",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _UserTask_task(ctx context.Context, field graphql.CollectedField, obj *db.UserTask) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -30319,6 +30411,11 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "isClosed":
+			out.Values[i] = ec._Product_isClosed(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "registered":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -32829,6 +32926,11 @@ func (ec *executionContext) _UserTask(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = graphql.MarshalString("UserTask")
 		case "id":
 			out.Values[i] = ec._UserTask_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "code":
+			out.Values[i] = ec._UserTask_code(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}

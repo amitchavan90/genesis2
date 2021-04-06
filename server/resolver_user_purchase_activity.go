@@ -109,6 +109,10 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 		return nil, terror.New(terror.ErrParse, "create purchase: no product found with given id")
 	}
 
+	if product.IsClosed {
+		return nil, terror.New(terror.ErrParse, "create purchase: product is closed")
+	}
+
 	// Get sku
 	skuUUID, _ := uuid.FromString(product.SkuID.String)
 	sku, err := r.SKUStore.Get(skuUUID)
