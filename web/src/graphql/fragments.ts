@@ -60,8 +60,8 @@ const SKU = gql`
 		code
 		description
 		isBeef
-		isPointSku
-		isAppSku
+		isPointBound
+		isAppBound
 		brand
 		ingredients
 		weight
@@ -74,7 +74,14 @@ const SKU = gql`
 
 		hasClones
 		cloneParentID
-
+		gif{
+			id
+			file_url
+		}
+		brandLogo {
+			id
+			file_url
+		}
 		masterPlan {
 			id
 			file_url
@@ -90,6 +97,10 @@ const SKU = gql`
 		urls {
 			title
 			content
+		}
+		retailLinks {
+			name
+			url
 		}
 		productInfo {
 			title
@@ -495,6 +506,10 @@ const TASK = gql`
 		finishDate,
 		maximumPeople,
 		skuID,
+		bannerPhoto{
+			id
+			file_url
+		},
 		sku {
 			id,
 			name,
@@ -546,6 +561,7 @@ fragment UserTaskListFragment on UserTask {
 	id,
 	isComplete,
 	status,
+	code,
 	task {
 		id,
 		title,

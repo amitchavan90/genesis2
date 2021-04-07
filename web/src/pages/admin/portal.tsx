@@ -34,7 +34,7 @@ const PortalInner = () => {
 		color: theme.colors.colorPrimary,
 		display: "flex",
 		minHeight: "100vh",
-		width: "100%",
+		width: "100%"
 	})
 
 	const mainStyle: string = css({

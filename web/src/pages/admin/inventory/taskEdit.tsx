@@ -25,6 +25,7 @@ import { Tabs, Tab } from "baseui/tabs"
 import { Modal, ModalButton, ModalFooter, ModalHeader } from "baseui/modal"
 import { promiseTimeout, TIMED_OUT } from "../../../helpers/timeout"
 import { paddingZero} from "../../../themeOverrides"
+import { ImageUpload ,ImageUploadHandler} from "../../../components/imageUpload"
 
 
 
@@ -79,6 +80,11 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 	const [isPeopleBound, setIsPeopleBound] = React.useState<boolean>(false)
 	const [isProductRelevant, setIsProductRelevant] = React.useState<boolean>(false)
 	const [finishDate, setfinishDate] = React.useState(new Date())
+
+	const [bannerPhotoFile, setBannerPhotoFile] = React.useState<File>()
+	const [bannerPhotoURL, setBannerPhotoURL] = React.useState<string>()
+	const [uploadBannerPhoto, setUploadBannerPhoto] = React.useState<ImageUploadHandler>()
+
 	const [sku, setSKU] = React.useState<Value>()
 
 	const [subTasksCount, setSubTasksCount] = React.useState(isNewTask? 0 : 25)
@@ -88,6 +94,28 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 	const onSubmit = handleSubmit(async ({ title, loyaltyPoints, maximumPeople, code, subtasks}) => {
 		setTimedOut(false)
+
+		// Upload Brand logo
+		let bannerPhotoBlobID: string | null = null
+		if (uploadBannerPhoto) {
+			if (uploadBannerPhoto.upload && uploadBannerPhoto.setUploadError) {
+				const response = await uploadBannerPhoto.upload()
+
+				if (!response || !response.data) {
+					uploadBannerPhoto.setUploadError("Upload Failed")
+					return
+				}
+
+				if (response.data.fileUpload) {
+					setBannerPhotoURL(response.data.fileUpload.file_url)
+					bannerPhotoBlobID = response.data.fileUpload.id
+				}
+			} else if (uploadBannerPhoto.removeImage) {
+				bannerPhotoBlobID = "-"
+			}
+		} else if (task) {
+			bannerPhotoBlobID = task.bannerPhoto.id
+		}
 		
 		const input = {
 			title,
@@ -98,6 +126,7 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 			isProductRelevant,
 			loyaltyPoints,
 			finishDate,
+			bannerPhotoBlobID,
 			maximumPeople,
 			skuID: sku && sku.length > 0 ? sku[0].id : "-",
 			subtasks,
@@ -124,7 +153,7 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 	React.useEffect(() => {
 		if (!task) return
-		
+		console.log("task----------------------->",task);
 		setValue("code", task.code)
 		setValue("title", task.title)
 		setDescription(task.description)
@@ -132,6 +161,7 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 		setIsTimeBound(task.isTimeBound)
 		setIsProductRelevant(task.isProductRelevant)
 		setValue("loyaltyPoints", task.loyaltyPoints)
+		if (task.bannerPhoto) setBannerPhotoURL(task.bannerPhoto.file_url)
 		if (task.finishDate) setfinishDate(new Date(task.finishDate))
 		if (task.sku) setSKU([{ id: task.sku.id, label: task.sku.code }])
 		if (task.maximumPeople) setValue("maximumPeople",task.maximumPeople)
@@ -191,6 +221,21 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 					}}
 				/>
 			</FormControl>
+
+			<ImageUpload.Single
+				// client requested to rename it to Hero Image
+				label="Upload Banner"
+				name="masterPlan"
+				imageURL={!bannerPhotoURL || uploadBannerPhoto?.removeImage ? "" : bannerPhotoURL}
+				setImageUploader={imageUploader => setUploadBannerPhoto(imageUploader)}
+				imageRemoved={uploadBannerPhoto?.removeImage}
+				file={bannerPhotoFile}
+				setFile={(file?: File) => setBannerPhotoFile(file)}
+				previewHeight="200px"
+				caption="Please select a jpg/png file smaller than 10MB"
+				maxFileSize={1e7}
+				clearable
+			/>
 
 			<FormControl label="LoyaltyPoints" error={errors.loyaltyPoints ? errors.loyaltyPoints.message : ""} positive="">
 				<Input name="loyaltyPoints" type="number" inputRef={register}/>

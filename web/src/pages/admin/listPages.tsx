@@ -532,7 +532,6 @@ const UserPurchaseActivityList = () => (
 		itemName="userPurchaseActivity"
 		header="UserPurchaseActivity"
 		query={graphql.query.USER_PURCHASE_ACTIVITIES}
-		batchActionMutation={graphql.mutation.BATCH_ACTION_SKU}
 		firstColumnValue="loyaltyPoints"
 		firstColumnSubValue="createdAt"
 		columns={[
@@ -557,7 +556,7 @@ const UserTaskList = () => (
 		query={graphql.query.USER_TASKS}
 		batchActionMutation={graphql.mutation.BATCH_ACTION_SKU}
 		firstColumnValue="status"
-		firstColumnSubValue="createdAt"
+		firstColumnSubValue="code"
 		columns={[
 			{ label: "task", value: "task" ,subValues: ["title"]},
 			{ label: "UserLastName", value: "user" ,subValues: ["lastName"]},
@@ -569,6 +568,7 @@ const UserTaskList = () => (
 			},
 		]}
 		actions={ActionItemSet.Archive}
+		readPermission={Perm.TaskRead}
 	/>
 )
 export const ListPage = {

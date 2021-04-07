@@ -63,6 +63,11 @@ export interface SKUContent {
 	content: string
 }
 
+export interface RetailsContent {
+	name: string
+	url: string
+}
+
 export interface SKUCategory {
 	name: string
 }
@@ -80,19 +85,22 @@ export interface SKU {
 	code: string
 	description: string
 	isBeef: boolean
-	isAppSku: boolean
-	isPointSku: boolean
+	isAppBound: boolean
+	isPointBound: boolean
 	loyaltyPoints: number
 	archived: boolean
 
 	cloneParentID?: string
 	hasClones: boolean
 
+	gif: Blob
+	brandLogo: Blob
 	masterPlan: Blob
 	video: Blob
 	photos: Blob[]
 	urls: SKUContent[]
 	productInfo: SKUContent[]
+	retailLinks: RetailsContent[]
 }
 export interface SKUClone {
 	sku: SKU
@@ -114,6 +122,7 @@ export interface Task{
     isPeopleBound:boolean
     isProductRelevant: boolean
     finishDate:Date
+	bannerPhoto: Blob
     maximumPeople:number
 	sku: SKU
 	subtasks:SubTask[]
