@@ -138,6 +138,13 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 		return nil, terror.New(err, "create user purchase")
 	}
 
+	// Update product
+	product.IsClosed = true
+	_, err = r.ProductStore.Update(product)
+	if err != nil {
+		return nil, terror.New(err, "Error while updating user")
+	}
+
 	// Update user
 	_, err = r.UserStore.Update(user)
 	if err != nil {

@@ -5065,7 +5065,6 @@ input UpdateProduct {
 	loyaltyPointsExpire: NullTime
 	inheritCartonHistory: NullBool
 	description: NullString
-	isAppBound: Boolean!
 }
 
 extend type Query {
@@ -28413,12 +28412,6 @@ func (ec *executionContext) unmarshalInputUpdateProduct(ctx context.Context, obj
 		case "description":
 			var err error
 			it.Description, err = ec.unmarshalONullString2ᚖgithubᚗcomᚋvolatiletechᚋnullᚐString(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isAppBound":
-			var err error
-			it.IsAppBound, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}

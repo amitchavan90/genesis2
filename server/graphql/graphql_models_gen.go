@@ -262,7 +262,6 @@ type UpdateProduct struct {
 	LoyaltyPointsExpire  *null.Time   `json:"loyaltyPointsExpire"`
 	InheritCartonHistory *null.Bool   `json:"inheritCartonHistory"`
 	Description          *null.String `json:"description"`
-	IsAppBound           bool         `json:"isAppBound"`
 }
 
 type UpdateProductCategory struct {

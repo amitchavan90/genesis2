@@ -43,7 +43,6 @@ input UpdateProduct {
 	loyaltyPointsExpire: NullTime
 	inheritCartonHistory: NullBool
 	description: NullString
-	isAppBound: Boolean!
 }
 
 extend type Query {

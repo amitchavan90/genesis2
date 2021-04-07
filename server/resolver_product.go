@@ -256,6 +256,17 @@ func (r *mutationResolver) ProductCreate(ctx context.Context, input graphql.Upda
 		createdByName = user.LastName.String
 	}
 
+	// Get sku
+	if input.SkuID == nil {
+		return nil, terror.New(err, "product create: SKU ID is required")
+	}
+
+	skuUUID, _ := uuid.FromString(input.SkuID.String)
+	sku, err := r.SKUStore.Get(skuUUID)
+	if err != nil {
+		return nil, terror.New(err, "product create: no sku found with give ID")
+	}
+
 	// Create Product
 	p := &db.Product{
 		Code:        fmt.Sprintf("P%05d", count+1),
@@ -286,13 +297,13 @@ func (r *mutationResolver) ProductCreate(ctx context.Context, input graphql.Upda
 			p.DistributorID = *input.DistributorID
 		}
 	}
-	if input.SkuID != nil {
-		if len(input.SkuID.String) <= 1 {
-			p.SkuID = null.StringFromPtr(nil)
-		} else {
-			p.SkuID = *input.SkuID
-		}
-	}
+	// if input.SkuID != nil {
+	// 	if len(input.SkuID.String) <= 1 {
+	// 		p.SkuID = null.StringFromPtr(nil)
+	// 	} else {
+	// 		p.SkuID = *input.SkuID
+	// 	}
+	// }
 	if input.ContractID != nil {
 		if len(input.ContractID.String) <= 1 {
 			p.ContractID = null.StringFromPtr(nil)
@@ -304,20 +315,15 @@ func (r *mutationResolver) ProductCreate(ctx context.Context, input graphql.Upda
 	if input.LoyaltyPoints != nil {
 		p.LoyaltyPoints = input.LoyaltyPoints.Int
 	} else {
-		// Get sku
-		if input.SkuID != nil {
-			skuUUID, _ := uuid.FromString(input.SkuID.String)
-			sku, err := r.SKUStore.Get(skuUUID)
-			if err != nil {
-				return nil, terror.New(err, "product create: no sku found with give ID")
-			}
-			p.SkuID = null.StringFrom(sku.ID)
-			p.LoyaltyPoints = sku.LoyaltyPoints
-		}
+		p.LoyaltyPoints = sku.LoyaltyPoints
 	}
+
 	if input.LoyaltyPointsExpire != nil {
 		p.LoyaltyPointsExpire = input.LoyaltyPointsExpire.Time
 	}
+
+	p.IsAppBound = sku.IsAppBound
+	p.IsPointBound = sku.IsPointBound
 
 	created, err := r.ProductStore.Insert(p)
 	if err != nil {
