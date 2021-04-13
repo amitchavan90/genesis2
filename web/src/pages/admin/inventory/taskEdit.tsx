@@ -147,7 +147,6 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 	})
 
 	React.useEffect(() => {
-		console.log("data------------------------------->",data);
 		if (!data || !data.task) return
 		setTask(data.task)
 	}, [data, loading, error])

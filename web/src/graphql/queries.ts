@@ -539,7 +539,62 @@ const TICKER_INFO = gql`
 		}
 	}
 `
+//task 
+const TASK = gql`
+	query task($code: String!) {
+		task(code: $code) {
+			...TaskFragment
+		}
+	}
+	${fragment.TASK}
+`
+const TASKS = gql`
+	query tasks($search: SearchFilter!, $limit: Int!, $offset: Int!) {
+		tasks(search: $search, limit: $limit, offset: $offset) {
+			tasks {
+				...TaskListFragment
+			}
+			total
+		}
+	}
+	${fragment.TASK_LIST}
+`
 
+const REFERRALS = gql`
+	query referrals($search: SearchFilter!, $limit: Int!, $offset: Int!) {
+		referrals(search: $search, limit: $limit, offset: $offset) {
+			referrals {
+				...ReferralListFragment         
+			}
+			total
+		}
+	}
+	${fragment.REFERRAL_LIST}
+`
+
+const USER_TASKS = gql`
+	query userTasks($search: SearchFilter!, $limit: Int!, $offset: Int!) {
+		userTasks(search: $search, limit: $limit, offset: $offset) {
+			userTasks {
+				...UserTaskListFragment         
+			}
+			total
+		}
+	}
+	${fragment.USER_TASK_LIST}
+`
+
+const USER_PURCHASE_ACTIVITIES = gql`
+	query userPurchaseActivities($search: SearchFilter!, $limit: Int!, $offset: Int!) {
+		userPurchaseActivities(search: $search, limit: $limit, offset: $offset) {
+			userPurchaseActivities{
+				...UserPurchaseActivityFragment         
+			}
+			total
+		}
+	}
+	${fragment.USER_PURCHASE_ACTIVITY}
+`
 export const query = {
 	ME,
 
@@ -603,4 +658,11 @@ export const query = {
 	PENDING_TRANSACTIONS_COUNT,
 	FIELDAPP_VERSION,
 	TICKER_INFO,
+
+	TASKS,
+	TASK,
+
+	REFERRALS,
+	USER_TASKS,
+	USER_PURCHASE_ACTIVITIES
 }

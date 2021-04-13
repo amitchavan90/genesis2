@@ -459,6 +459,28 @@ const FLUSH_PENDING_TRANSACTIONS = gql`
 		flushPendingTransactions
 	}
 `
+// TASK
+const UPDATE_TASK = gql`
+	mutation taskUpdate($id: ID!, $input: UpdateTask!) {
+		taskUpdate(id: $id, input: $input) {
+			...TaskFragment
+		}
+	}
+	${fragment.TASK}
+`
+const CREATE_TASK = gql`
+	mutation taskCreate($input: UpdateTask!) {
+		taskCreate(input: $input) {
+			...TaskFragment
+		}
+	}
+	${fragment.TASK}
+`
+const BATCH_ACTION_TASK = gql`
+	mutation taskBatchAction($ids: [ID!]!, $action: Action!, $value: BatchActionInput) {
+		taskBatchAction(ids: $ids, action: $action, value: $value)
+	}
+`
 
 export const mutation = {
 	FILE_UPLOAD,
@@ -534,4 +556,8 @@ export const mutation = {
 
 	DEPLOY_SMART_CONTRACT,
 	FLUSH_PENDING_TRANSACTIONS,
+
+	CREATE_TASK,
+	UPDATE_TASK,
+	BATCH_ACTION_TASK,
 }

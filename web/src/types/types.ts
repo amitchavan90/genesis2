@@ -63,27 +63,69 @@ export interface SKUContent {
 	content: string
 }
 
+export interface RetailsContent {
+	name: string
+	url: string
+}
+
+export interface SKUCategory {
+	name: string
+}
+
 export interface SKU {
 	id: string
 	name: string
+	brand :string
+	price: number
+	purchasePoints: number
+	weight: number
+	ingredients: string
+	categories: SKUCategory[]
+	productCategories: SKUCategory[]
 	code: string
 	description: string
 	isBeef: boolean
+	isAppBound: boolean
+	isPointBound: boolean
 	loyaltyPoints: number
 	archived: boolean
 
 	cloneParentID?: string
 	hasClones: boolean
 
+	gif: Blob
+	brandLogo: Blob
 	masterPlan: Blob
 	video: Blob
 	photos: Blob[]
 	urls: SKUContent[]
 	productInfo: SKUContent[]
+	retailLinks: RetailsContent[]
 }
 export interface SKUClone {
 	sku: SKU
 	depth: number
+}
+
+export interface SubTask {
+	title: string
+	description: string
+}
+
+export interface Task{
+	id:string
+    title:string
+	code: string
+    description:string
+    loyaltyPoints:number
+    isTimeBound:boolean
+    isPeopleBound:boolean
+    isProductRelevant: boolean
+    finishDate:Date
+	bannerPhoto: Blob
+    maximumPeople:number
+	sku: SKU
+	subtasks:SubTask[]
 }
 
 export interface Container {
@@ -220,6 +262,8 @@ export interface Contract {
 	code: string
 	name: string
 	description: string
+	latitude:number
+	longitude: number
 	supplierName: string
 	dateSigned: string
 	archived: boolean

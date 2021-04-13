@@ -28,6 +28,8 @@ import { promiseTimeout, TIMED_OUT } from "../../helpers/timeout"
 type FormData = {
 	name: string
 	supplierName: string
+	latitude: number
+	longitude: number
 }
 
 const ContractEdit = (props: RouteComponentProps<{ code: string }>) => {
@@ -73,11 +75,11 @@ const ContractEdit = (props: RouteComponentProps<{ code: string }>) => {
 	const [dateSigned, setDateSigned] = React.useState(new Date())
 
 	const { register, setValue, handleSubmit, errors } = useForm<FormData>()
-	const onSubmit = handleSubmit(({ name, supplierName }) => {
+	const onSubmit = handleSubmit(({ name, supplierName, latitude, longitude}) => {
 		setChangeSuccess(false)
 		setTimedOut(false)
-
-		const input = { name, description, supplierName, dateSigned }
+		
+		const input = { name, description, supplierName, dateSigned , latitude, longitude}
 
 		if (isNewContract) {
 			updateContract({
@@ -102,6 +104,8 @@ const ContractEdit = (props: RouteComponentProps<{ code: string }>) => {
 		if (!contract) return
 		setValue("name", contract.name)
 		setValue("supplierName", contract.supplierName)
+		setValue("latitude", contract.latitude)
+		setValue("longitude", contract.longitude)
 		setDescription(contract.description)
 		setDateSigned(new Date(contract.dateSigned))
 	}, [contract, activeKey])
@@ -169,6 +173,14 @@ const ContractEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 			<FormControl label="Supplier Name" error={errors.supplierName ? errors.supplierName.message : ""} positive="">
 				<Input name="supplierName" inputRef={register({ required: "Required" })} />
+			</FormControl>
+
+			<FormControl label="Latitude" error={errors.latitude ? errors.latitude.message : ""} positive="">
+				<Input name="latitude" inputRef={register({ required: "Required" })} />
+			</FormControl>
+
+			<FormControl label="Longitude" error={errors.longitude ? errors.longitude.message : ""} positive="">
+				<Input name="longitude" inputRef={register({ required: "Required" })} />
 			</FormControl>
 
 			<FormControl label="Date Signed" caption="YYYY/MM/DD" error="" positive="">

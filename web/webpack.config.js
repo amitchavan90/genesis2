@@ -28,10 +28,14 @@ const config = {
 	output: {
 		path: path.resolve(__dirname, "dist"),
 		publicPath: "/",
-		filename: "[name].[contenthash].js",
+		filename: "[name].[hash].js",
 	},
 	module: {
 		rules: [
+			{
+				test: /\.html$/i,
+				loader: 'html-loader',
+			},
 			{
 				test: /\.(js|jsx)$/,
 				use: "babel-loader",
@@ -84,7 +88,6 @@ const config = {
 			appMountId: "app",
 			favicon: "src/assets/images/favicon2.ico",
 		}),
-		new CopyWebpackPlugin([{ from: "./src/assets/static-files", to: "static-files" }]),
 	],
 	optimization: {
 		runtimeChunk: "single",

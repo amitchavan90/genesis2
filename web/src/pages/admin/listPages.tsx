@@ -479,6 +479,98 @@ const UserActivity = () => (
 	/>
 )
 
+const TasksList = () => (
+	<ItemListPage
+		itemName="task"
+		header="Task"
+		query={graphql.query.TASKS}
+		batchActionMutation={graphql.mutation.BATCH_ACTION_TASK}
+		firstColumnValue="title"
+		firstColumnSubValue="code"
+		columns={[
+			{ label: "Products Amount", value: "loyaltyPoints" },
+			{
+				label: "Date Created",
+				value: "createdAt",
+				dateTime: true,
+			},
+		]}
+		actions={ActionItemSet.Archive}
+		createPermission={Perm.TaskCreate}
+		readPermission={Perm.TaskRead}
+	/>
+)
+
+const ReferralList = () => (
+	<ItemListPage
+		itemName="referral"
+		header="Referral"
+		query={graphql.query.REFERRALS}
+		batchActionMutation={graphql.mutation.BATCH_ACTION_SKU}
+		firstColumnValue="isRedemmed"
+		firstColumnSubValue="createdAt"
+		columns={[
+			{ label: "UFName", value: "user" ,subValues: ["firstName"]},
+			{ label: "ULName", value: "user" ,subValues: ["lastName"]},
+			{ label: "RefralCode", value: "referee" ,subValues: ["referralCode"]},
+			{ label: "RFName", value: "referee" ,subValues: ["firstName"]},
+			{ label: "RLName", value: "referee" ,subValues: ["lastName"]},
+			{
+				label: "Date Created",
+				value: "createdAt",
+				dateTime: true,
+			},
+		]}
+		actions={ActionItemSet.Archive}
+		//createPermission={Perm.TaskCreate}
+		//readPermission={Perm.TaskRead}
+	/>
+)
+
+const UserPurchaseActivityList = () => (
+	<ItemListPage
+		itemName="userPurchaseActivity"
+		header="UserPurchaseActivity"
+		query={graphql.query.USER_PURCHASE_ACTIVITIES}
+		firstColumnValue="loyaltyPoints"
+		firstColumnSubValue="createdAt"
+		columns={[
+			{ label: "UFName", value: "user" ,subValues: ["firstName"]},
+			{ label: "ULName", value: "user" ,subValues: ["lastName"]},
+			{ label: "UEmail", value: "user" ,subValues: ["email"]},
+			{ label: "ProductCode", value: "product" ,subValues: ["code"]},
+			{
+				label: "Date Created",
+				value: "createdAt",
+				dateTime: true,
+			},
+		]}
+		actions={ActionItemSet.Archive}
+	/>
+)
+
+const UserTaskList = () => (
+	<ItemListPage
+		itemName="userTask"
+		header="UserTask"
+		query={graphql.query.USER_TASKS}
+		batchActionMutation={graphql.mutation.BATCH_ACTION_SKU}
+		firstColumnValue="status"
+		firstColumnSubValue="code"
+		columns={[
+			{ label: "task", value: "task" ,subValues: ["title"]},
+			{ label: "UserLastName", value: "user" ,subValues: ["lastName"]},
+			{ label: "USerEmail", value: "user" ,subValues: ["email"]},
+			{
+				label: "Date Created",
+				value: "createdAt",
+				dateTime: true,
+			},
+		]}
+		actions={ActionItemSet.Archive}
+		readPermission={Perm.TaskRead}
+	/>
+)
 export const ListPage = {
 	Products,
 	SKUs,
@@ -496,4 +588,8 @@ export const ListPage = {
 
 	Transactions,
 	UserActivity,
+	TasksList,
+	ReferralList,
+	UserPurchaseActivityList,
+	UserTaskList
 }

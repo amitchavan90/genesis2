@@ -90,6 +90,9 @@ interface ItemListProps {
 	contractID?: string
 	userID?: string
 	trackActionID?: string
+	taskID?: string
+	referralID?: string
+	userPurchaseActivityID?:string
 
 	/** Additional columns to show in the table
 	 *
@@ -194,6 +197,9 @@ export const ItemList = (props: ItemListProps) => {
 	const [contractID, setContractID] = React.useState(props.contractID)
 	const [userID, setUserID] = React.useState(props.userID)
 	const [trackActionID, setTrackActionID] = React.useState(props.trackActionID)
+	const [taskID, setTaskID] = React.useState(props.taskID)
+	const [referralID, setReferralID] = React.useState(props.referralID)
+	const [userPurchaseActivityID, setUserPurchaseActivityID] = React.useState(props.userPurchaseActivityID)
 
 	const [showModal, setShowModal] = React.useState<boolean>()
 	const [modalColumn, setModalColumn] = React.useState<number>()
@@ -219,6 +225,15 @@ export const ItemList = (props: ItemListProps) => {
 				return graphql.query.USERS
 			case "trackAction":
 				return graphql.query.TRACK_ACTIONS
+			case "task":
+				return graphql.query.TASKS	
+			case "referral":
+				return graphql.query.REFERRALS	
+			case "userPurchaseActivity":
+				console.log("USER_PURCHASE_ACTIVITIES-->",graphql.query.USER_PURCHASE_ACTIVITIES)
+				return graphql.query.USER_PURCHASE_ACTIVITIES
+			case "userTask":
+				return graphql.query.REFERRALS		
 		}
 		return graphql.query.CONTRACTS
 	}
@@ -239,6 +254,9 @@ export const ItemList = (props: ItemListProps) => {
 		setContractID(undefined)
 		setUserID(undefined)
 		setTrackActionID(undefined)
+		setTaskID(undefined)
+		setReferralID(undefined)
+		setUserPurchaseActivityID(undefined)
 
 		switch (column) {
 			case "container":
@@ -271,6 +289,19 @@ export const ItemList = (props: ItemListProps) => {
 			case "trackAction":
 				setTrackActionID(id)
 				break
+			case "task":
+				setTaskID(id)
+				break	
+			case "referral":
+				setReferralID(id)	
+				break
+			case "userPurchaseActivity":
+				setUserPurchaseActivityID(id)	
+				break
+			case "userTask":
+				setReferralID(id)	
+				break	
+
 		}
 	}
 
@@ -314,6 +345,9 @@ export const ItemList = (props: ItemListProps) => {
 			contractID,
 			userID,
 			trackActionID,
+			taskID,
+			referralID,
+			userPurchaseActivityID,
 		},
 	})
 

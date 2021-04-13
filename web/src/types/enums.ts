@@ -73,6 +73,14 @@ export enum Perm {
 	TrackActionArchive = "TrackActionArchive",
 	TrackActionUnarchive = "TrackActionUnarchive",
 
+	TaskList = "TaskList",
+	TaskRead = "TaskRead",
+	TaskCreate = "TaskCreate",
+
+	ReferralList = "ReferralList",
+	UserPurchaseActivityList = "UserPurchaseActivityList",
+	UserTaskList = "UserTaskList",
+
 	ContractList = "ContractList",
 	ContractRead = "ContractRead",
 	ContractCreate = "ContractCreate",
@@ -93,6 +101,23 @@ export enum Perm {
 	UseAdvancedMode = "UseAdvancedMode",
 	UseAdminPortal = "UseAdminPortal",
 }
+
+export const Categories = [
+	{name: "Dairy Free"},
+	{name: "Gluten Free"},
+	{name: "Keto Friendly"},
+	{name: "Vegan"},
+	{name: "Vegetarian"},
+	{name: "Kosher"}
+]
+
+export const ProductCategories = [
+	{name: "Meat"},
+	{name: "Seafood"},
+	{name: "Beverage"},
+	{name: "Vegetables"},
+	{name: "Fruit"}
+]
 
 export const AffiliateOrgs = [
 	{ id: "Latitude 28° Produce" },

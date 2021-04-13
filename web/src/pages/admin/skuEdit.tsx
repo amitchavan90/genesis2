@@ -3,7 +3,7 @@ import { RouteComponentProps, useHistory } from "react-router-dom"
 import { useStyletron } from "baseui"
 import { useQuery, useMutation } from "@apollo/react-hooks"
 import { graphql } from "../../graphql"
-import { SKU, Blob, SKUContent, Settings } from "../../types/types"
+import { SKU, Blob, SKUContent, Settings, RetailsContent } from "../../types/types"
 import { useForm } from "react-hook-form"
 import { FormControl, FormControlOverrides } from "baseui/form-control"
 import { Input } from "baseui/input"
@@ -31,19 +31,27 @@ import { invalidateListQueries } from "../../apollo"
 import { SKUCloneTree } from "../../components/skuCloneTree"
 import { Checkbox } from "baseui/checkbox"
 import { promiseTimeout, TIMED_OUT } from "../../helpers/timeout"
+import { Select,Value} from "baseui/select";
+import { Categories, ProductCategories } from "../../types/enums";
 
 type FormData = {
 	name: string
+	brand :string
+	price: number
+	purchasePoints: number
+	weight: number
+	ingredients: string
 	code: string
 	urls: SKUContent[]
 	productInfo: SKUContent[]
+	retailLinks: RetailsContent[]
 	loyaltyPoints: number
 }
 
 const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	const code = props.match.params.code
 	const isNewSKU = code === "new"
-
+	
 	const sQuery = new URLSearchParams(props.location.search)
 	const cloneFrom = isNewSKU ? sQuery.get("clone") : null
 
@@ -85,7 +93,20 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	const [timedOut, setTimedOut] = React.useState(false)
 	const [showSuccessModal, setShowSuccessModal] = React.useState(false)
 	const [description, setDescription] = React.useState("")
-	const [isBeef, setIsBeef] = React.useState<boolean>()
+	const [isBeef, setIsBeef] = React.useState<boolean>(false)
+	const [isAppBound, setIsAppBound] = React.useState<boolean>(false)
+	const [isPointBound, setIsPointBound] = React.useState<boolean>(false)
+
+	const [categories, setCategories] = React.useState<Value>()
+	const [productCategories, setProductCategories] = React.useState<Value>()
+	
+	const [gifFile, setGifFile] = React.useState<File>()
+	const [gifURL, setGifURL] = React.useState<string>()
+	const [uploadGif, setUploadGif] = React.useState<ImageUploadHandler>()
+
+	const [brandLogoFile, setBrandLogoFile] = React.useState<File>()
+	const [brandLogoURL, setBrandLogoURL] = React.useState<string>()
+	const [uploadBrandLogo, setUploadBrandLogo] = React.useState<ImageUploadHandler>()
 
 	const [masterPlanFile, setMasterPlanFile] = React.useState<File>()
 	const [masterPlanURL, setMasterPlanURL] = React.useState<string>()
@@ -100,12 +121,13 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 
 	const [urlCount, setURLCount] = React.useState(isNewSKU && !cloneFrom ? 0 : 4) // count must start a max for the initial load to work
 	const [productInfoCount, setProductInfoCount] = React.useState(isNewSKU && !cloneFrom ? 0 : 25)
+	const [retailsInfoCount, setRetailsInfoCount] = React.useState(isNewSKU && !cloneFrom ? 0 : 25)
 
 	const { register, setValue, handleSubmit, errors, getValues } = useForm<FormData>()
 
-	const onSubmit = handleSubmit(async ({ name, code, urls, productInfo, loyaltyPoints }) => {
+	const onSubmit = handleSubmit(async ({ name,brand, price, purchasePoints, weight, ingredients, code, urls, productInfo, retailLinks, loyaltyPoints}) => {
 		setTimedOut(false)
-
+		
 		// Upload Master Plan
 		let masterPlanBlobID: string | null = null
 		if (uploadMasterPlan) {
@@ -126,6 +148,50 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 			}
 		} else if (cloneFrom && sku) {
 			masterPlanBlobID = sku.masterPlan.id
+		}
+
+		// Upload Brand logo
+		let brandLogoBlobID: string | null = null
+		if (uploadBrandLogo) {
+			if (uploadBrandLogo.upload && uploadBrandLogo.setUploadError) {
+				const response = await uploadBrandLogo.upload()
+
+				if (!response || !response.data) {
+					uploadBrandLogo.setUploadError("Upload Failed")
+					return
+				}
+
+				if (response.data.fileUpload) {
+					setBrandLogoURL(response.data.fileUpload.file_url)
+					brandLogoBlobID = response.data.fileUpload.id
+				}
+			} else if (uploadBrandLogo.removeImage) {
+				brandLogoBlobID = "-"
+			}
+		} else if (cloneFrom && sku) {
+			brandLogoBlobID = sku.brandLogo.id
+		}
+
+		// Upload GIF
+		let gifBlobID: string | null = null
+		if (uploadGif) {
+			if (uploadGif.upload && uploadGif.setUploadError) {
+				const response = await uploadGif.upload()
+
+				if (!response || !response.data) {
+					uploadGif.setUploadError("Upload Failed")
+					return
+				}
+
+				if (response.data.fileUpload) {
+					setGifURL(response.data.fileUpload.file_url)
+					gifBlobID = response.data.fileUpload.id
+				}
+			} else if (uploadGif.removeImage) {
+				gifBlobID = "-"
+			}
+		} else if (cloneFrom && sku) {
+			gifBlobID = sku.gif.id
 		}
 
 		// Upload Video
@@ -169,19 +235,31 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 		} else if (cloneFrom && sku) {
 			photoBlobIDs = sku.photos.map(p => p.id)
 		}
-
+		
 		const input = {
 			name,
+			brand,
+			weight,
+			ingredients,
 			code,
 			description,
 			isBeef,
+			isAppBound,
+			isPointBound,
+			price: price || 0,
+			purchasePoints: purchasePoints || 0,
+			brandLogoBlobID,
+			gifBlobID,
 			masterPlanBlobID,
 			videoBlobID,
 			photoBlobIDs,
 			urls,
 			productInfo,
+			retailLinks,
 			loyaltyPoints: loyaltyPoints || 0,
 			cloneParentID: isNewSKU && cloneFrom ? sku?.id : undefined,
+			categories,
+			productCategories,
 		}
 
 		if (isNewSKU) {
@@ -205,12 +283,28 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	React.useEffect(() => {
 		if (activeKey != "#details") return
 		if (!sku) return
-
 		setValue("name", sku.name)
+		setValue("brand", sku.brand)
+		setValue("price", sku.price)
+		setValue("purchasePoints",sku.purchasePoints)
+		setValue("weight", sku.weight)
+		setValue("ingredients", sku.ingredients)
 		setValue("code", sku.code)
 		setValue("loyaltyPoints", sku.loyaltyPoints)
 		setDescription(sku.description)
 		setIsBeef(sku.isBeef)
+		setIsAppBound(sku.isAppBound)
+		setIsPointBound(sku.isPointBound)
+
+		if (sku.categories.length) {
+			console.log("categories-------------->",sku.categories)
+			setCategories(sku.categories)
+		}
+		if (sku.productCategories.length) {
+			setProductCategories(sku.productCategories)
+		}
+		if (sku.gif) setGifURL(sku.gif.file_url)
+		if (sku.brandLogo) setBrandLogoURL(sku.brandLogo.file_url)
 		if (sku.masterPlan) setMasterPlanURL(sku.masterPlan.file_url)
 		if (sku.video) setVideoURL(sku.video.file_url)
 		setPhotos(sku.photos)
@@ -226,6 +320,12 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 			setValue(`productInfo[${index}].title`, info.title)
 			setValue(`productInfo[${index}].content`, info.content)
 		})
+
+		setRetailsInfoCount(sku.retailLinks.length)
+		sku.retailLinks.forEach((retila,index)=>{
+			setValue(`retailLinks[${index}].name`, retila.name)
+			setValue(`retailLinks[${index}].url`, retila.url)
+		})
 	}, [sku, activeKey])
 
 	// On mutation (update/create sku)
@@ -238,7 +338,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 			history.replace(`/portal/sku/${mutUpdateSKU.data.skuCreate.code}`)
 			return
 		}
-
+		
 		if (!mutUpdateSKU.data.skuUpdate) return
 
 		setSKU(mutUpdateSKU.data.skuUpdate)
@@ -274,6 +374,8 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 			productInfo: formValues.productInfo || [],
 			urls: formValues.urls || [],
 			masterPlan: masterPlanFile ? { file_url: URL.createObjectURL(masterPlanFile) } : sku?.masterPlan,
+			gif: gifFile ? { file_url: URL.createObjectURL(gifFile) } : sku?.gif,
+			brandLogo: brandLogoFile ? { file_url: URL.createObjectURL(brandLogoFile) } : sku?.brandLogo,
 			video: videoFile ? { file_url: URL.createObjectURL(videoFile) } : sku?.video,
 			photos: sku && sku.photos.length > 0 ? sku.photos.concat(newPhotos) : newPhotos,
 		} as SKU
@@ -299,6 +401,8 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	)
 
 	const breakLine = <div className={breakLineStyle} />
+
+	const canEdit = isNewSKU;
 
 	const editForm = (
 		<form onSubmit={onSubmit}>
@@ -337,8 +441,94 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 					Is Beef
 				</Checkbox>
 			</FormControl>
+			{!isBeef?
+			<ImageUpload.Single
+				// client requested to rename it to Hero Image
+				label="GIF image"
+				name="masterPlan"
+				imageURL={!gifURL || uploadGif?.removeImage ? "" : gifURL}
+				setImageUploader={imageUploader => setUploadGif(imageUploader)}
+				imageRemoved={uploadGif?.removeImage}
+				file={gifFile}
+				setFile={(file?: File) => setGifFile(file)}
+				previewHeight="200px"
+				caption="Please select a gif file"
+				maxFileSize={1e7}
+				clearable
+			/>:<div></div>}
 
+			<FormControl caption="">
+				<Checkbox checked={isAppBound} onChange={e => setIsAppBound(e.currentTarget.checked)}>
+					Is App
+				</Checkbox>
+			</FormControl>
+
+			<FormControl caption="">
+				<Checkbox checked={isPointBound} onChange={e => setIsPointBound(e.currentTarget.checked)}>
+					Is Point SKU
+				</Checkbox>
+			</FormControl>
 			{breakLine}
+			
+			{!isPointBound?
+			<FormControl label="Price" error={errors.price ? errors.price.message : ""} positive="">
+				<Input name="price" type="number" inputRef={register} />
+			</FormControl>
+			:
+			<FormControl label="PurchasePoints" error={errors.purchasePoints ? errors.purchasePoints.message : ""} positive="">
+				<Input name="purchasePoints" type="number" inputRef={register} />
+	   		</FormControl>
+			}
+			{breakLine}
+			<FormControl label="Categories" error="" positive="" caption="">
+				<Select
+					creatable
+					options={Categories}
+					labelKey="name"
+					valueKey="name"
+					value={categories}
+					multi
+					onChange={({ value }) => setCategories(value)}
+					//disabled={!canEdit}
+				/>
+			</FormControl>
+			<FormControl label="Product Categories" error="" positive="" caption="">
+				<Select
+					creatable
+					options={ProductCategories}
+					labelKey="name"
+					valueKey="name"
+					value={productCategories}
+					multi
+					onChange={({ value }) => setProductCategories(value)}
+					//disabled={!canEdit}
+				/>
+			</FormControl>
+			<FormControl label="Brand" error={errors.brand ? errors.brand.message : ""} positive="">
+				<Input name="brand" inputRef={register({ required: "Required" })} />
+			</FormControl>
+			<ImageUpload.Single
+				// client requested to rename it to Hero Image
+				label="Brand logo"
+				name="masterPlan"
+				imageURL={!brandLogoURL || uploadBrandLogo?.removeImage ? "" : brandLogoURL}
+				setImageUploader={imageUploader => setUploadBrandLogo(imageUploader)}
+				imageRemoved={uploadBrandLogo?.removeImage}
+				file={brandLogoFile}
+				setFile={(file?: File) => setBrandLogoFile(file)}
+				previewHeight="200px"
+				caption="Please select a jpg/png file smaller than 10MB"
+				maxFileSize={1e7}
+				clearable
+			/>
+			<FormControl label="Weight" error={errors.weight ? errors.weight.message : ""} positive="">
+				<Input name="weight" type="number" inputRef={register({ required: "Required" })} />
+			</FormControl>
+			<FormControl label="Ingredients" error={errors.ingredients ? errors.ingredients.message : ""} positive="">
+				<Input name="ingredients" inputRef={register({ required: "Required" })} />
+			</FormControl>
+			{breakLine}
+			
 
 			<ImageUpload.Single
 				// client requested to rename it to Hero Image
@@ -391,6 +581,8 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 							index={index}
 							icon="link"
 							label2="URL"
+							pairValue1="title"
+							paireValue2="content"
 							titleInputRef={register({ required: "Required" })}
 							contentInputRef={register({ required: "Required" })}
 							titleError={errors.urls && errors.urls[index] && errors.urls[index].title?.message}
@@ -414,6 +606,40 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 				</div>
 			</FormControl>
 
+			<FormControl label={`Retails Information (${retailsInfoCount}/25)`} error="" positive="">
+				<div>
+					{Array.from({ length: retailsInfoCount }).map((_, index) => (
+						<InputPair
+							key={`sku_info_${index}`}
+							prefix="retailLinks"
+							index={index}
+							icon="link"
+							label2="URL"
+							pairValue1="name"
+							paireValue2="url"
+							titleInputRef={register({ required: "Required" })}
+							contentInputRef={register({ required: "Required" })}
+							titleError={errors.retailLinks && errors.retailLinks[index] && errors.retailLinks[index].name?.message}
+							contentError={errors.retailLinks && errors.retailLinks[index] && errors.retailLinks[index].url?.message}
+							onDelete={async () => {
+								const retailLinks = getValues({ nest: true }).retailLinks
+								const newInfo = [...retailLinks.slice(0, index), ...retailLinks.slice(index + 1)]
+								retailLinks.forEach((_, index) => {
+									setValue(`retailLinks[${index}].name`, index >= newInfo.length ? "" : newInfo[index].name)
+									setValue(`retailLinks[${index}].url`, index >= newInfo.length ? "" : newInfo[index].url)
+								})
+								setRetailsInfoCount(retailsInfoCount - 1)
+							}}
+						/>
+					))}
+					{retailsInfoCount < 25 && (
+						<Button type="button" kind="secondary" onClick={() => setRetailsInfoCount(retailsInfoCount + 1)}>
+							{plusCircle} Add Item
+						</Button>
+					)}
+				</div>
+			</FormControl>
+
 			{breakLine}
 
 			<FormControl label={`Product Information (${productInfoCount}/25)`} error="" positive="">
@@ -424,6 +650,8 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 							prefix="productInfo"
 							index={index}
 							icon="info-circle"
+							pairValue1="title"
+							paireValue2="content"
 							titleInputRef={register({ required: "Required" })}
 							contentInputRef={register({ required: "Required" })}
 							titleError={errors.productInfo && errors.productInfo[index] && errors.productInfo[index].title?.message}
@@ -622,11 +850,12 @@ interface InputPairProps {
 	onDelete: () => void
 	label1?: string
 	label2?: string
+	pairValue1?: string
+	paireValue2?: string
 }
 
 export const InputPair = (props: InputPairProps) => {
-	const { prefix, index } = props
-
+	const { prefix, index, pairValue1, paireValue2} = props
 	const [css, theme] = useStyletron()
 	const containerStyle = css({
 		display: "flex",
@@ -650,12 +879,12 @@ export const InputPair = (props: InputPairProps) => {
 					<FontAwesomeIcon icon={["fas", props.icon]} size="lg" />
 				</div>
 				<FormControl label={props.label1 || "Name"} overrides={InputParFormControlOverrides} error="" positive="">
-					<Input name={`${prefix}[${index}].title`} inputRef={props.titleInputRef} error={props.titleError !== undefined} />
+					<Input name={`${prefix}[${index}].${pairValue1}`} inputRef={props.titleInputRef} error={props.titleError !== undefined} />
 				</FormControl>
 			</div>
 			<div className={half}>
 				<FormControl label={props.label2 || "Value"} overrides={InputParFormControlOverrides} error="" positive="">
-					<Input name={`${prefix}[${index}].content`} inputRef={props.contentInputRef} error={props.contentError !== undefined} />
+					<Input name={`${prefix}[${index}].${paireValue2}`} inputRef={props.contentInputRef} error={props.contentError !== undefined} />
 				</FormControl>
 				<Button
 					type="button"
