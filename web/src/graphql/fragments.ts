@@ -60,28 +60,13 @@ const SKU = gql`
 		code
 		description
 		isBeef
-		isPointBound
-		isAppBound
-		brand
-		ingredients
-		weight
-		price
-		purchasePoints
-		ingredients
 		archived
 		productCount
 		loyaltyPoints
 
 		hasClones
 		cloneParentID
-		gif{
-			id
-			file_url
-		}
-		brandLogo {
-			id
-			file_url
-		}
+
 		masterPlan {
 			id
 			file_url
@@ -98,20 +83,10 @@ const SKU = gql`
 			title
 			content
 		}
-		retailLinks {
-			name
-			url
-		}
 		productInfo {
 			title
 			content
 		}
-		categories {
-            name
-        }
-        productCategories {
-            name
-        }
 	}
 `
 const SKU_LIST = gql`
@@ -369,8 +344,6 @@ const CONTRACT = gql`
 		code
 		name
 		description
-		latitude
-		longitude
 		supplierName
 		dateSigned
 		archived
@@ -493,110 +466,6 @@ const PRODUCT_VIEW = gql`
 	${SKU}
 	${TRANSACTION_VIEW}
 `
-const TASK = gql`
-	fragment TaskFragment on Task {
-		id,
-		title,
-		code,
-		description,
-		loyaltyPoints,
-		isTimeBound,
-		isPeopleBound,
-		isProductRelevant,
-		finishDate,
-		maximumPeople,
-		skuID,
-		bannerPhoto{
-			id
-			file_url
-		},
-		sku {
-			id,
-			name,
-			code
-		},
-		subtasks {
-			id,
-			title,
-			description
-		}
-		createdAt
-	}
-`
-const TASK_LIST = gql`
-	fragment TaskListFragment on Task {
-			id,
-			title,
-			code,
-			description,
-			isTimeBound,
-			isPeopleBound,
-			isProductRelevant,
-			isFinal,
-			finishDate,
-			maximumPeople,
-			createdAt
-	}
-`
-const REFERRAL_LIST = gql`
-fragment ReferralListFragment on Referral{
-	id,
-    referee {
-        id,
-        firstName,
-        lastName,
-        referralCode
-    },
-    isRedemmed,
-    createdAt,
-    user {
-        firstName,
-        lastName,
-        email
-    }
-}`
-
-const  USER_TASK_LIST = gql`
-fragment UserTaskListFragment on UserTask {
-	id,
-	isComplete,
-	status,
-	code,
-	task {
-		id,
-		title,
-		description,
-	},
-	user {
-		id,
-		firstName,
-		lastName,
-		email
-	}
-	userSubtasks {
-		id,
-		isComplete,
-		status
-	},
-	createdAt
-}`
-
-const  USER_PURCHASE_ACTIVITY = gql`
-fragment UserPurchaseActivityFragment on  UserPurchaseActivity{
-	id,
-	loyaltyPoints,
-	user {
-		id,
-		firstName,
-		lastName,
-		email
-	},
-	product {
-		id
-		code
-	}
-	createdAt
-}`
 
 export const fragment = {
 	USER,
@@ -628,11 +497,4 @@ export const fragment = {
 	TRACK_ACTION,
 	TRANSACTION,
 	TRANSACTION_VIEW,
-
-	TASK,
-	TASK_LIST,
-
-	REFERRAL_LIST,
-	USER_TASK_LIST,
-	USER_PURCHASE_ACTIVITY
 }

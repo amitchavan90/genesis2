@@ -23,14 +23,10 @@ export const SideBar = () => {
 		history.location.pathname.startsWith("/portal/consumer") ||
 		history.location.pathname.startsWith("/portal/role") ||
 		history.location.pathname.startsWith("/portal/trackAction")
-	const onAppPage = 
-		history.location.pathname.startsWith("/portal/tasks") || 
-		history.location.pathname.startsWith("/portal/referrals")||
-		history.location.pathname.startsWith("/portal/purchesActivity")
+
 	const [expandInventoryPanel, setExpandInventoryPanel] = React.useState(onInventoryPage)
 	const [expandActivityPanel, setExpandActivityPanel] = React.useState(onActivityPage)
 	const [expandSystemPanel, setExpandSystemPanel] = React.useState(onSystemPage)
-	const [expandAppPanel, setExpandAppPanel] = React.useState(onAppPage)
 
 	const [css, theme] = useStyletron()
 
@@ -79,17 +75,11 @@ export const SideBar = () => {
 		maxHeight: expandSystemPanel ? "150px" : "0px",
 		transition: "0.25s",
 	})
-	const accordionPanelApp: string = css({
-		transformOrigin: "top",
-		transform: expandAppPanel ? "scaleY(1)" : "scaleY(0)",
-		maxHeight: expandAppPanel ? "300px" : "0px",
-		transition: "0.25s",
-	})
 
 	const showInventoryPanel = hasPermission(Perm.ContainerList) || hasPermission(Perm.CartonList) || hasPermission(Perm.ProductList)
 	const showActivityPanel = hasPermission(Perm.ActivityListBlockchainActivity) || hasPermission(Perm.ActivityListUserActivity)
 	const showSystemPanel = hasPermission(Perm.UserList) || hasPermission(Perm.RoleList) || hasPermission(Perm.TrackActionList)
-	const showAppPanel = hasPermission(Perm.TaskList) || hasPermission(Perm.ReferralList) || hasPermission(Perm.UserPurchaseActivityList)
+
 	React.useEffect(() => {
 		if (expandSystemPanel != onSystemPage) setExpandSystemPanel(onSystemPage)
 		if (expandActivityPanel != onActivityPage) setExpandActivityPanel(onActivityPage)
@@ -105,6 +95,17 @@ export const SideBar = () => {
 			</div>
 			<div>
 				<SideMenuButton index={index++} icon="chart-pie" label="Dashboard" url="/portal" strictSelection />
+
+				{hasPermission(Perm.ContractList) && (
+					<SideMenuButton
+						index={index++}
+						icon="file-contract"
+						label="Livestock Specifications"
+						url="/portal/contracts"
+						altURL="/portal/contract"
+						fontSize="16px"
+					/>
+				)}
 
 				{hasPermission(Perm.OrderList) && <SideMenuButton index={index++} icon="shopping-cart" label="Orders" url="/portal/orders" altURL="/portal/order" />}
 
@@ -152,17 +153,6 @@ export const SideBar = () => {
 					<SideMenuButton index={index++} icon="shopping-basket" label="Distributors" url="/portal/distributors" altURL="/portal/distributor" />
 				)}
 
-				{hasPermission(Perm.ContractList) && (
-					<SideMenuButton
-						index={index++}
-						icon="file-contract"
-						label="ORIGIN"
-						url="/portal/contracts"
-						altURL="/portal/contract"
-						fontSize="16px"
-					/>
-				)}
-
 				{showActivityPanel && (
 					<>
 						<SideMenuButton
@@ -186,35 +176,7 @@ export const SideBar = () => {
 						</div>
 					</>
 				)}
-				{showAppPanel && (
-					<>
-						<SideMenuButton
-							index={index++}
-							icon="chart-line"
-							label="App"
-							selected={onAppPage}
-							onClick={() => {
-								if (onAppPage) return
-								setExpandAppPanel(!expandAppPanel)
-								if (!onAppPage) history.push("/portal/tasks")
-							}}
-						/>
-						<div className={accordionPanelApp}>
-							{hasPermission(Perm.TaskList) && (
-								<SideMenuButton index={index++} subMenu icon="file-contract" label="Tasks" url="/portal/tasks" />
-							)}
-							{hasPermission(Perm.ReferralList) && (
-								<SideMenuButton index={index++} subMenu icon="user-chart" label="Referrals" url="/portal/referrals" />
-							)}
-							{hasPermission(Perm.UserPurchaseActivityList) && (
-								<SideMenuButton index={index++} subMenu icon="steak" label="Purchase Activity" url="/portal/purchesActivity" />
-							)}
-							{hasPermission(Perm.UserTaskList) && ( 
-							<SideMenuButton index={index++} subMenu icon="users" label="User Tasks" url="/portal/userTasks"/>
-							)}
-						</div>
-					</>
-				)}
+
 				{showSystemPanel && (
 					<>
 						<SideMenuButton

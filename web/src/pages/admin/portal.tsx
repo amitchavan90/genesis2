@@ -13,7 +13,6 @@ import { Perm } from "../../types/enums"
 import { ListPage } from "./listPages"
 import { UserEdit, ConsumerEdit } from "./system/userEdit"
 const SKUEdit = React.lazy(() => import("./skuEdit"))
-const TaskEdit = React.lazy(() => import("./inventory/taskEdit"))
 const RoleEdit = React.lazy(() => import("./system/roleEdit"))
 const ContainerEdit = React.lazy(() => import("./inventory/containerEdit"))
 const PalletEdit = React.lazy(() => import("./inventory/palletEdit"))
@@ -34,7 +33,7 @@ const PortalInner = () => {
 		color: theme.colors.colorPrimary,
 		display: "flex",
 		minHeight: "100vh",
-		width: "100%"
+		width: "100%",
 	})
 
 	const mainStyle: string = css({
@@ -115,13 +114,6 @@ const PortalInner = () => {
 
 							{hasPermission(Perm.TrackActionUpdate) && <Route path={"/portal/trackAction/:code"} component={TrackActionEdit} />}
 							{hasPermission(Perm.TrackActionList) && <Route path={"/portal/trackActions"} component={ListPage.TrackActions} />}
-
-							{hasPermission(Perm.TaskCreate) && <Route path={"/portal/task/:code"} component={TaskEdit} />}
-							{hasPermission(Perm.TaskList) && <Route path={"/portal/tasks"} component={ListPage.TasksList} />}
-
-							{hasPermission(Perm.ReferralList) && <Route path={"/portal/referrals"} component={ListPage.ReferralList} />}
-							{hasPermission(Perm.UserPurchaseActivityList) && <Route path={"/portal/purchesActivity"} component={ListPage.UserPurchaseActivityList} />}
-							{hasPermission(Perm.UserTaskList) && <Route path={"/portal/userTasks"} component={ListPage.UserTaskList} />}
 							<Route path={"/portal/"} component={Dashboard} />
 						</Switch>
 					</div>
