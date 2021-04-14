@@ -18,6 +18,7 @@ type Product {
 	isBeef: Boolean!
 	isPointBound: Boolean!
 	isAppBound: Boolean!
+	isClosed: Boolean!
 
 	registered: Boolean!
 	registeredBy: User
@@ -42,7 +43,6 @@ input UpdateProduct {
 	loyaltyPointsExpire: NullTime
 	inheritCartonHistory: NullBool
 	description: NullString
-	isAppBound: Boolean!
 }
 
 extend type Query {

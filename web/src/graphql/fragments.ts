@@ -561,6 +561,32 @@ fragment UserTaskListFragment on UserTask {
 	id,
 	isComplete,
 	status,
+	code,
+	task {
+		id,
+		title,
+		description,
+	},
+	user {
+		id,
+		firstName,
+		lastName,
+		email
+	}
+	userSubtasks {
+		id,
+		isComplete,
+		status
+	},
+	createdAt
+}`
+
+const  USER_TASK = gql`
+fragment UserTaskFragment on UserTask {
+	id,
+	isComplete,
+	status,
+	code,
 	task {
 		id,
 		title,
@@ -632,6 +658,8 @@ export const fragment = {
 	TASK_LIST,
 
 	REFERRAL_LIST,
+
+	USER_TASK,
 	USER_TASK_LIST,
 	USER_PURCHASE_ACTIVITY
 }

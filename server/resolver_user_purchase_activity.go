@@ -109,14 +109,18 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 		return nil, terror.New(terror.ErrParse, "create purchase: no product found with given id")
 	}
 
+	if product.IsClosed {
+		return nil, terror.New(terror.ErrParse, "create purchase: product is closed")
+	}
+
 	// Get sku
-	skuUUID, _ := uuid.FromString(input.ProductID.String)
+	skuUUID, _ := uuid.FromString(product.SkuID.String)
 	sku, err := r.SKUStore.Get(skuUUID)
 	if err != nil {
 		return nil, terror.New(terror.ErrParse, "create purchase: no sku found with given id")
 	}
 
-	if product.IsPointBound {
+	if sku.IsPointBound {
 		if user.WalletPoints < sku.PurchasePoints {
 			return nil, terror.New(terror.ErrParse, "create purchase: not enough points in the wallet")
 		}
@@ -132,6 +136,13 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 	created, err := r.UserPurchaseActivityStore.Insert(t)
 	if err != nil {
 		return nil, terror.New(err, "create user purchase")
+	}
+
+	// Update product
+	product.IsClosed = true
+	_, err = r.ProductStore.Update(product)
+	if err != nil {
+		return nil, terror.New(err, "Error while updating user")
 	}
 
 	// Update user
@@ -174,10 +185,10 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 			UserID:        referee.ID,
 			LoyaltyPoints: 10,
 			IsCredit:      true,
-			Message:       "Loyalty points awarded bt referral",
+			Message:       fmt.Sprintf("Loyalty points awarded by referral %v", userID),
 		}
 
-		_, err = r.WalletTransactionStore.Insert(wt)
+		_, err = r.UserStore.InsertWalletTransaction(wt)
 		if err != nil {
 			return nil, terror.New(err, "create wallet transaction")
 		}
@@ -189,15 +200,17 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 		ID:     wtID.String(),
 		UserID: user.ID,
 	}
-	if product.IsPointBound {
-		wt.LoyaltyPoints -= sku.PurchasePoints
-		wt.Message = "Loyalty points deducted by purchase of product"
+	if sku.IsPointBound {
+		wt.LoyaltyPoints = sku.PurchasePoints
+		wt.IsCredit = false
+		wt.Message = fmt.Sprintf("Loyalty points deducted by purchase of product %v", product.Code)
 	} else {
-		wt.LoyaltyPoints += sku.LoyaltyPoints
-		wt.Message = "Loyalty points awarded by purchase of product"
+		wt.LoyaltyPoints = sku.LoyaltyPoints
+		wt.IsCredit = true
+		wt.Message = fmt.Sprintf("Loyalty points awarded by purchase of product %v", product.Code)
 	}
 
-	_, err = r.WalletTransactionStore.Insert(wt)
+	_, err = r.UserStore.InsertWalletTransaction(wt)
 	if err != nil {
 		return nil, terror.New(err, "create wallet transaction")
 	}

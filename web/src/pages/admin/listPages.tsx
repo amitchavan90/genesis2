@@ -556,11 +556,11 @@ const UserTaskList = () => (
 		query={graphql.query.USER_TASKS}
 		batchActionMutation={graphql.mutation.BATCH_ACTION_SKU}
 		firstColumnValue="status"
-		//firstColumnSubValue="code"
+		firstColumnSubValue="code"
 		columns={[
 			{ label: "task", value: "task" ,subValues: ["title"]},
 			{ label: "UserLastName", value: "user" ,subValues: ["lastName"]},
-			{ label: "USerEmail", value: "user" ,subValues: ["email"]},
+			{ label: "UserEmail", value: "user" ,subValues: ["email"]},
 			{
 				label: "Date Created",
 				value: "createdAt",
@@ -568,7 +568,7 @@ const UserTaskList = () => (
 			},
 		]}
 		actions={ActionItemSet.Archive}
-		readPermission={Perm.TaskRead}
+		readPermission={Perm.UserTaskUpdate}
 	/>
 )
 export const ListPage = {

@@ -84,6 +84,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 		} else {
 			archiveSKU({
 				variables: { id: sku.id },
+				
 				update: (cache: any) => invalidateListQueries(cache, "skus"),
 			})
 		}

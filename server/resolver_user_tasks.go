@@ -216,10 +216,10 @@ func (r *mutationResolver) UserTaskApprove(ctx context.Context, id string) (*db.
 		UserID:        u.ID,
 		LoyaltyPoints: ut.R.Task.LoyaltyPoints,
 		IsCredit:      true,
-		Message:       "Loyalty points awarded by completing the task",
+		Message:       fmt.Sprintf("Loyalty points awarded by completing the task %v", ut.R.Task.Code),
 	}
 
-	_, err = r.WalletTransactionStore.Insert(wt)
+	_, err = r.UserStore.InsertWalletTransaction(wt)
 	if err != nil {
 		return nil, terror.New(err, "create wallet transaction")
 	}

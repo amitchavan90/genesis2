@@ -257,6 +257,22 @@ func (s *Users) Update(u *db.User, txes ...*sql.Tx) (*db.User, error) {
 	return u, nil
 }
 
+// InsertWalletTransaction in wallet transaction
+func (s *Users) InsertWalletTransaction(t *db.WalletTransaction, txes ...*sql.Tx) (*db.WalletTransaction, error) {
+	var err error
+
+	handleTransactions(s.Conn, func(tx *sql.Tx) error {
+		return t.Insert(tx, boil.Infer())
+	}, txes...)
+
+	err = t.Reload(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+
+	return t, nil
+}
+
 // GetByEmail returns a user given an email
 func (s *Users) GetByEmail(email string, txes ...*sql.Tx) (*db.User, error) {
 	dat, err := db.Users(db.UserWhere.Email.EQ(null.StringFrom(strings.ToLower(email)))).One(s.Conn)

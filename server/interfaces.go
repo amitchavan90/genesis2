@@ -234,7 +234,7 @@ type UserStorer interface {
 	SearchSelect(search graphql.SearchFilter, limit int, offset int, consumer bool) (int64, []*db.User, error)
 	GetByOrganisation(orgID uuid.UUID, txes ...*sql.Tx) (db.UserSlice, error)
 	Insert(u *db.User, tx ...*sql.Tx) (*db.User, error)
-	// InsertUserAndReferral(u *db.User, referredByID string, tx ...*sql.Tx) (*db.User, error)
+	InsertWalletTransaction(t *db.WalletTransaction, txes ...*sql.Tx) (*db.WalletTransaction, error)
 	Update(u *db.User, tx ...*sql.Tx) (*db.User, error)
 	Archive(id uuid.UUID, txes ...*sql.Tx) (*db.User, error)
 	Unarchive(id uuid.UUID, txes ...*sql.Tx) (*db.User, error)

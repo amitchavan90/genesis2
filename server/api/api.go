@@ -361,6 +361,7 @@ func NewAuthRoutes(auther *genesis.Auther, authConfig *config.UserAuth, userStor
 		cookieDefaults,
 	}
 	r := chi.NewRouter()
+	r.Get("/roles", c.roleList())
 	r.Post("/register", c.register())
 	r.Post("/login", c.login())
 	r.Post("/logout", c.logout())
@@ -411,6 +412,22 @@ func writeError(w http.ResponseWriter, err error, message string, code int) {
 func RestResponse(w http.ResponseWriter, r *http.Request, status int, body interface{}) {
 	render.Status(r, status)
 	render.JSON(w, r, body)
+}
+
+// list roles
+func (c *AuthController) roleList() func(w http.ResponseWriter, r *http.Request) {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		roles, err := c.RoleStore.All()
+		if err != nil {
+			failedMsg := "Failed to load role list, please try again."
+			writeError(w, err, failedMsg, http.StatusInternalServerError)
+			return
+		}
+
+		RestResponse(w, r, http.StatusOK, roles)
+	}
+
+	return fn
 }
 
 // register creates a user
@@ -540,7 +557,7 @@ func (c *AuthController) register() func(w http.ResponseWriter, r *http.Request)
 
 			refID, _ := uuid.NewV4()
 			referral := &db.Referral{
-				Code:         fmt.Sprintf("T%05d", count+1),
+				Code:         fmt.Sprintf("R%05d", count+1),
 				ID:           refID.String(),
 				UserID:       created.ID,
 				ReferredByID: null.StringFrom(referee.ID),
