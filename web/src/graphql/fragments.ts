@@ -561,7 +561,6 @@ fragment UserTaskListFragment on UserTask {
 	id,
 	isComplete,
 	status,
-	code,
 	task {
 		id,
 		title,
