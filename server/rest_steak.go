@@ -93,7 +93,6 @@ func SteakView(
 
 		redirect := fmt.Sprintf("/view?productID=%s&distributorCode=%s", productID, distributorCode)
 
-		fmt.Println(http.StatusFound, redirect)
 		http.Redirect(w, r, redirect, http.StatusFound)
 	}
 
