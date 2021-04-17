@@ -202,7 +202,7 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 				</FormControl>
 			)}
 
-			<FormControl label="Name" error={errors.title ? errors.title.message : ""} positive="">
+			<FormControl label="Title" error={errors.title ? errors.title.message : ""} positive="">
 				<Input name="title" inputRef={register({ required: "Required" })} />
 			</FormControl>
 
@@ -258,10 +258,10 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 				</Checkbox>
 			</FormControl>
 			{breakLine}
-			{isPeopleBound?
+			
 			<FormControl label="MaximumPeople" error={errors.maximumPeople ? errors.maximumPeople.message : ""} positive="">
 				<Input name="maximumPeople" type="number" inputRef={register}/>
-			</FormControl>:<div></div>}
+			</FormControl>
 			{isTimeBound?
 			<FormControl label="Finish Date" caption="YYYY/MM/DD" error="" positive="">
 				<div
@@ -272,11 +272,11 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 				>
 					<Datepicker value={finishDate} onChange={({ date }) => setfinishDate(date as Date)} />
 				</div>
-			</FormControl>:<div></div>}	
+			</FormControl>:""}	
 			{isProductRelevant?
 			<FormControl label="SKU">
 				<SKUSelectList value={sku} setValue={setSKU} />
-			</FormControl>:<div></div>}
+			</FormControl>:""}
 			{breakLine}
 			<FormControl label={`Sub Tasks (${subTasksCount}/25)`} error="" positive="">
 				<div>
