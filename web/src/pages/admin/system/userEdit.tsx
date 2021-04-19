@@ -113,11 +113,13 @@ const UserEditComponent = (props: { id?: string; hash: string; consumer?: boolea
 
 	// On load user
 	React.useEffect(() => {
+		console.log("data----------->",data)
 		if (!data || !data.user) return
 		setUser(data.user)
 	}, [data, loading, error])
 	React.useEffect(() => {
 		if (!user) return
+		
 		setValue("email", user.email)
 		setValue("firstName", user.firstName)
 		setValue("lastName", user.lastName)

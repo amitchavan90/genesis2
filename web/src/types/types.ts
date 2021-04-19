@@ -128,6 +128,17 @@ export interface Task{
 	subtasks:SubTask[]
 }
 
+export interface UserTask
+{
+	id: string
+	code: string
+	task: Task
+	user: User
+	status: string
+	isComplete: Boolean
+	createdAt: Date
+}
+
 export interface Container {
 	id: string
 	code: string

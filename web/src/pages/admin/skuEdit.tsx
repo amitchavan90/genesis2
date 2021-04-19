@@ -84,6 +84,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 		} else {
 			archiveSKU({
 				variables: { id: sku.id },
+				
 				update: (cache: any) => invalidateListQueries(cache, "skus"),
 			})
 		}
@@ -261,13 +262,15 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 			categories,
 			productCategories,
 		}
-
+		console.log("input----new-------->",input);
 		if (isNewSKU) {
+			console.log("input----new-------->",input.purchasePoints);
 			updateSKU({
 				variables: { input },
 				update: (cache: any) => invalidateListQueries(cache, "skus"),
 			})
 		} else if (sku) {
+			console.log("sku----update-------->",sku.purchasePoints);
 			promiseTimeout(updateSKU({ variables: { id: sku.id, input } })).catch(reason => {
 				if (reason !== TIMED_OUT) return
 				setTimedOut(true)
@@ -283,6 +286,7 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 	React.useEffect(() => {
 		if (activeKey != "#details") return
 		if (!sku) return
+		console.log("sku---------->",sku);
 		setValue("name", sku.name)
 		setValue("brand", sku.brand)
 		setValue("price", sku.price)
@@ -469,16 +473,14 @@ const SKUEdit = (props: RouteComponentProps<{ code: string }>) => {
 				</Checkbox>
 			</FormControl>
 			{breakLine}
-			
-			{!isPointBound?
 			<FormControl label="Price" error={errors.price ? errors.price.message : ""} positive="">
 				<Input name="price" type="number" inputRef={register} />
 			</FormControl>
-			:
+
 			<FormControl label="PurchasePoints" error={errors.purchasePoints ? errors.purchasePoints.message : ""} positive="">
 				<Input name="purchasePoints" type="number" inputRef={register} />
 	   		</FormControl>
-			}
+		
 			{breakLine}
 			<FormControl label="Categories" error="" positive="" caption="">
 				<Select

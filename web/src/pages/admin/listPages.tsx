@@ -560,7 +560,7 @@ const UserTaskList = () => (
 		columns={[
 			{ label: "task", value: "task" ,subValues: ["title"]},
 			{ label: "UserLastName", value: "user" ,subValues: ["lastName"]},
-			{ label: "USerEmail", value: "user" ,subValues: ["email"]},
+			{ label: "UserEmail", value: "user" ,subValues: ["email"]},
 			{
 				label: "Date Created",
 				value: "createdAt",
@@ -568,7 +568,7 @@ const UserTaskList = () => (
 			},
 		]}
 		actions={ActionItemSet.Archive}
-		readPermission={Perm.TaskRead}
+		readPermission={Perm.UserTaskUpdate}
 	/>
 )
 export const ListPage = {

@@ -124,6 +124,7 @@ func (r *mutationResolver) OrderCreate(ctx context.Context, input graphql.Create
 	// Setup Order
 	u := &db.Order{
 		Code:        fmt.Sprintf("N%05d", count),
+		IsAppBound:  input.IsAppBound,
 		CreatedByID: user.ID,
 	}
 
@@ -189,6 +190,7 @@ func (r *mutationResolver) OrderCreate(ctx context.Context, input graphql.Create
 			CreatedByID: user.ID,
 			OrderID:     null.StringFrom(created.ID),
 			SkuID:       skuID,
+			IsAppBound:  input.IsAppBound,
 		}
 
 		if input.ContractID != nil {

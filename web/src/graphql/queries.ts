@@ -595,6 +595,14 @@ const USER_PURCHASE_ACTIVITIES = gql`
 	}
 	${fragment.USER_PURCHASE_ACTIVITY}
 `
+const USER_TASK = gql`
+	query userTask($code: String!) {
+		userTask(code: $code) {
+			...UserTaskFragment
+		}
+	}
+	${fragment.USER_TASK}
+`
 export const query = {
 	ME,
 
@@ -664,5 +672,6 @@ export const query = {
 
 	REFERRALS,
 	USER_TASKS,
+	USER_TASK,
 	USER_PURCHASE_ACTIVITIES
 }

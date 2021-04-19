@@ -80,6 +80,8 @@ export enum Perm {
 	ReferralList = "ReferralList",
 	UserPurchaseActivityList = "UserPurchaseActivityList",
 	UserTaskList = "UserTaskList",
+	UserTaskUpdate= "UserTaskUpdate",
+
 
 	ContractList = "ContractList",
 	ContractRead = "ContractRead",

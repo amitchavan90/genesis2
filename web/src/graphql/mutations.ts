@@ -481,6 +481,12 @@ const BATCH_ACTION_TASK = gql`
 		taskBatchAction(ids: $ids, action: $action, value: $value)
 	}
 `
+const USER_TASK_APPROVE = gql`mutation userTaskApprove($id: ID!) {
+	userTaskApprove(id: $id) {
+		...UserTaskFragment
+	}
+}
+${fragment.USER_TASK}`
 
 export const mutation = {
 	FILE_UPLOAD,
@@ -560,4 +566,6 @@ export const mutation = {
 	CREATE_TASK,
 	UPDATE_TASK,
 	BATCH_ACTION_TASK,
+
+	USER_TASK_APPROVE
 }

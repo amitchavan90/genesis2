@@ -196,6 +196,7 @@ func SteakDetail(
 			}
 
 			product.CloseRegisterID = null.StringFrom(uid.String())
+			product.IsClosed = true
 			product, err = ProductStore.Update(product)
 			if err != nil {
 				err = terror.New(fmt.Errorf("error updating product"), "")
