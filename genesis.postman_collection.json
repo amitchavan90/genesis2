@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e4c13772-ab1a-4b03-806e-eca2843ca3e1",
+		"_postman_id": "f867df68-f09e-47f4-b761-8e8e63742935",
 		"name": "genesis",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -12,7 +12,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"jondoe@example.com\",\n    \"password\": \"Password$123\"\n}",
+					"raw": "{\n    \"email\": \"superadmin@example.com\",\n    \"password\": \"******\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -268,13 +268,13 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJhMzRiNjM2OC0xZjM3LTQ5NTctYjA4Ni1lYzk0YTM4MGUxMGIiLCJ0b2tlbklkIjoiMDE0MzEyNDEtMTBkMS00NDg0LWI1ZjMtMzE2YjQ2OGRhMDg2IiwidWlkIjoiNmI4Y2FkMjQtMjk1Mi00YjllLWE5OTUtMTNjMjdmN2MyYzhhIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.pAKOR1ZfFlOTjXel1myLcPMlHOT0xf26jijWZhgP1t4; Path=/; Expires=Thu, 06 May 2021 03:42:25 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiNzdiNDFjYS00ZmMzLTRlOWQtODQ5Yi02ODI0NGQxY2I5NzMiLCJ0b2tlbklkIjoiMjkzYmY4OWYtNGFjNi00ZjYxLTliZjItZGE0NjYzNDdmYTZkIiwidWlkIjoiNDY3OTk2MTAtZGM0Mi00MDM0LThmZjQtMjQ5ZmI4OGU5NGUyIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.LlLBBdHP02ans9Sfj0vgzubk7QdWfvR1Lxk1e2aXxXw; Path=/; Expires=Fri, 21 May 2021 03:25:44 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query {\n  tasks(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      tasks {\n          id,\n          code,\n          title,\n          description,\n          isTimeBound,\n          isPeopleBound,\n          isProductRelevant,\n          isFinal,\n          finishDate,\n          maximumPeople,\n          skuID,\n          subtasks {\n              id,\n              title,\n              description\n          },\n          brandLogo {\n              id\n          },\n          bannerPhoto {\n              id\n          }\n          createdAt\n      }\n      total\n  }\n}",
+						"query": "query {\n  tasks(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      tasks {\n          id,\n          code,\n          title,\n          description,\n          isTimeBound,\n          isPeopleBound,\n          isProductRelevant,\n          isFinal,\n          finishDate,\n          maximumPeople,\n          sku {\n              id,\n              name\n          }\n          subtasks {\n              id,\n              title,\n              description\n          },\n          brandLogo {\n              id\n          },\n          bannerPhoto {\n              id\n          }\n          createdAt\n      }\n      total\n  }\n}",
 						"variables": ""
 					}
 				},
@@ -301,13 +301,13 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJhMzRiNjM2OC0xZjM3LTQ5NTctYjA4Ni1lYzk0YTM4MGUxMGIiLCJ0b2tlbklkIjoiMDE0MzEyNDEtMTBkMS00NDg0LWI1ZjMtMzE2YjQ2OGRhMDg2IiwidWlkIjoiNmI4Y2FkMjQtMjk1Mi00YjllLWE5OTUtMTNjMjdmN2MyYzhhIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.pAKOR1ZfFlOTjXel1myLcPMlHOT0xf26jijWZhgP1t4; Path=/; Expires=Thu, 06 May 2021 03:42:25 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiNzdiNDFjYS00ZmMzLTRlOWQtODQ5Yi02ODI0NGQxY2I5NzMiLCJ0b2tlbklkIjoiMjkzYmY4OWYtNGFjNi00ZjYxLTliZjItZGE0NjYzNDdmYTZkIiwidWlkIjoiNDY3OTk2MTAtZGM0Mi00MDM0LThmZjQtMjQ5ZmI4OGU5NGUyIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.LlLBBdHP02ans9Sfj0vgzubk7QdWfvR1Lxk1e2aXxXw; Path=/; Expires=Fri, 21 May 2021 03:25:44 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query task {\n  task(code: \"T00002\") {\n    id,\n    code,\n    title,\n    description,\n    loyaltyPoints,\n    isTimeBound,\n    isPeopleBound,\n    isProductRelevant,\n    finishDate,\n    maximumPeople,\n    skuID,\n    subtasks {\n        id,\n        title,\n        description\n    }\n    createdAt\n  }\n}",
+						"query": "query task {\n  task(code: \"T00002\") {\n    id,\n    code,\n    title,\n    description,\n    loyaltyPoints,\n    isTimeBound,\n    isPeopleBound,\n    isProductRelevant,\n    finishDate,\n    maximumPeople,\n    sku {\n        id,\n        name\n    },\n    subtasks {\n        id,\n        title,\n        description\n    }\n    createdAt\n  }\n}",
 						"variables": ""
 					}
 				},
@@ -367,13 +367,13 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJhMzRiNjM2OC0xZjM3LTQ5NTctYjA4Ni1lYzk0YTM4MGUxMGIiLCJ0b2tlbklkIjoiMDE0MzEyNDEtMTBkMS00NDg0LWI1ZjMtMzE2YjQ2OGRhMDg2IiwidWlkIjoiNmI4Y2FkMjQtMjk1Mi00YjllLWE5OTUtMTNjMjdmN2MyYzhhIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.pAKOR1ZfFlOTjXel1myLcPMlHOT0xf26jijWZhgP1t4; Path=/; Expires=Thu, 06 May 2021 03:42:25 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiNzdiNDFjYS00ZmMzLTRlOWQtODQ5Yi02ODI0NGQxY2I5NzMiLCJ0b2tlbklkIjoiMjkzYmY4OWYtNGFjNi00ZjYxLTliZjItZGE0NjYzNDdmYTZkIiwidWlkIjoiNDY3OTk2MTAtZGM0Mi00MDM0LThmZjQtMjQ5ZmI4OGU5NGUyIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.LlLBBdHP02ans9Sfj0vgzubk7QdWfvR1Lxk1e2aXxXw; Path=/; Expires=Fri, 21 May 2021 03:25:44 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation taskCreate {\n    taskCreate(\n        input: {\n            title: \"Task 1\"\n            description: \"Task One\"\n            loyaltyPoints: 50\n            isTimeBound: true\n            isPeopleBound: true\n            isProductRelevant: false\n            finishDate: \"2021-04-18T15:04:05Z\"\n            maximumPeople: 10\n            subtasks: [\n                {\n                    title: \"Subtask 1\"\n                    description: \"Subtask One\"\n                },\n                {\n                    title: \"Subtask 2\"\n                    description: \"Subtask Two\"\n                }\n            ]\n        }\n    ) {\n        id,\n        code,\n        title,\n        description,\n        loyaltyPoints,\n        isTimeBound,\n        isPeopleBound,\n        isProductRelevant,\n        isFinal,\n        finishDate,\n        maximumPeople,\n        skuID,\n        subtasks {\n            id,\n            title,\n            description\n        }\n    }\n}",
+						"query": "mutation taskCreate {\n    taskCreate(\n        input: {\n            title: \"Task 1\"\n            description: \"Task One\"\n            loyaltyPoints: 50\n            isTimeBound: true\n            isPeopleBound: true\n            isProductRelevant: true\n            finishDate: \"2021-04-18T15:04:05Z\"\n            maximumPeople: 10,\n            skuID: \"31dee13c-6150-4c3e-aeb5-dc87a5c2bb9c\",\n            subtasks: [\n                {\n                    title: \"Subtask 1\"\n                    description: \"Subtask One\"\n                },\n                {\n                    title: \"Subtask 2\"\n                    description: \"Subtask Two\"\n                }\n            ]\n        }\n    ) {\n        id,\n        code,\n        title,\n        description,\n        loyaltyPoints,\n        isTimeBound,\n        isPeopleBound,\n        isProductRelevant,\n        isFinal,\n        finishDate,\n        maximumPeople,\n        sku {\n            id,\n            name\n        }\n        subtasks {\n            id,\n            title,\n            description\n        }\n    }\n}",
 						"variables": ""
 					}
 				},
@@ -459,6 +459,39 @@
 			"response": []
 		},
 		{
+			"name": "Order Create",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiNzdiNDFjYS00ZmMzLTRlOWQtODQ5Yi02ODI0NGQxY2I5NzMiLCJ0b2tlbklkIjoiMjkzYmY4OWYtNGFjNi00ZjYxLTliZjItZGE0NjYzNDdmYTZkIiwidWlkIjoiNDY3OTk2MTAtZGM0Mi00MDM0LThmZjQtMjQ5ZmI4OGU5NGUyIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.LlLBBdHP02ans9Sfj0vgzubk7QdWfvR1Lxk1e2aXxXw; Path=/; Expires=Fri, 21 May 2021 03:25:44 GMT; HttpOnly; SameSite=None"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation orderCreate {\n    orderCreate(\n        input: {\n            quantity: 2,\n            isAppBound: true\n        }\n    ) {\n        id,\n        code,\n        isAppBound,\n        sku {\n            id,\n            code,\n            name\n        },\n        productCount\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{genesis}}/api/gql/query",
+					"host": [
+						"{{genesis}}"
+					],
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
 			"name": "Product List",
 			"request": {
 				"method": "POST",
@@ -466,13 +499,46 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJhMzRiNjM2OC0xZjM3LTQ5NTctYjA4Ni1lYzk0YTM4MGUxMGIiLCJ0b2tlbklkIjoiMDE0MzEyNDEtMTBkMS00NDg0LWI1ZjMtMzE2YjQ2OGRhMDg2IiwidWlkIjoiNmI4Y2FkMjQtMjk1Mi00YjllLWE5OTUtMTNjMjdmN2MyYzhhIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.pAKOR1ZfFlOTjXel1myLcPMlHOT0xf26jijWZhgP1t4; Path=/; Expires=Thu, 06 May 2021 03:42:25 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiNzdiNDFjYS00ZmMzLTRlOWQtODQ5Yi02ODI0NGQxY2I5NzMiLCJ0b2tlbklkIjoiMjkzYmY4OWYtNGFjNi00ZjYxLTliZjItZGE0NjYzNDdmYTZkIiwidWlkIjoiNDY3OTk2MTAtZGM0Mi00MDM0LThmZjQtMjQ5ZmI4OGU5NGUyIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.LlLBBdHP02ans9Sfj0vgzubk7QdWfvR1Lxk1e2aXxXw; Path=/; Expires=Fri, 21 May 2021 03:25:44 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
 						"query": "query {\n  products(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      products {\n          id,\n          code,\n          registerID,\n          loyaltyPoints,\n          sku {\n              id,\n              code,\n              name\n          }\n      }\n      total\n  }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{genesis}}/api/gql/query",
+					"host": [
+						"{{genesis}}"
+					],
+					"path": [
+						"api",
+						"gql",
+						"query"
+					]
+				},
+				"description": "User Referral List"
+			},
+			"response": []
+		},
+		{
+			"name": "Order List",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cookie",
+						"type": "text",
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiNzdiNDFjYS00ZmMzLTRlOWQtODQ5Yi02ODI0NGQxY2I5NzMiLCJ0b2tlbklkIjoiMjkzYmY4OWYtNGFjNi00ZjYxLTliZjItZGE0NjYzNDdmYTZkIiwidWlkIjoiNDY3OTk2MTAtZGM0Mi00MDM0LThmZjQtMjQ5ZmI4OGU5NGUyIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.LlLBBdHP02ans9Sfj0vgzubk7QdWfvR1Lxk1e2aXxXw; Path=/; Expires=Fri, 21 May 2021 03:25:44 GMT; HttpOnly; SameSite=None"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n  orders(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      orders {\n          id,\n          code,\n          isAppBound,\n          sku {\n              id,\n              code,\n              name\n          },\n          productCount\n      }\n      total\n  }\n}",
 						"variables": ""
 					}
 				},
@@ -499,7 +565,7 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJhMzRiNjM2OC0xZjM3LTQ5NTctYjA4Ni1lYzk0YTM4MGUxMGIiLCJ0b2tlbklkIjoiMDE0MzEyNDEtMTBkMS00NDg0LWI1ZjMtMzE2YjQ2OGRhMDg2IiwidWlkIjoiNmI4Y2FkMjQtMjk1Mi00YjllLWE5OTUtMTNjMjdmN2MyYzhhIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.pAKOR1ZfFlOTjXel1myLcPMlHOT0xf26jijWZhgP1t4; Path=/; Expires=Thu, 06 May 2021 03:42:25 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiNzdiNDFjYS00ZmMzLTRlOWQtODQ5Yi02ODI0NGQxY2I5NzMiLCJ0b2tlbklkIjoiMjkzYmY4OWYtNGFjNi00ZjYxLTliZjItZGE0NjYzNDdmYTZkIiwidWlkIjoiNDY3OTk2MTAtZGM0Mi00MDM0LThmZjQtMjQ5ZmI4OGU5NGUyIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.LlLBBdHP02ans9Sfj0vgzubk7QdWfvR1Lxk1e2aXxXw; Path=/; Expires=Fri, 21 May 2021 03:25:44 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {

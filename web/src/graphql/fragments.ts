@@ -337,6 +337,7 @@ const ORDER = gql`
 		archived
 		createdAt
 		productCount
+		isAppBound
 		sku {
 			id
 			code
@@ -356,6 +357,7 @@ const ORDER_LIST = gql`
 		archived
 		createdAt
 		productCount
+		isAppBound
 		sku {
 			id
 			code
@@ -505,7 +507,6 @@ const TASK = gql`
 		isProductRelevant,
 		finishDate,
 		maximumPeople,
-		skuID,
 		bannerPhoto{
 			id
 			file_url

@@ -35,7 +35,7 @@ func (r *taskResolver) FinishDate(ctx context.Context, obj *db.Task) (*time.Time
 func (r *taskResolver) Sku(ctx context.Context, obj *db.Task) (*db.StockKeepingUnit, error) {
 	result, err := r.TaskStore.GetSku(obj.SkuID.String)
 	if err != nil {
-		return nil, terror.New(err, "get sku")
+		return nil, nil
 	}
 	return result, nil
 }

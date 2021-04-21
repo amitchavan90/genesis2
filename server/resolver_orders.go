@@ -123,7 +123,7 @@ func (r *mutationResolver) OrderCreate(ctx context.Context, input graphql.Create
 
 	// Setup Order
 	u := &db.Order{
-		Code:        fmt.Sprintf("N%05d", count),
+		Code:        fmt.Sprintf("N%05d", count+1),
 		IsAppBound:  input.IsAppBound,
 		CreatedByID: user.ID,
 	}
