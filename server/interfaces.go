@@ -295,6 +295,7 @@ type TaskStorer interface {
 type UserTaskStorer interface {
 	Get(id uuid.UUID, txes ...*sql.Tx) (*db.UserTask, error)
 	GetByCode(code string, txes ...*sql.Tx) (*db.UserTask, error)
+	GetByUserID(userID string, txes ...*sql.Tx) (*db.UserTaskSlice, error)
 	GetMany(keys []string, txes ...*sql.Tx) (db.UserTaskSlice, []error)
 	GetSubtasks(userTaskID string, txes ...*sql.Tx) (db.UserSubtaskSlice, error)
 	GetSubtask(subTaskID string, txes ...*sql.Tx) (*db.Subtask, error)

@@ -96,6 +96,30 @@ func (r *mutationResolver) UserTaskCreate(ctx context.Context, input graphql.Upd
 		return nil, terror.New(terror.ErrParse, "create userTask: Task ID is required")
 	}
 
+	// get user
+	userID, err := r.Auther.UserIDFromContext(ctx)
+	if err != nil {
+		return nil, terror.New(terror.ErrParse, "create userTask: Error while fetching user")
+	}
+
+	// Verify if user already completed for task
+	utList, err := r.UserTaskStore.GetByUserID(userID.String())
+	if err != nil {
+		return nil, terror.New(terror.ErrParse, "create userTask: Error while verifying task")
+	}
+
+	for _, dat := range *utList {
+		if dat.TaskID == null.StringFrom(input.TaskID) {
+			if dat != nil {
+				if !dat.IsComplete {
+					return nil, terror.New(terror.ErrParse, "create userTask: Task approval pending")
+				}
+
+				return nil, terror.New(terror.ErrParse, "create userTask: Task already completed")
+			}
+		}
+	}
+
 	// get task
 	task, err := r.UserTaskStore.GetTask(input.TaskID)
 	if err != nil {
@@ -106,12 +130,6 @@ func (r *mutationResolver) UserTaskCreate(ctx context.Context, input graphql.Upd
 	subtasks, err := r.TaskStore.GetSubtasks(input.TaskID)
 	if err != nil {
 		return nil, terror.New(terror.ErrParse, "create userTask: Error while fetching subtasks")
-	}
-
-	// get user
-	userID, err := r.Auther.UserIDFromContext(ctx)
-	if err != nil {
-		return nil, terror.New(terror.ErrParse, "create userTask: Error while fetching user")
 	}
 
 	// Verify if user already opted for task --- TODO

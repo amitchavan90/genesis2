@@ -114,6 +114,15 @@ func (s *UserTasks) GetByCode(code string, txes ...*sql.Tx) (*db.UserTask, error
 	return dat, nil
 }
 
+// GetByUserID by taskID
+func (s *UserTasks) GetByUserID(userID string, txes ...*sql.Tx) (*db.UserTaskSlice, error) {
+	dat, err := db.UserTasks(db.UserTaskWhere.UserID.EQ(userID)).All(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return &dat, nil
+}
+
 // GetTask by taskID
 func (s *UserTasks) GetTask(taskID string, txes ...*sql.Tx) (*db.Task, error) {
 	dat, err := db.Tasks(db.TaskWhere.ID.EQ(taskID)).One(s.Conn)

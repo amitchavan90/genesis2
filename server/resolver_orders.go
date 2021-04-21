@@ -184,7 +184,7 @@ func (r *mutationResolver) OrderCreate(ctx context.Context, input graphql.Create
 
 	// Create products
 	for i := 0; i < input.Quantity; i++ {
-		productCode := fmt.Sprintf("P%05d", productCount)
+		productCode := fmt.Sprintf("P%05d", productCount+1)
 
 		// Create Product
 		p := &db.Product{

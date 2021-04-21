@@ -54,7 +54,7 @@ func main() {
 
 		apiAddr         = serveFlagSet.String("api_addr", "localhost:8081", "host:port to run the API")
 		apiBlobbaseurl  = serveFlagSet.String("api_blobbaseurl", "/api/files/", "the sub url for downloading blobs")
-		apiConsumerhost = serveFlagSet.String("api_consumerhost", "61.8.154.108:8082", "the url for the consumer site")
+		apiConsumerhost = serveFlagSet.String("api_consumerhost", "http://61.8.154.108:8082", "the url for the consumer site")
 		apiAdminHost    = serveFlagSet.String("api_adminhost", "https://admin.genesis.staging.theninja.life", "the url for the admin site")
 
 		loadbalancerAdminaddr         = serveFlagSet.String("loadbalancer_adminaddr", ":8080", "host:port to run caddy for admin")
