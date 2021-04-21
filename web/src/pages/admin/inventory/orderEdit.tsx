@@ -26,6 +26,7 @@ import { SKUSelectList, ItemSelectList } from "../../../components/itemSelectLis
 import { SKUItemPreview } from "../../../components/itemPreview"
 import { invalidateListQueries } from "../../../apollo"
 import { TablePickerSelect } from "../../../components/tablePickerSelect"
+import { Checkbox } from "baseui/checkbox"
 
 type FormData = {
 	quantity: number
@@ -77,6 +78,7 @@ const OrderEdit = (props: RouteComponentProps<{ code: string }>) => {
 	const [contract, setContract] = React.useState<Value>()
 	const [sku, setSKU] = React.useState<Value>()
 	const [contractError, setContractError] = React.useState<string>()
+	const [isAppBound, setIsAppBound] = React.useState<boolean>(true)
 
 	const { register, setValue, handleSubmit, errors } = useForm<FormData>()
 
@@ -91,6 +93,7 @@ const OrderEdit = (props: RouteComponentProps<{ code: string }>) => {
 						contractID: contract && contract.length > 0 ? contract[0].id : undefined,
 						skuID: sku && sku.length > 0 ? sku[0].id : undefined,
 						quantity,
+						isAppBound
 					},
 				},
 				update: (cache: any) => {
@@ -120,6 +123,7 @@ const OrderEdit = (props: RouteComponentProps<{ code: string }>) => {
 		if (activeKey != "#details") return
 		if (!order) return
 		setValue("code", order.code)
+		setIsAppBound(order.isAppBound)
 	}, [order, activeKey])
 
 	// On mutation (update/create order)
@@ -238,6 +242,12 @@ const OrderEdit = (props: RouteComponentProps<{ code: string }>) => {
 									setSKU(value)
 								}}
 							/>
+						</FormControl>
+
+						<FormControl caption="">
+							<Checkbox checked={isAppBound} onChange={e => setIsAppBound(e.currentTarget.checked)}>
+								Is App
+							</Checkbox>
 						</FormControl>
 
 						<FormControl label="Livestock Specification" error={contractError || ""}>

@@ -286,6 +286,7 @@ export interface Order {
 	code: string
 	archived: boolean
 	productCount: number
+	isAppBound: boolean
 
 	sku: SKU
 }
