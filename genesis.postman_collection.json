@@ -35,6 +35,36 @@
 			"response": []
 		},
 		{
+			"name": "Login Consumer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"jondoe@example.com\",\n    \"password\": \"password$123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{genesis}}/api/auth/consumer/login",
+					"host": [
+						"{{genesis}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"consumer",
+						"login"
+					]
+				},
+				"description": "Login returns header with Set-Cookie, where jwt token is defined"
+			},
+			"response": []
+		},
+		{
 			"name": "Roles List",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -73,7 +103,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"jondoe@example.com\",\n    \"firstName\": \"Jon\",\n    \"lastName\": \"DDoearbey\",\n    \"mobilePhone\": \"1234567890\",\n    \"roleID\": \"a34b6368-1f37-4957-b086-ec94a380e10b\",\n    \"password\": \"Password$123\",\n    \"referredByCode\": \"5903332\"\n}",
+					"raw": "{\n    \"email\": \"jondoe@example.com\",\n    \"firstName\": \"Jon\",\n    \"lastName\": \"Doe\",\n    \"mobilePhone\": \"1234567890\",\n    \"roleID\": \"d91abfda-5d4f-4b68-91a6-8decf7ee918a\",\n    \"password\": \"password$123\",\n    \"referredByCode\": \"\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -400,7 +430,7 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJhMzRiNjM2OC0xZjM3LTQ5NTctYjA4Ni1lYzk0YTM4MGUxMGIiLCJ0b2tlbklkIjoiNDA4NTdkNDQtMzU5YS00NGVjLWJlNTUtYWRlODM1NmE4NjFjIiwidWlkIjoiNmI4Y2FkMjQtMjk1Mi00YjllLWE5OTUtMTNjMjdmN2MyYzhhIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.XAzfmKojbLMt9BAdS6UG-pBPJhTZtVZJDwZneW-jai8; Path=/; Expires=Thu, 06 May 2021 03:36:13 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJkOTFhYmZkYS01ZDRmLTRiNjgtOTFhNi04ZGVjZjdlZTkxOGEiLCJ0b2tlbklkIjoiN2Q0YjE1ZTItMzcyMC00YjBmLTg2YjEtMjI3ZjA3OTUwOGYyIiwidWlkIjoiZGQxYjkzNzItN2NjZi00MjIzLThiZjgtOWZlMTc1ZGQ0OGU3IiwidXNlcm5hbWUiOiJqb25kb2VAZXhhbXBsZS5jb20ifQ.o1W4v9aBO5ZvloUCzVIzNujP9YCEyi9N6qGhgoAVrlM; Path=/; Expires=Fri, 21 May 2021 10:08:29 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
@@ -466,13 +496,13 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiNzdiNDFjYS00ZmMzLTRlOWQtODQ5Yi02ODI0NGQxY2I5NzMiLCJ0b2tlbklkIjoiMjkzYmY4OWYtNGFjNi00ZjYxLTliZjItZGE0NjYzNDdmYTZkIiwidWlkIjoiNDY3OTk2MTAtZGM0Mi00MDM0LThmZjQtMjQ5ZmI4OGU5NGUyIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.LlLBBdHP02ans9Sfj0vgzubk7QdWfvR1Lxk1e2aXxXw; Path=/; Expires=Fri, 21 May 2021 03:25:44 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiI0ZmU1ZGE0NS1jMTkzLTRjNDMtYmY2Mi0xYzk4NTBlNjFhNzgiLCJ0b2tlbklkIjoiOTA5Yjc4NzAtZDY3YS00ZGU1LWEyZmUtMWZlZGQwMjNlZjdkIiwidWlkIjoiZWI5ZTFlMDMtOGYxMy00OGY1LWIwNjYtYTUzNDZkZGEyZjlkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.d5az4gB1bePnZb9UvTZS6CzkjuT1COwyJCQ7yr1qDeU; Path=/; Expires=Fri, 21 May 2021 04:42:12 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation orderCreate {\n    orderCreate(\n        input: {\n            quantity: 2,\n            isAppBound: true\n        }\n    ) {\n        id,\n        code,\n        isAppBound,\n        sku {\n            id,\n            code,\n            name\n        },\n        productCount\n    }\n}",
+						"query": "mutation orderCreate {\n    orderCreate(\n        input: {\n            skuID: \"7f739db4-4b3d-4c4a-b4c5-9aa241b7bcf0\",\n            quantity: 4,\n            isAppBound: true\n        }\n    ) {\n        id,\n        code,\n        isAppBound,\n        sku {\n            id,\n            code,\n            name\n        },\n        productCount\n    }\n}",
 						"variables": ""
 					}
 				},
@@ -499,13 +529,13 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiNzdiNDFjYS00ZmMzLTRlOWQtODQ5Yi02ODI0NGQxY2I5NzMiLCJ0b2tlbklkIjoiMjkzYmY4OWYtNGFjNi00ZjYxLTliZjItZGE0NjYzNDdmYTZkIiwidWlkIjoiNDY3OTk2MTAtZGM0Mi00MDM0LThmZjQtMjQ5ZmI4OGU5NGUyIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.LlLBBdHP02ans9Sfj0vgzubk7QdWfvR1Lxk1e2aXxXw; Path=/; Expires=Fri, 21 May 2021 03:25:44 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiI0ZmU1ZGE0NS1jMTkzLTRjNDMtYmY2Mi0xYzk4NTBlNjFhNzgiLCJ0b2tlbklkIjoiOTA5Yjc4NzAtZDY3YS00ZGU1LWEyZmUtMWZlZGQwMjNlZjdkIiwidWlkIjoiZWI5ZTFlMDMtOGYxMy00OGY1LWIwNjYtYTUzNDZkZGEyZjlkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.d5az4gB1bePnZb9UvTZS6CzkjuT1COwyJCQ7yr1qDeU; Path=/; Expires=Fri, 21 May 2021 04:42:12 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query {\n  products(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      products {\n          id,\n          code,\n          registerID,\n          loyaltyPoints,\n          sku {\n              id,\n              code,\n              name\n          }\n      }\n      total\n  }\n}",
+						"query": "query {\n  products(\n    search: {\n      sortBy: DateCreated,\n      sortDir: Ascending\n    },\n    limit: 100,\n    offset: 0\n  ) {\n      products {\n          id,\n          code,\n          registerID,\n          loyaltyPoints,\n          sku {\n              id,\n              code,\n              name,\n              isAppBound,\n              isPointBound\n          }\n      }\n      total\n  }\n}",
 						"variables": ""
 					}
 				},
@@ -565,13 +595,13 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJiNzdiNDFjYS00ZmMzLTRlOWQtODQ5Yi02ODI0NGQxY2I5NzMiLCJ0b2tlbklkIjoiMjkzYmY4OWYtNGFjNi00ZjYxLTliZjItZGE0NjYzNDdmYTZkIiwidWlkIjoiNDY3OTk2MTAtZGM0Mi00MDM0LThmZjQtMjQ5ZmI4OGU5NGUyIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.LlLBBdHP02ans9Sfj0vgzubk7QdWfvR1Lxk1e2aXxXw; Path=/; Expires=Fri, 21 May 2021 03:25:44 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiI0ZmU1ZGE0NS1jMTkzLTRjNDMtYmY2Mi0xYzk4NTBlNjFhNzgiLCJ0b2tlbklkIjoiOTA5Yjc4NzAtZDY3YS00ZGU1LWEyZmUtMWZlZGQwMjNlZjdkIiwidWlkIjoiZWI5ZTFlMDMtOGYxMy00OGY1LWIwNjYtYTUzNDZkZGEyZjlkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.d5az4gB1bePnZb9UvTZS6CzkjuT1COwyJCQ7yr1qDeU; Path=/; Expires=Fri, 21 May 2021 04:42:12 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation skuCreate {\n    skuCreate(\n        input: {\n            name: \"Galaxy S21\"\n            brand: \"Samsung\"\n            description: \"Smartphone\"\n            weight: 200\n            weightUnit: \"gram\"\n            price: 999,\n            purchasePoints: 50,\n            loyaltyPoints: 0\n            currency: \"AUD\"\n            isBeef: false\n            isAppBound: true\n            isPointBound: true\n            categories: [\n                {\n                    name: \"Cat 1\"\n                },\n                {\n                    name: \"Cat 2\"\n                }\n            ]\n            productCategories: [\n                {\n                    name: \"Product Cat 1\"\n                },\n                {\n                    name: \"Product Cat 2\"\n                }\n            ]\n            retailLinks: [\n                {\n                    name: \"Amazon\"\n                    url: \"www.amazon.com\"\n                },\n                {\n                    name: \"Flipkart\"\n                    url: \"www.flipkart.com\"\n                }\n            ]\n        }\n    ) {\n        id,\n        code,\n        name,\n        brand,\n        description,\n        isBeef,\n        isAppBound,\n        isPointBound,\n        weight,\n        weightUnit,\n        purchasePoints,\n        loyaltyPoints,\n        price,\n        currency,\n        categories {\n            id,\n            name\n        },\n        productCategories {\n            id,\n            name\n        },\n        retailLinks {\n            name,\n            url\n        }\n    }\n}",
+						"query": "mutation skuCreate {\n    skuCreate(\n        input: {\n            name: \"iPhone 12\"\n            brand: \"Apple\"\n            description: \"Smartphone\"\n            weight: 200\n            weightUnit: \"gram\"\n            price: 999,\n            purchasePoints: 50,\n            loyaltyPoints: 50\n            currency: \"AUD\"\n            isBeef: false\n            isAppBound: true\n            isPointBound: false\n            categories: [\n                {\n                    name: \"Cat 1\"\n                },\n                {\n                    name: \"Cat 2\"\n                }\n            ]\n            productCategories: [\n                {\n                    name: \"Product Cat 1\"\n                },\n                {\n                    name: \"Product Cat 2\"\n                }\n            ]\n            retailLinks: [\n                {\n                    name: \"Amazon\"\n                    url: \"www.amazon.com\"\n                },\n                {\n                    name: \"Flipkart\"\n                    url: \"www.flipkart.com\"\n                }\n            ]\n        }\n    ) {\n        id,\n        code,\n        name,\n        brand,\n        description,\n        isBeef,\n        isAppBound,\n        isPointBound,\n        weight,\n        weightUnit,\n        purchasePoints,\n        loyaltyPoints,\n        price,\n        currency,\n        categories {\n            id,\n            name\n        },\n        productCategories {\n            id,\n            name\n        },\n        retailLinks {\n            name,\n            url\n        }\n    }\n}",
 						"variables": ""
 					}
 				},
@@ -664,13 +694,13 @@
 					{
 						"key": "cookie",
 						"type": "text",
-						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiJhMzRiNjM2OC0xZjM3LTQ5NTctYjA4Ni1lYzk0YTM4MGUxMGIiLCJ0b2tlbklkIjoiMDE0MzEyNDEtMTBkMS00NDg0LWI1ZjMtMzE2YjQ2OGRhMDg2IiwidWlkIjoiNmI4Y2FkMjQtMjk1Mi00YjllLWE5OTUtMTNjMjdmN2MyYzhhIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.pAKOR1ZfFlOTjXel1myLcPMlHOT0xf26jijWZhgP1t4; Path=/; Expires=Thu, 06 May 2021 03:42:25 GMT; HttpOnly; SameSite=None"
+						"value": "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlSWQiOiI0ZmU1ZGE0NS1jMTkzLTRjNDMtYmY2Mi0xYzk4NTBlNjFhNzgiLCJ0b2tlbklkIjoiOTA5Yjc4NzAtZDY3YS00ZGU1LWEyZmUtMWZlZGQwMjNlZjdkIiwidWlkIjoiZWI5ZTFlMDMtOGYxMy00OGY1LWIwNjYtYTUzNDZkZGEyZjlkIiwidXNlcm5hbWUiOiJzdXBlcmFkbWluQGV4YW1wbGUuY29tIn0.d5az4gB1bePnZb9UvTZS6CzkjuT1COwyJCQ7yr1qDeU; Path=/; Expires=Fri, 21 May 2021 04:42:12 GMT; HttpOnly; SameSite=None"
 					}
 				],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query user {\n  user(email: \"jondoe@example.com\") {\n    id,\n    email,\n    firstName,\n    lastName,\n    mobilePhone,\n    walletPoints,\n    referralCode,\n    organisation {\n        id\n    },\n    role {\n        id\n    },\n    referrals {\n      id,\n      user {\n          id,\n          firstName,\n          lastName,\n          email,\n          walletPoints\n      },\n      isRedemmed,\n      createdAt\n    },\n    walletHistory {\n        id,\n        loyaltyPoints,\n        isCredit,\n        message\n    }\n  }\n}",
+						"query": "query user {\n  user(email: \"superadmin@example.com\") {\n    id,\n    email,\n    firstName,\n    lastName,\n    mobilePhone,\n    walletPoints,\n    referralCode,\n    organisation {\n        id\n    },\n    role {\n        id\n    },\n    referrals {\n      id,\n      user {\n          id,\n          firstName,\n          lastName,\n          email,\n          walletPoints\n      },\n      isRedemmed,\n      createdAt\n    },\n    walletHistory {\n        id,\n        loyaltyPoints,\n        isCredit,\n        message\n    }\n  }\n}",
 						"variables": ""
 					}
 				},

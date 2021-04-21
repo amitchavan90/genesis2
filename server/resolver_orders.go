@@ -104,9 +104,7 @@ func (r *mutationResolver) OrderCreate(ctx context.Context, input graphql.Create
 		}
 		skuID = null.StringFrom(sku.ID)
 
-		if sku.IsAppBound != input.IsAppBound {
-			return nil, terror.New(err, "create order: IsAppBound did not match")
-		}
+		input.IsAppBound = sku.IsAppBound
 	}
 
 	// Get Order count (for Order Code)

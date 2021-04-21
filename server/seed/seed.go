@@ -467,9 +467,39 @@ func Roles(conn *sqlx.DB) error {
 
 	// Consumer
 	roleConsumer := &db.Role{
-		Name:        roleConsumer,
-		Permissions: types.StringArray{},
-		Tier:        10,
+		Name: roleConsumer,
+		Permissions: types.StringArray{
+			string(graphql.PermReferralList),
+			string(graphql.PermReferralRead),
+
+			string(graphql.PermTaskList),
+			string(graphql.PermTaskRead),
+
+			string(graphql.PermUserTaskList),
+			string(graphql.PermUserTaskCreate),
+			string(graphql.PermUserTaskRead),
+			string(graphql.PermUserTaskUpdate),
+			string(graphql.PermUserTaskArchive),
+
+			string(graphql.PermCategoryList),
+			string(graphql.PermCategoryRead),
+			string(graphql.PermCategoryUpdate),
+
+			string(graphql.PermProductCategoryList),
+			string(graphql.PermProductCategoryRead),
+
+			string(graphql.PermSKUList),
+			string(graphql.PermSKURead),
+
+			string(graphql.PermProductList),
+			string(graphql.PermProductRead),
+
+			string(graphql.PermUserPurchaseActivityList),
+			string(graphql.PermUserPurchaseActivityRead),
+			string(graphql.PermUserPurchaseActivityCreate),
+			string(graphql.PermUserPurchaseActivityUpdate),
+		},
+		Tier: 10,
 	}
 	err = roleConsumer.Insert(conn, boil.Infer())
 	if err != nil {

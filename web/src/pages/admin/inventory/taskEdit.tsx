@@ -40,9 +40,8 @@ type FormData = {
 
 const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 	const code = props.match.params.code
-	console.log("code ---------------->",code);
+	
 	const isNewTask = code ==="new"
-	console.log("isNewTask ---------------->",isNewTask);
 	const history = useHistory()
 	const [activeKey, setActiveKey] = React.useState(props.location.hash || "#details")
 	const [showPreviewModal, setShowPreviewModal] = React.useState<boolean>()
@@ -127,7 +126,7 @@ const taskEdit = (props: RouteComponentProps<{ code: string }>) => {
 			loyaltyPoints,
 			finishDate,
 			bannerPhotoBlobID,
-			maximumPeople,
+			maximumPeople: maximumPeople || 0,
 			skuID: sku && sku.length > 0 ? sku[0].id : "-",
 			subtasks,
 		}
