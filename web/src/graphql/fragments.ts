@@ -530,6 +530,7 @@ const TASK_LIST = gql`
 			title,
 			code,
 			description,
+			loyaltyPoints,
 			isTimeBound,
 			isPeopleBound,
 			isProductRelevant,
@@ -542,10 +543,12 @@ const TASK_LIST = gql`
 const REFERRAL_LIST = gql`
 fragment ReferralListFragment on Referral{
 	id,
+	code,
     referee {
         id,
         firstName,
         lastName,
+		email,
         referralCode
     },
     isRedemmed,
