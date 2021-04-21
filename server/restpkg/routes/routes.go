@@ -5,7 +5,7 @@ import (
 )
 
 func MapUrls(r chi.Router) {
-	r.Route("/", func(r chi.Router) {
+	r.Route("/api/", func(r chi.Router) {
 		Ping(r)
 	})
 }

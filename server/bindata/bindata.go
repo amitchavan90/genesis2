@@ -520,7 +520,7 @@ func _20190805142119_initial_migrationUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "20190805142119_initial_migration.up.sql", size: 18437, mode: os.FileMode(0664), modTime: time.Unix(1617687949, 0)}
+	info := bindataFileInfo{name: "20190805142119_initial_migration.up.sql", size: 18437, mode: os.FileMode(0777), modTime: time.Unix(1618978890, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x54, 0x61, 0xde, 0xf4, 0x82, 0xc0, 0xfe, 0xee, 0xd2, 0xf8, 0xa7, 0x48, 0x10, 0xeb, 0x7a, 0xff, 0x20, 0xb8, 0x4b, 0x44, 0xd9, 0xeb, 0xdb, 0x68, 0x3f, 0x28, 0x20, 0xcf, 0x5, 0x39, 0xd7, 0x5c}}
 	return a, nil
 }

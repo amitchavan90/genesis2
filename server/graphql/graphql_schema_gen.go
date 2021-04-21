@@ -497,7 +497,6 @@ type ComplexityRoot struct {
 		LoyaltyPoints     func(childComplexity int) int
 		MaximumPeople     func(childComplexity int) int
 		Sku               func(childComplexity int) int
-		SkuID             func(childComplexity int) int
 		Subtasks          func(childComplexity int) int
 		Title             func(childComplexity int) int
 	}
@@ -3670,13 +3669,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Task.Sku(childComplexity), true
 
-	case "Task.skuID":
-		if e.complexity.Task.SkuID == nil {
-			break
-		}
-
-		return e.complexity.Task.SkuID(childComplexity), true
-
 	case "Task.subtasks":
 		if e.complexity.Task.Subtasks == nil {
 			break
@@ -5287,7 +5279,6 @@ type Task {
 	isFinal: Boolean!
 	finishDate: Time
 	maximumPeople: Int!
-    skuID: NullString
 	sku: SKU
 	brandLogo: Blob
 	bannerPhoto: Blob
@@ -22555,40 +22546,6 @@ func (ec *executionContext) _Task_maximumPeople(ctx context.Context, field graph
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Task_skuID(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "Task",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SkuID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(null.String)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalONullString2githubᚗcomᚋvolatiletechᚋnullᚐString(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Task_sku(ctx context.Context, field graphql.CollectedField, obj *db.Task) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -32015,8 +31972,6 @@ func (ec *executionContext) _Task(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "skuID":
-			out.Values[i] = ec._Task_skuID(ctx, field, obj)
 		case "sku":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {

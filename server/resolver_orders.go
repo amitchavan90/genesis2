@@ -103,6 +103,10 @@ func (r *mutationResolver) OrderCreate(ctx context.Context, input graphql.Create
 			return nil, terror.New(err, "get sku")
 		}
 		skuID = null.StringFrom(sku.ID)
+
+		if sku.IsAppBound != input.IsAppBound {
+			return nil, terror.New(err, "create order: IsAppBound did not match")
+		}
 	}
 
 	// Get Order count (for Order Code)
@@ -123,7 +127,8 @@ func (r *mutationResolver) OrderCreate(ctx context.Context, input graphql.Create
 
 	// Setup Order
 	u := &db.Order{
-		Code:        fmt.Sprintf("N%05d", count),
+		Code:        fmt.Sprintf("N%05d", count+1),
+		IsAppBound:  input.IsAppBound,
 		CreatedByID: user.ID,
 	}
 
@@ -189,6 +194,7 @@ func (r *mutationResolver) OrderCreate(ctx context.Context, input graphql.Create
 			CreatedByID: user.ID,
 			OrderID:     null.StringFrom(created.ID),
 			SkuID:       skuID,
+			IsAppBound:  input.IsAppBound,
 		}
 
 		if input.ContractID != nil {

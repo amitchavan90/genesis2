@@ -366,6 +366,15 @@ func NewAuthRoutes(auther *genesis.Auther, authConfig *config.UserAuth, userStor
 	r.Post("/login", c.login())
 	r.Post("/logout", c.logout())
 	r.Post("/verify_account", c.verifyAccount())
+
+	// Social Login
+	r.Post("/social_login", c.socialLogin())
+	r.Get("/google_auth/home", c.handleGoogleMain())
+	r.Get("/google_auth/login", c.handleGoogleLogin())
+	r.Get("/google_auth/callback", c.handleGoogleCallback())
+	r.Get("/facebook_auth/home", c.handleFacebookMain())
+	r.Get("/facebook_auth/login", c.handleFacebookLogin())
+	r.Get("/facebook_auth/callback", c.handleFacebookCallback())
 	return r
 }
 
@@ -631,6 +640,54 @@ func (c *AuthController) login() func(w http.ResponseWriter, r *http.Request) {
 		err = c.auther.ValidatePassword(r.Context(), email, req.Password)
 		if err != nil {
 			failedMsg := "Invalid Password"
+			writeError(w, err, failedMsg, http.StatusInternalServerError)
+			return
+		}
+
+		expiration := time.Now().Add(time.Duration(c.authConfig.TokenExpiryDays) * time.Hour * 24)
+		jwt, err := c.auther.GenerateJWT(r.Context(), user.Email.String, user.ID, user.RoleID, r.UserAgent(), &expiration)
+		if err != nil {
+			failedMsg := "jwt expired"
+			writeError(w, err, failedMsg, http.StatusInternalServerError)
+			return
+		}
+		cookie := http.Cookie{Name: "jwt", Value: jwt, Expires: expiration, HttpOnly: c.cookieDefaults.HTTPOnly, Path: c.cookieDefaults.Path, SameSite: c.cookieDefaults.SameSite, Secure: c.cookieDefaults.Secure}
+		http.SetCookie(w, &cookie)
+
+		// record user activity
+		_, err = c.UserActivityStore.Insert(&db.UserActivity{
+			UserID:     user.ID,
+			Action:     "Sign in",
+			ObjectType: graphql.ObjectTypeSelf.String(),
+		})
+		if err != nil {
+			fmt.Println("update user activity: %w", err)
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}
+	return fn
+}
+
+// socialLogin logs a user in
+func (c *AuthController) socialLogin() func(w http.ResponseWriter, r *http.Request) {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		req := &LoginRequest{}
+
+		failedMsg := "Login failed, please try again."
+
+		err := json.NewDecoder(r.Body).Decode(req)
+		if err != nil {
+			writeError(w, err, failedMsg, http.StatusInternalServerError)
+			return
+		}
+		defer r.Body.Close()
+
+		email := strings.ToLower(req.Email)
+
+		user, err := c.UserStore.GetByEmail(email)
+		if err != nil {
+			failedMsg := "Invalid user, please try again."
 			writeError(w, err, failedMsg, http.StatusInternalServerError)
 			return
 		}

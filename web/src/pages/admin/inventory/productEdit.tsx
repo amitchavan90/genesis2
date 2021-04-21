@@ -248,7 +248,7 @@ const ProductEdit = (props: RouteComponentProps<{ code: string }>) => {
 		return <p>No settings returned</p>
 	}
 	const viewLink = product ? `${settingsQuery.data.settings.consumerHost}/api/steak/view?productID=${product.id}` : ""
-	const registerLink = product ? `${settingsQuery.data.settings.consumerHost}/api/steak/detail?steakID=${product.registerID}` : ""
+	const registerLink = product ? `${settingsQuery.data.settings.consumerHost}/api/steak/detail?steakID=${product.registerID}&productID=${product.id}` : ""
 	const registerLinkDemo = product ? `${settingsQuery.data.settings.consumerHost}/api/steak/final?steakID=${product.registerID}&demo=true` : ""
 
 	const editForm = (

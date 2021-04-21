@@ -93,7 +93,6 @@ func SteakView(
 
 		redirect := fmt.Sprintf("/view?productID=%s&distributorCode=%s", productID, distributorCode)
 
-		fmt.Println(http.StatusFound, redirect)
 		http.Redirect(w, r, redirect, http.StatusFound)
 	}
 
@@ -197,6 +196,7 @@ func SteakDetail(
 			}
 
 			product.CloseRegisterID = null.StringFrom(uid.String())
+			product.IsClosed = true
 			product, err = ProductStore.Update(product)
 			if err != nil {
 				err = terror.New(fmt.Errorf("error updating product"), "")

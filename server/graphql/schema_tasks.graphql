@@ -15,7 +15,6 @@ type Task {
 	isFinal: Boolean!
 	finishDate: Time
 	maximumPeople: Int!
-    skuID: NullString
 	sku: SKU
 	brandLogo: Blob
 	bannerPhoto: Blob
