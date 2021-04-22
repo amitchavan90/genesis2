@@ -488,7 +488,7 @@ const TasksList = () => (
 		firstColumnValue="title"
 		firstColumnSubValue="code"
 		columns={[
-			{ label: "Products Amount", value: "loyaltyPoints" },
+			{ label: "loyaltyPoints", value: "loyaltyPoints" },
 			{
 				label: "Date Created",
 				value: "createdAt",
@@ -508,22 +508,18 @@ const ReferralList = () => (
 		query={graphql.query.REFERRALS}
 		batchActionMutation={graphql.mutation.BATCH_ACTION_SKU}
 		firstColumnValue="isRedemmed"
-		firstColumnSubValue="createdAt"
+		firstColumnSubValue="code"
 		columns={[
-			{ label: "UFName", value: "user" ,subValues: ["firstName"]},
-			{ label: "ULName", value: "user" ,subValues: ["lastName"]},
+			{ label: "UserEmail", value: "user" ,subValues: ["email"]},
 			{ label: "RefralCode", value: "referee" ,subValues: ["referralCode"]},
-			{ label: "RFName", value: "referee" ,subValues: ["firstName"]},
-			{ label: "RLName", value: "referee" ,subValues: ["lastName"]},
+			{ label: "RefralEmail", value: "referee" ,subValues: ["email"]},
 			{
 				label: "Date Created",
 				value: "createdAt",
 				dateTime: true,
 			},
 		]}
-		actions={ActionItemSet.Archive}
-		//createPermission={Perm.TaskCreate}
-		//readPermission={Perm.TaskRead}
+		hideEditButton
 	/>
 )
 
