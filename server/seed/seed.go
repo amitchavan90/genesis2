@@ -472,6 +472,9 @@ func Roles(conn *sqlx.DB) error {
 			string(graphql.PermReferralList),
 			string(graphql.PermReferralRead),
 
+			string(graphql.PermUserRead),
+			string(graphql.PermUserUpdate),
+
 			string(graphql.PermTaskList),
 			string(graphql.PermTaskRead),
 
