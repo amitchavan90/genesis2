@@ -98,7 +98,7 @@ type RegisterResponse struct {
 	MobilePhone  null.String `json:"mobilePhone"`
 	RoleID       string      `json:"roleID"`
 	AffilatedOrg null.String `json:"affiliateOrg"`
-	ReferralCode null.String `json:"referredByCode"`
+	ReferralCode null.String `json:"referralCode"`
 }
 
 // LoginRequest structs for the HTTP request/response cycle
@@ -280,6 +280,27 @@ func (c *AuthController) register() func(w http.ResponseWriter, r *http.Request)
 				RestResponse(w, r, http.StatusInternalServerError, failedMsg)
 				return
 			}
+		}
+
+		// Gnerate token
+		expiration := time.Now().Add(time.Duration(c.authConfig.TokenExpiryDays) * time.Hour * 24)
+		jwt, err := c.auther.GenerateJWT(r.Context(), user.Email.String, user.ID, user.RoleID, r.UserAgent(), &expiration)
+		if err != nil {
+			failedMsg := "jwt expired"
+			writeError(w, err, failedMsg, http.StatusInternalServerError)
+			return
+		}
+		cookie := http.Cookie{Name: "jwt", Value: jwt, Expires: expiration, HttpOnly: c.cookieDefaults.HTTPOnly, Path: c.cookieDefaults.Path, SameSite: c.cookieDefaults.SameSite, Secure: c.cookieDefaults.Secure}
+		http.SetCookie(w, &cookie)
+
+		// record user activity
+		_, err = c.UserActivityStore.Insert(&db.UserActivity{
+			UserID:     user.ID,
+			Action:     "Sign in",
+			ObjectType: graphql.ObjectTypeSelf.String(),
+		})
+		if err != nil {
+			fmt.Println("update user activity: %w", err)
 		}
 
 		response := RegisterResponse{}

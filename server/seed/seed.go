@@ -657,19 +657,24 @@ func Inventory(conn *sqlx.DB, isProduction bool) error {
 
 	// SKU
 	sku := store.SKUFactory()
-	sku.Code = fmt.Sprintf("L28%05d", 0)
+	sku.Code = fmt.Sprintf("L28%05d", 1)
 	sku.CreatedByID = user.ID
-	sku.LoyaltyPoints = 1
+	sku.LoyaltyPoints = 10
 	// Seed last SKU
-	sku.Name = "南纬28°沙好牛排"
+	sku.Name = "28°South Latitude Shahao Steak"
 	sku.Description =
-		`波特壕斯牛排取目牛外背, 其特点是肉度
-		嫩消，顶部有一层溥溥的肥肉，以增加口
-		感。平拱锅大火照制，锁住美味的肉汁。
-		所有L28的产品均在澳大利亚包委完整，
-		并由澳大利亚出口工上认证，监管，直到
-		你在和家中拆开包委之前，产品都保持其在
-		涵洲本十原本的模样.`
+		`Portholes steak is taken from the outside back of the beef, which is characterized by its meatiness.
+		Tenderness, with a layer of Pupu fat on the top to increase the mouth sense. The flat arched pan is fired under the fire to lock in the delicious gravy.
+		All L28 products are complete in the Australian packaging committee,
+		It is certified and supervised by Australian export workers until
+		Before you open the package with your home, the product will remain in place Han Zhou Benju's original appearance.`
+	sku.IsAppBound = true
+	sku.IsPointBound = false
+	sku.Price = 100
+	sku.Currency = "AUD"
+	sku.Weight = 1000
+	sku.WeightUnit = "gram"
+	sku.PurchasePoints = 0
 
 	err = sku.Insert(conn, boil.Infer())
 	if err != nil {
@@ -677,17 +682,18 @@ func Inventory(conn *sqlx.DB, isProduction bool) error {
 	}
 
 	skuContent := []*db.StockKeepingUnitContent{
-		{Title: "生产", Content: "澳大利亚", ContentType: db.ContentTypeINFO},
-		{Title: "加工*", Content: "澳大利亚", ContentType: db.ContentTypeINFO},
-		{Title: "包装*", Content: "澳大利亚", ContentType: db.ContentTypeINFO},
-		{Title: "纯天然澳洲牛肉", Content: "质量保证", ContentType: db.ContentTypeINFO},
-		{Title: "牧场养殖", Content: "澳大利亚环境生态养殖", ContentType: db.ContentTypeINFO},
-		{Title: "清真", Content: "已认证", ContentType: db.ContentTypeINFO},
+		{Title: "Produce", Content: "Australia", ContentType: db.ContentTypeINFO},
+		{Title: "Processing", Content: "Australia", ContentType: db.ContentTypeINFO},
+		{Title: "Package", Content: "Australia", ContentType: db.ContentTypeINFO},
+		{Title: "Pure natural Australian beef", Content: "Quality assurance", ContentType: db.ContentTypeINFO},
+		{Title: "Pasture farming", Content: "Australia Environmental Ecological Farming", ContentType: db.ContentTypeINFO},
+		{Title: "Halal", Content: "Verified", ContentType: db.ContentTypeINFO},
 
-		{Title: "南结28°拉音", Content: "https://www.latitude28produce.com", ContentType: db.ContentTypeURL},
-		{Title: "南纬28°官方网站", Content: "https://www.latitude28produce.com", ContentType: db.ContentTypeURL},
-		{Title: "澳大利亚政府认证", Content: "https://www.latitude28produce.com", ContentType: db.ContentTypeURL},
+		{Title: "28° Layin on South Street", Content: "https://www.latitude28produce.com", ContentType: db.ContentTypeURL},
+		{Title: "28° South Latitude Official Website", Content: "https://www.latitude28produce.com", ContentType: db.ContentTypeURL},
+		{Title: "Australian government certification", Content: "https://www.latitude28produce.com", ContentType: db.ContentTypeURL},
 	}
+
 	for _, content := range skuContent {
 
 		err := sku.AddSkuStockKeepingUnitContents(conn, true, content)
