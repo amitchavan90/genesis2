@@ -156,7 +156,7 @@ func (r *queryResolver) SkuByID(ctx context.Context, id string) (*db.StockKeepin
 }
 
 func (r *queryResolver) Skus(ctx context.Context, search graphql.SearchFilter, limit int, offset int) (*graphql.SKUResult, error) {
-	total, skus, err := r.SKUStore.SearchSelect(search, limit, offset)
+	total, skus, err := r.SKUStore.SearchSelect(search, limit, offset, true, false)
 	if err != nil {
 		return nil, terror.New(err, "list sku")
 	}
@@ -169,10 +169,24 @@ func (r *queryResolver) Skus(ctx context.Context, search graphql.SearchFilter, l
 	return result, nil
 }
 
-func (r *queryResolver) PointEnabledSkus(ctx context.Context, search graphql.SearchFilter, limit int, offset int, isPointEnabled bool) (*graphql.SKUResult, error) {
-	total, skus, err := r.SKUStore.SearchSelect(search, limit, offset)
+func (r *queryResolver) RetailSkus(ctx context.Context, search graphql.SearchFilter, limit int, offset int) (*graphql.SKUResult, error) {
+	total, skus, err := r.SKUStore.SearchSelect(search, limit, offset, false, false)
 	if err != nil {
-		return nil, terror.New(err, "list sku")
+		return nil, terror.New(err, "list retail sku")
+	}
+
+	result := &graphql.SKUResult{
+		Skus:  skus,
+		Total: int(total),
+	}
+
+	return result, nil
+}
+
+func (r *queryResolver) PointBoundSkus(ctx context.Context, search graphql.SearchFilter, limit int, offset int) (*graphql.SKUResult, error) {
+	total, skus, err := r.SKUStore.SearchSelect(search, limit, offset, false, true)
+	if err != nil {
+		return nil, terror.New(err, "list point bound sku")
 	}
 
 	result := &graphql.SKUResult{
@@ -373,7 +387,7 @@ func (r *mutationResolver) SkuCreate(ctx context.Context, input graphql.UpdateSk
 	if input.WeightUnit != nil {
 		u.WeightUnit = input.WeightUnit.String
 	} else {
-		u.WeightUnit = "Kilograms"
+		u.WeightUnit = "grams"
 	}
 	if input.Weight != nil {
 		u.Weight = *input.Weight

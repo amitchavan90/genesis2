@@ -442,7 +442,10 @@ func (r *queryResolver) VerifyResetToken(ctx context.Context, token string, emai
 func (r *queryResolver) Skus(ctx context.Context, search SearchFilter, limit int, offset int) (*SKUResult, error) {
 	panic("not implemented")
 }
-func (r *queryResolver) PointEnabledSkus(ctx context.Context, search SearchFilter, limit int, offset int, isPointEnabled bool) (*SKUResult, error) {
+func (r *queryResolver) RetailSkus(ctx context.Context, search SearchFilter, limit int, offset int) (*SKUResult, error) {
+	panic("not implemented")
+}
+func (r *queryResolver) PointBoundSkus(ctx context.Context, search SearchFilter, limit int, offset int) (*SKUResult, error) {
 	panic("not implemented")
 }
 func (r *queryResolver) Sku(ctx context.Context, code string) (*db.StockKeepingUnit, error) {

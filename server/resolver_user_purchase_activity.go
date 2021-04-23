@@ -79,7 +79,7 @@ func (r *mutationResolver) UserPurchaseActivityCreate(ctx context.Context, input
 
 	// Create UserPurchaseActivity
 	t := &db.UserPurchaseActivity{
-		Code: fmt.Sprintf("P%05d", count),
+		Code: fmt.Sprintf("P%05d", count+1),
 	}
 
 	// get user

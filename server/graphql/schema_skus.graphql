@@ -110,7 +110,8 @@ type SKUClone {
 
 extend type Query {
 	skus(search: SearchFilter!, limit: Int!, offset: Int!): SKUResult! @hasPerm(p: SKUList)
-	pointEnabledSkus(search: SearchFilter!, limit: Int!, offset: Int!, isPointEnabled: Boolean!): SKUResult! @hasPerm(p: SKUList)
+	retailSkus(search: SearchFilter!, limit: Int!, offset: Int!): SKUResult! @hasPerm(p: SKUList)
+	pointBoundSkus(search: SearchFilter!, limit: Int!, offset: Int!): SKUResult! @hasPerm(p: SKUList)
 	sku(code: String!): SKU! @hasPerm(p: SKURead)
 	skuByID(id: ID!): SKU!
 

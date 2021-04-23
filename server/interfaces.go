@@ -81,7 +81,7 @@ type SKUStorer interface {
 	GetProductCategories(skuID string, txes ...*sql.Tx) (db.ProductCategorySlice, error)
 	GetRetailLinks(skuID string, txes ...*sql.Tx) (db.RetailLinkSlice, error)
 	All() (db.StockKeepingUnitSlice, error)
-	SearchSelect(search graphql.SearchFilter, limit int, offset int) (int64, db.StockKeepingUnitSlice, error)
+	SearchSelect(search graphql.SearchFilter, limit int, offset int, getAll bool, isPointBound bool) (int64, db.StockKeepingUnitSlice, error)
 	Insert(u *db.StockKeepingUnit, tx ...*sql.Tx) (*db.StockKeepingUnit, error)
 	InsertCategory(cat *db.Category, txes ...*sql.Tx) (*db.Category, error)
 	InsertProductCategory(pcat *db.ProductCategory, txes ...*sql.Tx) (*db.ProductCategory, error)

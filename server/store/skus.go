@@ -56,7 +56,7 @@ func (s *SKU) All() (db.StockKeepingUnitSlice, error) {
 }
 
 // SearchSelect searchs/selects SKUs
-func (s *SKU) SearchSelect(search graphql.SearchFilter, limit int, offset int) (int64, db.StockKeepingUnitSlice, error) {
+func (s *SKU) SearchSelect(search graphql.SearchFilter, limit int, offset int, getAll bool, isPointBound bool) (int64, db.StockKeepingUnitSlice, error) {
 	queries := []qm.QueryMod{}
 
 	// Search
@@ -82,6 +82,14 @@ func (s *SKU) SearchSelect(search graphql.SearchFilter, limit int, offset int) (
 			queries = append(queries, db.StockKeepingUnitWhere.Archived.EQ(false))
 		case graphql.FilterOptionArchived:
 			queries = append(queries, db.StockKeepingUnitWhere.Archived.EQ(true))
+		}
+	}
+
+	if !getAll {
+		if isPointBound {
+			queries = append(queries, db.StockKeepingUnitWhere.IsPointBound.EQ(true))
+		} else {
+			queries = append(queries, db.StockKeepingUnitWhere.IsPointBound.EQ(false))
 		}
 	}
 

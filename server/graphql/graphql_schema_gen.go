@@ -357,12 +357,13 @@ type ComplexityRoot struct {
 		Pallet                   func(childComplexity int, code string) int
 		Pallets                  func(childComplexity int, search SearchFilter, limit int, offset int, containerID *string, trackActionID *string) int
 		PendingTransactionsCount func(childComplexity int) int
-		PointEnabledSkus         func(childComplexity int, search SearchFilter, limit int, offset int, isPointEnabled bool) int
+		PointBoundSkus           func(childComplexity int, search SearchFilter, limit int, offset int) int
 		Product                  func(childComplexity int, code string) int
 		ProductByID              func(childComplexity int, id string) int
 		Products                 func(childComplexity int, search SearchFilter, limit int, offset int, cartonID *string, orderID *string, skuID *string, distributorID *string, contractID *string, trackActionID *string) int
 		Referral                 func(childComplexity int, userID *string) int
 		Referrals                func(childComplexity int, search SearchFilter, limit int, offset int) int
+		RetailSkus               func(childComplexity int, search SearchFilter, limit int, offset int) int
 		Role                     func(childComplexity int, name string) int
 		Roles                    func(childComplexity int, search SearchFilter, limit int, offset int, excludeSuper bool) int
 		Settings                 func(childComplexity int) int
@@ -791,7 +792,8 @@ type QueryResolver interface {
 	UserTasks(ctx context.Context, search SearchFilter, limit int, offset int) (*UserTasksResult, error)
 	UserTask(ctx context.Context, code *string) (*db.UserTask, error)
 	Skus(ctx context.Context, search SearchFilter, limit int, offset int) (*SKUResult, error)
-	PointEnabledSkus(ctx context.Context, search SearchFilter, limit int, offset int, isPointEnabled bool) (*SKUResult, error)
+	RetailSkus(ctx context.Context, search SearchFilter, limit int, offset int) (*SKUResult, error)
+	PointBoundSkus(ctx context.Context, search SearchFilter, limit int, offset int) (*SKUResult, error)
 	Sku(ctx context.Context, code string) (*db.StockKeepingUnit, error)
 	SkuByID(ctx context.Context, id string) (*db.StockKeepingUnit, error)
 	SkuCloneTree(ctx context.Context, id string) ([]*SKUClone, error)
@@ -2816,17 +2818,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.PendingTransactionsCount(childComplexity), true
 
-	case "Query.pointEnabledSkus":
-		if e.complexity.Query.PointEnabledSkus == nil {
+	case "Query.pointBoundSkus":
+		if e.complexity.Query.PointBoundSkus == nil {
 			break
 		}
 
-		args, err := ec.field_Query_pointEnabledSkus_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_pointBoundSkus_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.PointEnabledSkus(childComplexity, args["search"].(SearchFilter), args["limit"].(int), args["offset"].(int), args["isPointEnabled"].(bool)), true
+		return e.complexity.Query.PointBoundSkus(childComplexity, args["search"].(SearchFilter), args["limit"].(int), args["offset"].(int)), true
 
 	case "Query.product":
 		if e.complexity.Query.Product == nil {
@@ -2887,6 +2889,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Referrals(childComplexity, args["search"].(SearchFilter), args["limit"].(int), args["offset"].(int)), true
+
+	case "Query.retailSkus":
+		if e.complexity.Query.RetailSkus == nil {
+			break
+		}
+
+		args, err := ec.field_Query_retailSkus_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.RetailSkus(childComplexity, args["search"].(SearchFilter), args["limit"].(int), args["offset"].(int)), true
 
 	case "Query.role":
 		if e.complexity.Query.Role == nil {
@@ -5247,7 +5261,8 @@ type SKUClone {
 
 extend type Query {
 	skus(search: SearchFilter!, limit: Int!, offset: Int!): SKUResult! @hasPerm(p: SKUList)
-	pointEnabledSkus(search: SearchFilter!, limit: Int!, offset: Int!, isPointEnabled: Boolean!): SKUResult! @hasPerm(p: SKUList)
+	retailSkus(search: SearchFilter!, limit: Int!, offset: Int!): SKUResult! @hasPerm(p: SKUList)
+	pointBoundSkus(search: SearchFilter!, limit: Int!, offset: Int!): SKUResult! @hasPerm(p: SKUList)
 	sku(code: String!): SKU! @hasPerm(p: SKURead)
 	skuByID(id: ID!): SKU!
 
@@ -7256,7 +7271,7 @@ func (ec *executionContext) field_Query_pallets_args(ctx context.Context, rawArg
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_pointEnabledSkus_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_pointBoundSkus_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 SearchFilter
@@ -7283,14 +7298,6 @@ func (ec *executionContext) field_Query_pointEnabledSkus_args(ctx context.Contex
 		}
 	}
 	args["offset"] = arg2
-	var arg3 bool
-	if tmp, ok := rawArgs["isPointEnabled"]; ok {
-		arg3, err = ec.unmarshalNBoolean2bool(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["isPointEnabled"] = arg3
 	return args, nil
 }
 
@@ -7415,6 +7422,36 @@ func (ec *executionContext) field_Query_referral_args(ctx context.Context, rawAr
 }
 
 func (ec *executionContext) field_Query_referrals_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 SearchFilter
+	if tmp, ok := rawArgs["search"]; ok {
+		arg0, err = ec.unmarshalNSearchFilter2genesisᚋgraphqlᚐSearchFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["search"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["limit"]; ok {
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg1
+	var arg2 int
+	if tmp, ok := rawArgs["offset"]; ok {
+		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_retailSkus_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 SearchFilter
@@ -17935,7 +17972,7 @@ func (ec *executionContext) _Query_skus(ctx context.Context, field graphql.Colle
 	return ec.marshalNSKUResult2ᚖgenesisᚋgraphqlᚐSKUResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_pointEnabledSkus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_retailSkus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -17952,7 +17989,7 @@ func (ec *executionContext) _Query_pointEnabledSkus(ctx context.Context, field g
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_pointEnabledSkus_args(ctx, rawArgs)
+	args, err := ec.field_Query_retailSkus_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -17962,7 +17999,75 @@ func (ec *executionContext) _Query_pointEnabledSkus(ctx context.Context, field g
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().PointEnabledSkus(rctx, args["search"].(SearchFilter), args["limit"].(int), args["offset"].(int), args["isPointEnabled"].(bool))
+			return ec.resolvers.Query().RetailSkus(rctx, args["search"].(SearchFilter), args["limit"].(int), args["offset"].(int))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "SKUList")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasPerm == nil {
+				return nil, errors.New("directive hasPerm is not implemented")
+			}
+			return ec.directives.HasPerm(ctx, nil, directive0, p)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*SKUResult); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *genesis/graphql.SKUResult`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*SKUResult)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNSKUResult2ᚖgenesisᚋgraphqlᚐSKUResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_pointBoundSkus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_pointBoundSkus_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().PointBoundSkus(rctx, args["search"].(SearchFilter), args["limit"].(int), args["offset"].(int))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			p, err := ec.unmarshalNPerm2genesisᚋgraphqlᚐPerm(ctx, "SKUList")
@@ -30772,7 +30877,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "pointEnabledSkus":
+		case "retailSkus":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -30780,7 +30885,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_pointEnabledSkus(ctx, field)
+				res = ec._Query_retailSkus(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "pointBoundSkus":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pointBoundSkus(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
