@@ -294,7 +294,7 @@ func (r *mutationResolver) SkuCreate(ctx context.Context, input graphql.UpdateSk
 
 	// Create SKU
 	u := &db.StockKeepingUnit{
-		Code:        fmt.Sprintf("L28%05d", count),
+		Code:        fmt.Sprintf("L28%05d", count+1),
 		CreatedByID: userID.String(),
 	}
 

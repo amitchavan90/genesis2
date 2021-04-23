@@ -271,6 +271,7 @@ func (r *mutationResolver) ProductCreate(ctx context.Context, input graphql.Upda
 	p := &db.Product{
 		Code:        fmt.Sprintf("P%05d", count+1),
 		CreatedByID: user.ID,
+		SkuID:       null.StringFrom(sku.ID),
 		// Description: input.Description.String,
 	}
 	if input.Description != nil {
