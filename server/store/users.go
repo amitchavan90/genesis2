@@ -282,6 +282,15 @@ func (s *Users) GetByEmail(email string, txes ...*sql.Tx) (*db.User, error) {
 	return dat, nil
 }
 
+// GetByMobilePhone returns a user given an mobilePhone
+func (s *Users) GetByMobilePhone(mobilePhone string, txes ...*sql.Tx) (*db.User, error) {
+	dat, err := db.Users(db.UserWhere.MobilePhone.EQ(null.StringFrom(strings.ToLower(mobilePhone)))).One(s.Conn)
+	if err != nil {
+		return nil, terror.New(err, "")
+	}
+	return dat, nil
+}
+
 // GetByReferralCode returns a user given an referralCode
 func (s *Users) GetByReferralCode(referralCode string, txes ...*sql.Tx) (*db.User, error) {
 	dat, err := db.Users(db.UserWhere.ReferralCode.EQ(null.StringFrom(referralCode))).One(s.Conn)

@@ -223,6 +223,7 @@ type UserStorer interface {
 	GetByVerifyToken(token string, txes ...*sql.Tx) (*db.User, error)
 	GetByResetToken(token string, txes ...*sql.Tx) (*db.User, error)
 	GetByEmail(email string, txes ...*sql.Tx) (*db.User, error)
+	GetByMobilePhone(mobilePhone string, txes ...*sql.Tx) (*db.User, error)
 	GetByReferralCode(referralCode string, txes ...*sql.Tx) (*db.User, error)
 	GetReferrals(refByID string, txes ...*sql.Tx) (db.ReferralSlice, error)
 	GetWalletHistory(userID string, txes ...*sql.Tx) (db.WalletTransactionSlice, error)

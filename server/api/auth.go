@@ -190,6 +190,14 @@ func (c *AuthController) register() func(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
+		// Verify email
+		d, _ := c.UserStore.GetByMobilePhone(input.MobilePhone)
+		if d != nil {
+			failedMsg := "Mobile number already registered, please try again."
+			RestResponse(w, r, http.StatusBadRequest, failedMsg)
+			return
+		}
+
 		// Verify role
 		roleUUID, err := uuid.FromString(input.RoleID)
 		if err != nil {
