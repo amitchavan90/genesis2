@@ -378,6 +378,24 @@ func (r *mutationResolver) ProductUpdate(ctx context.Context, id string, input g
 		return nil, terror.New(ErrArchived, "cannot update archived product")
 	}
 
+	if !p.SkuID.Valid && input.SkuID != nil {
+		skuUUID, _ := uuid.FromString(input.SkuID.String)
+		sku, err := r.SKUStore.Get(skuUUID)
+		if err != nil {
+			return nil, terror.New(err, "update product: no sku found")
+		}
+
+		if p.IsAppBound != sku.IsAppBound {
+			msg := fmt.Sprintf("Condition isAppBound didn't match. SKU isAppBound is %v", sku.IsAppBound)
+			return nil, terror.New(err, msg)
+		}
+
+		p.SkuID = null.StringFrom(sku.ID)
+		p.Description = sku.Description
+		p.IsPointBound = sku.IsPointBound
+		p.LoyaltyPoints = sku.LoyaltyPoints
+	}
+
 	// Update Product
 	if input.Description != nil {
 		p.Description = input.Description.String
@@ -442,13 +460,13 @@ func (r *mutationResolver) ProductUpdate(ctx context.Context, id string, input g
 			p.DistributorID = *input.DistributorID
 		}
 	}
-	if input.SkuID != nil {
-		if len(input.SkuID.String) <= 1 {
-			p.SkuID = null.StringFromPtr(nil)
-		} else {
-			p.SkuID = *input.SkuID
-		}
-	}
+	// if input.SkuID != nil {
+	// 	if len(input.SkuID.String) <= 1 {
+	// 		p.SkuID = null.StringFromPtr(nil)
+	// 	} else {
+	// 		p.SkuID = *input.SkuID
+	// 	}
+	// }
 	if input.ContractID != nil {
 		if len(input.ContractID.String) <= 1 {
 			p.ContractID = null.StringFromPtr(nil)
