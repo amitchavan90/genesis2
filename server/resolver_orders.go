@@ -91,6 +91,8 @@ func (r *mutationResolver) OrderCreate(ctx context.Context, input graphql.Create
 	}
 
 	// Get SKU
+	sku := &db.StockKeepingUnit{}
+	sku = nil
 	skuID := null.StringFromPtr(nil)
 	if input.SkuID != nil && input.SkuID.Valid {
 		skuUUID, err := uuid.FromString(input.SkuID.String)
@@ -98,10 +100,11 @@ func (r *mutationResolver) OrderCreate(ctx context.Context, input graphql.Create
 			return nil, terror.New(terror.ErrParse, "")
 		}
 
-		sku, err := r.SKUStore.Get(skuUUID)
+		dat, err := r.SKUStore.Get(skuUUID)
 		if err != nil {
 			return nil, terror.New(err, "get sku")
 		}
+		sku = dat
 		skuID = null.StringFrom(sku.ID)
 
 		input.IsAppBound = sku.IsAppBound
@@ -192,11 +195,19 @@ func (r *mutationResolver) OrderCreate(ctx context.Context, input graphql.Create
 			CreatedByID: user.ID,
 			OrderID:     null.StringFrom(created.ID),
 			SkuID:       skuID,
-			IsAppBound:  input.IsAppBound,
 		}
 
 		if input.ContractID != nil {
 			p.ContractID = *input.ContractID
+		}
+
+		if sku != nil {
+			p.SkuID = null.StringFrom(sku.ID)
+			p.Description = sku.Description
+			p.IsBeef = sku.IsBeef
+			p.IsAppBound = sku.IsAppBound
+			p.IsPointBound = sku.IsPointBound
+			p.LoyaltyPoints = sku.LoyaltyPoints
 		}
 
 		_, err = r.ProductStore.Insert(p, tx)
